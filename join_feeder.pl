@@ -73,11 +73,10 @@ logFileInformation(\@inputFiles, 'Input');
 # Global find/replace
 # globalFindReplace();
 
-# Update Output Rules
-# updateOutputRules();
+loadModel(\@inputFiles);
 
 # Log out warning if we couldn't find any files to load
-if (!@redpointSystemFiles > 0 && !@inputFiles > 0) {
+if (!@inputFiles > 0) {
   $partnerApps::logger->warn("No files were found to work on. You might want to check that out.");
 }
 
@@ -243,31 +242,33 @@ sub logFileInformation {
 # ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
-# Loop over list of package files and update any output rules that are found
-sub updateOutputRules {
+# Loop over list of package files and load model info
+sub loadModel {
+  my ($fileList) = @_;
   my $subName = (caller(0))[3];
 
-  if ($outputRuleList) {
+  # if ($outputRuleList) {
 
-    # Parse scalar list of output rules into an array
-    my @outputRules;
-    eval { @outputRules = Text::ParseWords::parse_line(',', 0, $outputRuleList); };    # Split list on comma
-    $partnerApps::logger->error_die(
-             "$subName Could not ParseWords outputRuleList: '$outputRuleList'." . "Error message from ParseWords: '$@'")
-      if $@;
+  # Parse scalar list of output rules into an array
+  # my @outputRules;
+  # eval { @outputRules = Text::ParseWords::parse_line(',', 0, $outputRuleList); };    # Split list on comma
+  # $partnerApps::logger->error_die(
+  #  "$subName Could not ParseWords outputRuleList: '$outputRuleList'." . "Error message from ParseWords: '$@'")
+  # if $@;
 
-    # Process the list of packages, one file at a time
-    for my $currentFilename (@redpointSystemFiles) { mungeOutputRules($currentFilename, @outputRules); }
-  } ## end if ($outputRuleList)
+  # Process the list of packages, one file at a time
+  for my $currentFilename (@$fileList) { loadModelFile($currentFilename); }
+
+  # } ## end if ($outputRuleList)
 
   return;
-} ## end sub updateOutputRules
+} ## end sub loadModel
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
 # Update output rules in a package
-sub mungeOutputRules {
-  my ($currentFilename, @outputRules) = @_;
+sub loadModelFile {
+  my ($currentFilename) = @_;
   my $subName = (caller(0))[3];
   my $XMLObj;    # Our XML Twig containing the package file contents
   my $fileUpdateCount = 0;    # Count of changes made to the package by this sub
@@ -278,63 +279,77 @@ sub mungeOutputRules {
   eval { $XMLObj = $partnerApps::twig->parsefile($currentFilename); };
   $partnerApps::logger->error(partnerApps::objConversionErrorMsgGenerator($@)) if $@;
 
-  # Climb down our XML tree and hunt for output rule lists to update
-  my $rpiFile = $XMLObj->root;
-  my $details = $rpiFile->first_child('details');
-  for my $fileStorageItem ($details->children('FileStorageItem')) {
-    my $innerDetails    = $fileStorageItem->first_child('Details');
-    my $innerDetailsObj = $innerDetails->first_child('obj');
-    for my $shr ($innerDetailsObj->children('shr')) {
-      for my $shrObj ($shr->children('obj')) {
-        my $shrObjID   = $shrObj->att("id");
-        my $shrObjName = $shrObj->att("name");
+  # Table name
+  # $partnerApps::logger->info("$XMLObj: " . partnerApps::Dumper($XMLObj));
+  # my $xmlRoot   = $XMLObj->root; # this will actually be Table I think
+  # my $table = $xmlRoot->first_child('Table');
+  my $table     = $XMLObj->root;
+  my $tableName = $table->att("name");
+  $partnerApps::logger->info("tableName" . partnerApps::Dumper($tableName));
 
-        # The output rules should live here if they exist
-        if ($shrObjID and lc($shrObjName) eq 'output_rule') {
-          if ($verbose) {
-            $partnerApps::logger->info("$subName Found output rule definition in [$currentFilename]");
-          }
-          my $shrObjP = $shrObj->first_child('p');
+  # really only care about the table names, guids and the index info for now
+  # as a stretch, grab everything so the full DDL can be generated
 
-          # Cleanup any old rules coming in except for the default rule
-          my $defaultOutputRuleValue = $shrObjP->att("dv");
-          for my $shrObjPcVL ($shrObjP->children('cVL')) {
-            if ($shrObjPcVL->att("cV") ne $defaultOutputRuleValue) {    # If the current value is not the default value
-              if ($verbose) {
-                $partnerApps::logger->info(
-                                         "$subName Deleting non-default output rule: [" . $shrObjPcVL->att("cV") . "]");
-              }
-              $shrObjPcVL->delete;                                      # Remove the output rule element
-              $fileUpdateCount++;                                       # Note that we made a file update
-            } ## end if ($shrObjPcVL->att("cV"...))
-          } ## end for my $shrObjPcVL ($shrObjP...)
+  # my $tableName = $XMLObj->root->first_child('Table');
+  # $partnerApps::logger->info("tableName" . partnerApps::Dumper($tableName));
 
-          # After deleting the old rules, install the ones we got from outputRuleList
-          for my $newOutputRule (@outputRules) {
-            if ($verbose) { $partnerApps::logger->info("$subName Adding output rule: [" . $newOutputRule . "]"); }
-            $shrObjP->insert_new_elt(qq(cVL cV="$newOutputRule" cVdt="System.String"));
-            $fileUpdateCount++;                                         # Note that we made a file update
-          }
-        } ## end if ($shrObjID and lc($shrObjName...))
-      } ## end for my $shrObj ($shr->children...)
-    } ## end for my $shr ($innerDetailsObj...)
-  } ## end for my $fileStorageItem...
+  # # Climb down our XML tree and hunt for output rule lists to update
+  # my $rpiFile = $XMLObj->root;
+  # my $details = $rpiFile->first_child('details');
+  # for my $fileStorageItem ($details->children('FileStorageItem')) {
+  #   my $innerDetails    = $fileStorageItem->first_child('Details');
+  #   my $innerDetailsObj = $innerDetails->first_child('obj');
+  #   for my $shr ($innerDetailsObj->children('shr')) {
+  #     for my $shrObj ($shr->children('obj')) {
+  #       my $shrObjID   = $shrObj->att("id");
+  #       my $shrObjName = $shrObj->att("name");
 
-  # Update the source file with the new contents if we had changes and not in testMode
-  if ($fileUpdateCount > 0) {
-    if (!$testMode) {
-      $partnerApps::logger->info("$subName Changes detected, updating [$currentFilename]");
-      partnerApps::createExportFile($XMLObj->sprint, $currentFilename, undef, $utfDisabled);
-    }
-    else {
-      $partnerApps::logger->info("$subName Running in testMode, skipping file update [$currentFilename]");
-    }
-  } ## end if ($fileUpdateCount >...)
+  #       # The output rules should live here if they exist
+  #       if ($shrObjID and lc($shrObjName) eq 'output_rule') {
+  #         if ($verbose) {
+  #           $partnerApps::logger->info("$subName Found output rule definition in [$currentFilename]");
+  #         }
+  #         my $shrObjP = $shrObj->first_child('p');
+
+#         # Cleanup any old rules coming in except for the default rule
+#         my $defaultOutputRuleValue = $shrObjP->att("dv");
+#         for my $shrObjPcVL ($shrObjP->children('cVL')) {
+#           if ($shrObjPcVL->att("cV") ne $defaultOutputRuleValue) {    # If the current value is not the default value
+#             if ($verbose) {
+#               $partnerApps::logger->info(
+#                                        "$subName Deleting non-default output rule: [" . $shrObjPcVL->att("cV") . "]");
+#             }
+#             $shrObjPcVL->delete;                                      # Remove the output rule element
+#             $fileUpdateCount++;                                       # Note that we made a file update
+#           } ## end if ($shrObjPcVL->att("cV"...))
+#         } ## end for my $shrObjPcVL ($shrObjP...)
+
+  #         # After deleting the old rules, install the ones we got from outputRuleList
+  #         for my $newOutputRule (@outputRules) {
+  #           if ($verbose) { $partnerApps::logger->info("$subName Adding output rule: [" . $newOutputRule . "]"); }
+  #           $shrObjP->insert_new_elt(qq(cVL cV="$newOutputRule" cVdt="System.String"));
+  #           $fileUpdateCount++;                                         # Note that we made a file update
+  #         }
+  #       } ## end if ($shrObjID and lc($shrObjName...))
+  #     } ## end for my $shrObj ($shr->children...)
+  #   } ## end for my $shr ($innerDetailsObj...)
+  # } ## end for my $fileStorageItem...
+
+  # # Update the source file with the new contents if we had changes and not in testMode
+  # if ($fileUpdateCount > 0) {
+  #   if (!$testMode) {
+  #     $partnerApps::logger->info("$subName Changes detected, updating [$currentFilename]");
+  #     partnerApps::createExportFile($XMLObj->sprint, $currentFilename, undef, $utfDisabled);
+  #   }
+  #   else {
+  #     $partnerApps::logger->info("$subName Running in testMode, skipping file update [$currentFilename]");
+  #   }
+  # } ## end if ($fileUpdateCount >...)
 
   if ($verbose) { $partnerApps::logger->info("$subName Complete: [$currentFilename]") }
 
   return;
-} ## end sub mungeOutputRules
+} ## end sub loadModelFile
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
