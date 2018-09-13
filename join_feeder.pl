@@ -283,9 +283,10 @@ sub loadModelFile {
   # $partnerApps::logger->info("$XMLObj: " . partnerApps::Dumper($XMLObj));
   # my $xmlRoot   = $XMLObj->root; # this will actually be Table I think
   # my $table = $xmlRoot->first_child('Table');
-  my $table     = $XMLObj->root;
-  my $tableName = $table->att("name");
-  $partnerApps::logger->info("tableName" . partnerApps::Dumper($tableName));
+  my $tableInfo = {};
+  my $tableXMLObj     = $XMLObj->root;
+  my $tableInfo->{tableName} = $tableXMLObj->att("name");
+  $partnerApps::logger->info("tableName" . partnerApps::Dumper($tableInfo));
 
   # really only care about the table names, guids and the index info for now
   # as a stretch, grab everything so the full DDL can be generated
