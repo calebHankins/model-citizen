@@ -161,20 +161,9 @@ sub loadModel {
   my ($fileList) = @_;
   my $subName = (caller(0))[3];
 
-  # if ($outputFile) {
-
-  # Parse scalar list of output rules into an array
-  # my @outputRules;
-  # eval { @outputRules = Text::ParseWords::parse_line(',', 0, $outputFile); };    # Split list on comma
-  # $partnerApps::logger->error_die(
-  #  "$subName Could not ParseWords outputFile: '$outputFile'." . "Error message from ParseWords: '$@'")
-  # if $@;
-
   # Process the list of packages, one file at a time
   my $tablesInfo = [];
   for my $currentFilename (@$fileList) { push(@$tablesInfo, loadModelFile($currentFilename)); }
-
-  # } ## end if ($outputFile)
 
   return $tablesInfo;
 } ## end sub loadModel
@@ -186,7 +175,6 @@ sub loadModelFile {
   my ($currentFilename) = @_;
   my $subName = (caller(0))[3];
   my $XMLObj;    # Our XML Twig containing the package file contents
-  my $fileUpdateCount = 0;    # Count of changes made to the package by this sub
 
   if ($verbose) { $partnerApps::logger->info("$subName Processing: [$currentFilename]") }
 
@@ -294,14 +282,17 @@ sub getSQL {
 # Generate sql from table info
 sub getColumnNameFromID {
   my ($tables, $columnID) = @_;
-  my $subName    = (caller(0))[3];
-  my $columnName = '';
+  my $subName = (caller(0))[3];
 
-  $columnName = "todo lookup name for $columnID ";    # todo
+  for my $table (@$tables) {
+    for my $column (@{$table->{columns}}) {
+      if ($column->{id} eq $columnID) { return $column->{name}; }
+    }
+  }
 
-  return $columnName;
-
+  return "ERR_COULD_NOT_RESOLVE_FIELD_NAME_FOR_ID_${columnID}";
 } ## end sub getColumnNameFromID
+##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
 # Podusage
