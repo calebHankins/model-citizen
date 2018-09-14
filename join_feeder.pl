@@ -252,8 +252,7 @@ sub loadModelFileTable () {
 
       # pk         => $index->first_child("pk")->inner_xml # this only sometimes exists
 
-      # looks like FKs don't have indexCoolumnUsage
-
+      # looks like FKs don't have indexColumnUsage
       if (defined $index->first_child("indexState")) {
         $indexInfo->{indexState} = $index->first_child("indexState")->inner_xml;
       }
