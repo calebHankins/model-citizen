@@ -218,9 +218,25 @@ sub loadModelFileTable () {
   my $columns = $tableXMLObj->first_child("columns");
   $tableInfo->{columns} = [];
   for my $column ($columns->children('Column')) {
-    $partnerApps::logger->info("column name:" . $column->att("name"));
-    push(@{$tableInfo->{columns}}, {name => $column->att("name"), id => $column->att("id")});
-  }
+
+    my $colInfo = {name => $column->att('name'), id => $column->att('id')};
+
+    if (defined $column->first_child('associations')) {
+      my $colAssociations = [];
+      for my $colAssociation ($column->first_child('associations')->children('colAssociation')) {
+        push(
+             @{$colAssociations},
+             {
+              fkAssociation  => $colAssociation->att('fkAssociation'),
+              referredColumn => $colAssociation->att('referredColumn')
+             }
+        );
+      } ## end for my $colAssociation ...
+      $colInfo->{associations} = $colAssociations;
+    } ## end if (defined $column->first_child...)
+
+    push(@{$tableInfo->{columns}}, $colInfo);
+  } ## end for my $column ($columns...)
 
   my $indexes = $tableXMLObj->first_child("indexes");
   if (defined $indexes) {
