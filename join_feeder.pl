@@ -70,7 +70,9 @@ my $tables = loadModel(\@inputFiles);
 
 my $sql = getSQL($tables);
 
-$partnerApps::logger->info("sql:$sql");
+# $partnerApps::logger->info("sql:$sql");
+
+if ($outputFile) { partnerApps::createExportFile($sql, $outputFile); }
 
 # $partnerApps::logger->info($partnerApps::json->encode($info)); # todo, debugging
 
