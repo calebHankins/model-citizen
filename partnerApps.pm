@@ -35,7 +35,7 @@ use Exporter qw(import);         # Implements default import method for modules
 
 our @EXPORT_OK = qw(
   Dumper import
-  $logger 
+  $logger
   $ua $xml $twig $json $verbose $fuseLogSafeOutput
   getFuseLogSafeOutput apiRespErrorMsgGenerator objConversionErrorMsgGenerator
   checkRequiredParm setLoginCredentials signOff
@@ -54,7 +54,7 @@ our @EXPORT_OK = qw(
 ##--------------------------------------------------------------------------
 # Create logger object
 # our $logger = ASC::Logger->new() or die "Cannot retrieve Logger object\n";
-use  Logger;
+use Logger;
 our $logger = Logger->new() or die "Cannot retrieve Logger object\n";
 ##--------------------------------------------------------------------------
 
@@ -256,25 +256,13 @@ sub buildPackageFileList {
     opendir($dh, $packageFilepath)
       or
       $logger->confess("$subName Could not open dir '$packageFilepath', exiting in error state. Error Message: '$!'");
-    while (my $file = readdir($dh))
-    {          # Open the directory and loop through all the entries looking for valid package files
+
+    # Open the directory and recursively loop through all the entries looking for valid package files
+    while (my $file = readdir($dh)) {
       chomp $file;
-      if ($file ~~ /^\.{1,2}$/) {next;} # Skip . and ..
+      if ($file ~~ /^\.{1,2}$/) { next; }    # Skip . and ..
       my $fullFile = $packageFilepath . '/' . $file;    # Construct full filepath
-      $logger->info("$subName $fullFile"); # todo, debug remove
-
-      # If this is a file, push it
-      # pushPackageFile(\@packageFiles, $fullFile, \@validPackageExts, $emptyFilesOk);
-
-      # Recurse
-      my @subDirFiles = buildPackageFileList($fullFile, $validPackageExts, $emptyFilesOk);
-      my $cntSubDir = @subDirFiles;
-      $logger->info("$subName cntSubDir count is now $cntSubDir"); # todo, debug remove
-      # @packageFiles = splice (@packageFiles, buildPackageFileList($fullFile, $validPackageExts, $emptyFilesOk));
-      push (@packageFiles,@subDirFiles); 
-      my $cnt = @packageFiles;
-      $logger->info("$subName packageFiles count is now $cnt"); # todo, debug remove
-
+      push(@packageFiles, buildPackageFileList($fullFile, $validPackageExts, $emptyFilesOk));
     } ## end while (my $file = readdir...)
     closedir($dh);
   } ## end elsif (-d $packageFilepath...)
