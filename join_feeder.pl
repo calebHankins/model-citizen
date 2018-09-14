@@ -33,6 +33,7 @@ STDERR->autoflush(1);
 # User options that we'll set using GetOptions()
 my $packageFilepath   = cwd();    # Default dir to current working dir if no path is specified
 my $outputFile        = '';
+my $outputFileJSON    = '';
 my $globalFindReplace = '';
 my $preserveQuotes    = '';       # Default to stripping quotes from find/replace strings
 my $utfDisabled       = '';       # Default to creating files with encoding(UTF-8)
@@ -43,6 +44,7 @@ my $verbose           = '';
 my $rc = GetOptions(
   'f|packageFilepath=s'   => \$packageFilepath,
   'o|outputFile=s'        => \$outputFile,
+  'outputFileJSON=s'      => \$outputFileJSON,
   'g|globalFindReplace=s' => \$globalFindReplace,
   'p|preserveQuotes'      => \$preserveQuotes,
   'utfDisabled'           => \$utfDisabled,
@@ -66,10 +68,10 @@ logScriptConfig();
 my @inputFiles = partnerApps::buildPackageFileList($packageFilepath, '.xml');
 logFileInformation(\@inputFiles, 'Input');
 
-my $tables = loadModel(\@inputFiles);
+my $model = loadModel(\@inputFiles);
+if ($outputFileJSON) { partnerApps::createExportFile($partnerApps::json->encode($model), $outputFileJSON); }
 
-my $sql = getSQL($tables);
-
+my $sql = getSQL($model);
 if ($outputFile) { partnerApps::createExportFile($sql, $outputFile); }
 
 # $partnerApps::logger->info($partnerApps::json->encode($info)); # todo, debugging
