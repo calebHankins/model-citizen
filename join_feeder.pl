@@ -205,16 +205,15 @@ sub loadModelFile {
     $partnerApps::logger->info("index name:" . $index->att("name"));
 
     # my $indexInfo = {};
-    my $indexInfo = {
-                     name       => $index->att("name"),
-                     id         => $index->att("id"),
-                     indexState => $index->first_child("indexState")->inner_xml,
-    };
+    my $indexInfo = {name => $index->att("name"), id => $index->att("id")};
 
     # pk         => $index->first_child("pk")->inner_xml # this only sometimes exists
 
     # looks like FKs don't have indexCoolumnUsage
 
+    if (defined $index->first_child("indexState")) {
+      $indexInfo->{indexState} = $index->first_child("indexState")->inner_xml;
+    }
     if (defined $index->first_child("pk")) { $indexInfo->{pk} = $index->first_child("pk")->inner_xml; }
     if (defined $index->first_child("indexColumnUsage")) {
       my $indexColumnUsage = [];
