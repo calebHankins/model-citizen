@@ -301,15 +301,21 @@ sub loadModelFile {
   for my $index ($indexes->children('ind_PK_UK')) {
     $partnerApps::logger->info("index name:" . $index->att("name"));
 
+    # my $indexInfo = {};
+    my $indexInfo = {
+                     name       => $index->att("name"),
+                     id         => $index->att("id"),
+                     indexState => $index->first_child("indexState")->inner_xml,
+    };
+
+    # pk         => $index->first_child("pk")->inner_xml # this only sometimes exists
+
+    # looks like FKs don't have indexCoolumnUsage
+
+    if (defined $index->first_child("pk")) { $indexInfo->{pk} = $index->first_child("pk")->inner_xml; }
+
     # $partnerApps::logger->info(partnerApps::Dumper($index));
-    push(
-         $tableInfo->{indexes},
-         {
-          name       => $index->att("name"),
-          id         => $index->att("id"),
-          indexState => $index->first_child("indexState")->inner_xml
-         }
-    );
+    push($tableInfo->{indexes}, $indexInfo);
   } ## end for my $index ($indexes...)
 
   $partnerApps::logger->info("tableName" . partnerApps::Dumper($tableInfo));
