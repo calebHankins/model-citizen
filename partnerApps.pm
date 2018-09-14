@@ -259,8 +259,15 @@ sub buildPackageFileList {
     while (my $file = readdir($dh))
     {          # Open the directory and loop through all the entries looking for valid package files
       chomp $file;
+      if ($file ~~ /^\.{1,2}$/) {next;} # Skip . and ..
       my $fullFile = $packageFilepath . '/' . $file;    # Construct full filepath
-      pushPackageFile(\@packageFiles, $fullFile, \@validPackageExts, $emptyFilesOk);
+      $logger->info("$subName $fullFile"); # todo, debug remove
+
+      # If this is a file, push it
+      # pushPackageFile(\@packageFiles, $fullFile, \@validPackageExts, $emptyFilesOk);
+
+      # Recurse
+      @packageFiles = splice (@packageFiles, buildPackageFileList($fullFile, $validPackageExts, $emptyFilesOk));
     } ## end while (my $file = readdir...)
     closedir($dh);
   } ## end elsif (-d $packageFilepath...)

@@ -63,16 +63,17 @@ sanityCheckOptions();
 logScriptConfig();
 
 # Construct a list of files to munge and log file details
-my @inputFiles = partnerApps::buildPackageFileList($packageFilepath, '.*');
+my @inputFiles = partnerApps::buildPackageFileList($packageFilepath, '.xml');
 logFileInformation(\@inputFiles, 'Input');
 
-my $tables = loadModel(\@inputFiles);
+sub todo () {
 
-my $sql = getSQL($tables);
+  my $tables = loadModel(\@inputFiles);
 
-# $partnerApps::logger->info("sql:$sql");
+  my $sql = getSQL($tables);
 
-if ($outputFile) { partnerApps::createExportFile($sql, $outputFile); }
+  if ($outputFile) { partnerApps::createExportFile($sql, $outputFile); }
+} ## end sub todo
 
 # $partnerApps::logger->info($partnerApps::json->encode($info)); # todo, debugging
 
@@ -184,6 +185,8 @@ sub loadModelFile {
   eval { $XMLObj = $partnerApps::twig->parsefile($currentFilename); };
   $partnerApps::logger->error(partnerApps::objConversionErrorMsgGenerator($@)) if $@;
 
+  # todo, need to add a split here for fk vs table files
+
   # Table name
   # $partnerApps::logger->info("$XMLObj: " . partnerApps::Dumper($XMLObj));
   # my $xmlRoot   = $XMLObj->root; # this will actually be Table I think
@@ -257,7 +260,7 @@ sub getSQL {
         for my $columnID (@{$index->{indexColumnUsage}}) {
           $partnerApps::logger->info("  columnID:" . $columnID);
           push(@$columnNames, getColumnNameFromID($tables, $columnID));
-        } ## end for my $columnID (@{$index...})
+        }
         $partnerApps::logger->info("  column names for index:" . $partnerApps::json->encode($columnNames));
         my $fieldList = join ',', @$columnNames;
         $sql .= qq{
@@ -285,6 +288,8 @@ sub getColumnNameFromID {
     }
   }
 
+  my $error = "ERR_COULD_NOT_RESOLVE_FIELD_NAME_FOR_ID_${columnID}";
+  $partnerApps::logger->error("$subName $error");
   return "ERR_COULD_NOT_RESOLVE_FIELD_NAME_FOR_ID_${columnID}";
 } ## end sub getColumnNameFromID
 ##---------------------------------------------------------------------------
