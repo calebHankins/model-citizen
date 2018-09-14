@@ -267,7 +267,14 @@ sub buildPackageFileList {
       # pushPackageFile(\@packageFiles, $fullFile, \@validPackageExts, $emptyFilesOk);
 
       # Recurse
-      @packageFiles = splice (@packageFiles, buildPackageFileList($fullFile, $validPackageExts, $emptyFilesOk));
+      my @subDirFiles = buildPackageFileList($fullFile, $validPackageExts, $emptyFilesOk);
+      my $cntSubDir = @subDirFiles;
+      $logger->info("$subName cntSubDir count is now $cntSubDir"); # todo, debug remove
+      # @packageFiles = splice (@packageFiles, buildPackageFileList($fullFile, $validPackageExts, $emptyFilesOk));
+      push (@packageFiles,@subDirFiles); 
+      my $cnt = @packageFiles;
+      $logger->info("$subName packageFiles count is now $cnt"); # todo, debug remove
+
     } ## end while (my $file = readdir...)
     closedir($dh);
   } ## end elsif (-d $packageFilepath...)
