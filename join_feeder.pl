@@ -300,10 +300,15 @@ sub loadModelFile {
   $tableInfo->{indexes} = [];
   for my $index ($indexes->children('ind_PK_UK')) {
     $partnerApps::logger->info("index name:" . $index->att("name"));
+
     # $partnerApps::logger->info(partnerApps::Dumper($index));
     push(
          $tableInfo->{indexes},
-         {name => $index->att("name"), id => $index->att("id"), indexState => $index->first_child("indexState")->inner_xml }
+         {
+          name       => $index->att("name"),
+          id         => $index->att("id"),
+          indexState => $index->first_child("indexState")->inner_xml
+         }
     );
   } ## end for my $index ($indexes...)
 
