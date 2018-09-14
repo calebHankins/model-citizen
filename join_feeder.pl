@@ -246,8 +246,6 @@ sub getSQL {
   my $sql = '';
 
   for my $table (@$tables) {
-
-    # push(@$tablesInfo, loadModelFile($currentFilename));
     $partnerApps::logger->info("table name:" . $table->{name});
     for my $index (@{$table->{indexes}}) {
       $partnerApps::logger->info("index name:" . $index->{name});
@@ -258,11 +256,7 @@ sub getSQL {
         # look up this index's column names using the guids in indexColumnUsage
         for my $columnID (@{$index->{indexColumnUsage}}) {
           $partnerApps::logger->info("  columnID:" . $columnID);
-
           push(@$columnNames, getColumnNameFromID($tables, $columnID));
-
-          # for each of these ids, pull back the column name
-
         } ## end for my $columnID (@{$index...})
         $partnerApps::logger->info("  column names for index:" . $partnerApps::json->encode($columnNames));
         my $fieldList = join ',', @$columnNames;
