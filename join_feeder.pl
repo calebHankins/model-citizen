@@ -313,6 +313,13 @@ sub loadModelFile {
     # looks like FKs don't have indexCoolumnUsage
 
     if (defined $index->first_child("pk")) { $indexInfo->{pk} = $index->first_child("pk")->inner_xml; }
+    if (defined $index->first_child("indexColumnUsage")) {
+      my $indexColumnUsage = [];
+      for my $colUsage ($index->first_child("indexColumnUsage")->children('colUsage')) {
+        push(@$indexColumnUsage, $colUsage->att("columnID"));
+      }
+      $indexInfo->{indexColumnUsage} = $indexColumnUsage;
+    } ## end if (defined $index->first_child...)
 
     # $partnerApps::logger->info(partnerApps::Dumper($index));
     push($tableInfo->{indexes}, $indexInfo);
