@@ -183,13 +183,15 @@ sub loadModelFile {
   eval { $XMLObj = $partnerApps::twig->parsefile($currentFilename); };
   $partnerApps::logger->error(partnerApps::objConversionErrorMsgGenerator($@)) if $@;
 
-  # Handle files based on type
+  # Handle files based on type. Could also do this based on internal metadata in the file instead of the path
   my $fileType = '';
-  if   ($currentFilename ~~ /table/) { $fileType = 'table'; }
-  else                               { $fileType = 'unknown/'; }
+  if    ($currentFilename ~~ /table/)      { $fileType = 'table'; }
+  elsif ($currentFilename ~~ /foreignkey/) { $fileType = 'foreignkey'; }
+  else                                     { $fileType = 'unknown'; }
   $partnerApps::logger->info("$subName detected as a $fileType fileType: [$currentFilename]");
 
-  if ($fileType eq 'table') { $modelFile = loadModelFileTable($XMLObj); }
+  if ($fileType eq 'table')      { $modelFile = loadModelFileTable($XMLObj); }
+  if ($fileType eq 'foreignkey') { $modelFile = loadModelFileForeignKey($XMLObj); }
 
   if ($verbose) { $partnerApps::logger->info("$subName Complete: [$currentFilename]") }
 
@@ -208,6 +210,7 @@ sub loadModelFileTable () {
   # my $table = $xmlRoot->first_child('Table');
   my $tableInfo   = {};
   my $tableXMLObj = $XMLObj->root;
+  $tableInfo->{type} = 'table';
   $tableInfo->{name} = $tableXMLObj->att("name");
   $tableInfo->{id}   = $tableXMLObj->att("id");
 
@@ -220,37 +223,65 @@ sub loadModelFileTable () {
   }
 
   my $indexes = $tableXMLObj->first_child("indexes");
-  $tableInfo->{indexes} = [];
-  for my $index ($indexes->children('ind_PK_UK')) {
-    $partnerApps::logger->info("index name:" . $index->att("name"));
+  if (defined $indexes) {
 
-    # my $indexInfo = {};
-    my $indexInfo = {name => $index->att("name"), id => $index->att("id")};
+    $tableInfo->{indexes} = [];
+    for my $index ($indexes->children('ind_PK_UK')) {
+      $partnerApps::logger->info("index name:" . $index->att("name"));
 
-    # pk         => $index->first_child("pk")->inner_xml # this only sometimes exists
+      # my $indexInfo = {};
+      my $indexInfo = {name => $index->att("name"), id => $index->att("id")};
 
-    # looks like FKs don't have indexCoolumnUsage
+      # pk         => $index->first_child("pk")->inner_xml # this only sometimes exists
 
-    if (defined $index->first_child("indexState")) {
-      $indexInfo->{indexState} = $index->first_child("indexState")->inner_xml;
-    }
-    if (defined $index->first_child("pk")) { $indexInfo->{pk} = $index->first_child("pk")->inner_xml; }
-    if (defined $index->first_child("indexColumnUsage")) {
-      my $indexColumnUsage = [];
-      for my $colUsage ($index->first_child("indexColumnUsage")->children('colUsage')) {
-        push(@$indexColumnUsage, $colUsage->att("columnID"));
+      # looks like FKs don't have indexCoolumnUsage
+
+      if (defined $index->first_child("indexState")) {
+        $indexInfo->{indexState} = $index->first_child("indexState")->inner_xml;
       }
-      $indexInfo->{indexColumnUsage} = $indexColumnUsage;
-    } ## end if (defined $index->first_child...)
+      if (defined $index->first_child("pk")) { $indexInfo->{pk} = $index->first_child("pk")->inner_xml; }
+      if (defined $index->first_child("indexColumnUsage")) {
+        my $indexColumnUsage = [];
+        for my $colUsage ($index->first_child("indexColumnUsage")->children('colUsage')) {
+          push(@$indexColumnUsage, $colUsage->att("columnID"));
+        }
+        $indexInfo->{indexColumnUsage} = $indexColumnUsage;
+      } ## end if (defined $index->first_child...)
 
-    # $partnerApps::logger->info(partnerApps::Dumper($index));
-    push(@{$tableInfo->{indexes}}, $indexInfo);
-  } ## end for my $index ($indexes...)
+      # $partnerApps::logger->info(partnerApps::Dumper($index));
+      push(@{$tableInfo->{indexes}}, $indexInfo);
+    } ## end for my $index ($indexes...)
+  } ## end if (defined $indexes)
 
   $partnerApps::logger->info("tableName" . partnerApps::Dumper($tableInfo));
 
   return $tableInfo;
 } ## end sub loadModelFileTable
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+sub loadModelFileForeignKey () {
+  my ($XMLObj) = @_;
+  my $subName = (caller(0))[3];
+
+  my $fkInfo   = {};
+  my $fkXMLObj = $XMLObj->root;
+  $fkInfo->{type}      = 'foreignkey';
+  $fkInfo->{name}      = $fkXMLObj->att("name");
+  $fkInfo->{id}        = $fkXMLObj->att("id");
+  $fkInfo->{keyObject} = $fkXMLObj->first_child("keyObject")->inner_xml;
+
+  if (defined $fkXMLObj->first_child("containerWithKeyObject")) {
+    $fkInfo->{containerWithKeyObject} = $fkXMLObj->first_child("containerWithKeyObject")->inner_xml;
+  }
+  if (defined $fkXMLObj->first_child("localFKIndex")) {
+    $fkInfo->{localFKIndex} = $fkXMLObj->first_child("localFKIndex")->inner_xml;
+  }
+
+  if ($verbose) { $partnerApps::logger->info("fkName" . partnerApps::Dumper($fkInfo)); }
+
+  return $fkInfo;
+} ## end sub loadModelFileForeignKey
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
