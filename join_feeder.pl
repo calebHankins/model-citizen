@@ -32,7 +32,7 @@ STDERR->autoflush(1);
 
 # User options that we'll set using GetOptions()
 my $packageFilepath   = cwd();    # Default dir to current working dir if no path is specified
-my $outputFile    = '';
+my $outputFile        = '';
 my $globalFindReplace = '';
 my $preserveQuotes    = '';       # Default to stripping quotes from find/replace strings
 my $utfDisabled       = '';       # Default to creating files with encoding(UTF-8)
@@ -42,7 +42,7 @@ my $verbose           = '';
 
 my $rc = GetOptions(
   'f|packageFilepath=s'   => \$packageFilepath,
-  'o|outputFile=s'    => \$outputFile,
+  'o|outputFile=s'        => \$outputFile,
   'g|globalFindReplace=s' => \$globalFindReplace,
   'p|preserveQuotes'      => \$preserveQuotes,
   'utfDisabled'           => \$utfDisabled,
@@ -74,6 +74,8 @@ logFileInformation(\@inputFiles, 'Input');
 # globalFindReplace();
 
 my $tables = loadModel(\@inputFiles);
+
+my $sql = getSQL($tables);
 
 # $partnerApps::logger->info($partnerApps::json->encode($info)); # todo, debugging
 
@@ -159,7 +161,7 @@ sub logFileInformation {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
-# Loop over list of package files and load model info
+# Loop over list of model files and load model info
 sub loadModel {
   my ($fileList) = @_;
   my $subName = (caller(0))[3];
@@ -184,7 +186,7 @@ sub loadModel {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
-# Update output rules in a package
+# load a model file
 sub loadModelFile {
   my ($currentFilename) = @_;
   my $subName = (caller(0))[3];
@@ -249,6 +251,38 @@ sub loadModelFile {
 
   return $tableInfo;
 } ## end sub loadModelFile
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Generate sql from table info
+sub getSQL {
+  my ($tables) = @_;
+
+  my $sql = '';
+
+  for my $table (@$tables) {
+
+    # push(@$tablesInfo, loadModelFile($currentFilename));
+    $partnerApps::logger->info("table name:" . $table->{name});
+    for my $index (@{$table->{indexes}}) {
+      $partnerApps::logger->info("index name:" . $index->{name});
+      if (defined $index->{pk}) {
+        $partnerApps::logger->info("index:" . $index->{name} . " detected as a pk");
+
+        # look up this index's column names using the guids in indexColumnUsage
+        for my $columnID (@{$index->{indexColumnUsage}}) {
+          $partnerApps::logger->info("  columnID:" . $columnID);
+
+          # for each of these ids, pull back the column name
+
+        } ## end for my $columnID (@{$index...})
+      } ## end if (defined $index->{pk...})
+    } ## end for my $index (@{$table...})
+  } ## end for my $table (@$tables)
+
+  return $sql;
+
+} ## end sub getSQL
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
