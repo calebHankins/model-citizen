@@ -283,10 +283,33 @@ sub loadModelFile {
   # $partnerApps::logger->info("$XMLObj: " . partnerApps::Dumper($XMLObj));
   # my $xmlRoot   = $XMLObj->root; # this will actually be Table I think
   # my $table = $xmlRoot->first_child('Table');
-  my $tableInfo = {};
-  my $tableXMLObj     = $XMLObj->root;
-  my $tableInfo->{tableName} = $tableXMLObj->att("name");
+  my $tableInfo   = {};
+  my $tableXMLObj = $XMLObj->root;
+  $tableInfo->{name} = $tableXMLObj->att("name");
+  $tableInfo->{id}   = $tableXMLObj->att("id");
+
+  #  $partnerApps::logger->info("columns:" . partnerApps::Dumper($columns));
+  my $columns = $tableXMLObj->first_child("columns");
+  $tableInfo->{columns} = [];
+  for my $column ($columns->children('Column')) {
+    $partnerApps::logger->info("column name:" . $column->att("name"));
+    push($tableInfo->{columns}, {name => $column->att("name"), id => $column->att("id")});
+  }
+
+  my $indexes = $tableXMLObj->first_child("indexes");
+  $tableInfo->{indexes} = [];
+  for my $index ($indexes->children('ind_PK_UK')) {
+    $partnerApps::logger->info("index name:" . $index->att("name"));
+    # $partnerApps::logger->info(partnerApps::Dumper($index));
+    push(
+         $tableInfo->{indexes},
+         {name => $index->att("name"), id => $index->att("id"), indexState => $index->first_child("indexState")->inner_xml }
+    );
+  } ## end for my $index ($indexes...)
+
   $partnerApps::logger->info("tableName" . partnerApps::Dumper($tableInfo));
+
+  # todo, looks like these datatypes are doing to have to be translated
 
   # really only care about the table names, guids and the index info for now
   # as a stretch, grab everything so the full DDL can be generated
@@ -312,7 +335,7 @@ sub loadModelFile {
   #         }
   #         my $shrObjP = $shrObj->first_child('p');
 
-#         # Cleanup any old rules coming in except for the default rule
+#           # Cleanup any old rules coming in except for the default rule
 #         my $defaultOutputRuleValue = $shrObjP->att("dv");
 #         for my $shrObjPcVL ($shrObjP->children('cVL')) {
 #           if ($shrObjPcVL->att("cV") ne $defaultOutputRuleValue) {    # If the current value is not the default value
