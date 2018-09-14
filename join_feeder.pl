@@ -32,7 +32,7 @@ STDERR->autoflush(1);
 
 # User options that we'll set using GetOptions()
 my $packageFilepath   = cwd();    # Default dir to current working dir if no path is specified
-my $outputRuleList    = '';
+my $outputFile    = '';
 my $globalFindReplace = '';
 my $preserveQuotes    = '';       # Default to stripping quotes from find/replace strings
 my $utfDisabled       = '';       # Default to creating files with encoding(UTF-8)
@@ -42,7 +42,7 @@ my $verbose           = '';
 
 my $rc = GetOptions(
   'f|packageFilepath=s'   => \$packageFilepath,
-  'o|outputRuleList=s'    => \$outputRuleList,
+  'o|outputFile=s'    => \$outputFile,
   'g|globalFindReplace=s' => \$globalFindReplace,
   'p|preserveQuotes'      => \$preserveQuotes,
   'utfDisabled'           => \$utfDisabled,
@@ -73,7 +73,9 @@ logFileInformation(\@inputFiles, 'Input');
 # Global find/replace
 # globalFindReplace();
 
-loadModel(\@inputFiles);
+my $tables = loadModel(\@inputFiles);
+
+# $partnerApps::logger->info($partnerApps::json->encode($info)); # todo, debugging
 
 # Log out warning if we couldn't find any files to load
 if (!@inputFiles > 0) {
@@ -121,7 +123,7 @@ sub logScriptConfig {
   $partnerApps::logger->info("  script path:             [$0]");
   $partnerApps::logger->info("  packageFilepath:         [$packageFilepath]");
   $partnerApps::logger->info("  globalFindReplace:       [$globalFindReplace]");
-  $partnerApps::logger->info("  outputRuleList:          [$outputRuleList]");
+  $partnerApps::logger->info("  outputFile:          [$outputFile]");
   $utfDisabled
     ? $partnerApps::logger->info("  utf Encoding:            [Disabled]")
     : $partnerApps::logger->info("  utf Encoding:            [Enabled]");
@@ -162,21 +164,22 @@ sub loadModel {
   my ($fileList) = @_;
   my $subName = (caller(0))[3];
 
-  # if ($outputRuleList) {
+  # if ($outputFile) {
 
   # Parse scalar list of output rules into an array
   # my @outputRules;
-  # eval { @outputRules = Text::ParseWords::parse_line(',', 0, $outputRuleList); };    # Split list on comma
+  # eval { @outputRules = Text::ParseWords::parse_line(',', 0, $outputFile); };    # Split list on comma
   # $partnerApps::logger->error_die(
-  #  "$subName Could not ParseWords outputRuleList: '$outputRuleList'." . "Error message from ParseWords: '$@'")
+  #  "$subName Could not ParseWords outputFile: '$outputFile'." . "Error message from ParseWords: '$@'")
   # if $@;
 
   # Process the list of packages, one file at a time
-  for my $currentFilename (@$fileList) { loadModelFile($currentFilename); }
+  my $tablesInfo = [];
+  for my $currentFilename (@$fileList) { push(@$tablesInfo, loadModelFile($currentFilename)); }
 
-  # } ## end if ($outputRuleList)
+  # } ## end if ($outputFile)
 
-  return;
+  return $tablesInfo;
 } ## end sub loadModel
 ##---------------------------------------------------------------------------
 
@@ -242,70 +245,9 @@ sub loadModelFile {
 
   $partnerApps::logger->info("tableName" . partnerApps::Dumper($tableInfo));
 
-  # todo, looks like these datatypes are doing to have to be translated
-
-  # really only care about the table names, guids and the index info for now
-  # as a stretch, grab everything so the full DDL can be generated
-
-  # my $tableName = $XMLObj->root->first_child('Table');
-  # $partnerApps::logger->info("tableName" . partnerApps::Dumper($tableName));
-
-  # # Climb down our XML tree and hunt for output rule lists to update
-  # my $rpiFile = $XMLObj->root;
-  # my $details = $rpiFile->first_child('details');
-  # for my $fileStorageItem ($details->children('FileStorageItem')) {
-  #   my $innerDetails    = $fileStorageItem->first_child('Details');
-  #   my $innerDetailsObj = $innerDetails->first_child('obj');
-  #   for my $shr ($innerDetailsObj->children('shr')) {
-  #     for my $shrObj ($shr->children('obj')) {
-  #       my $shrObjID   = $shrObj->att("id");
-  #       my $shrObjName = $shrObj->att("name");
-
-  #       # The output rules should live here if they exist
-  #       if ($shrObjID and lc($shrObjName) eq 'output_rule') {
-  #         if ($verbose) {
-  #           $partnerApps::logger->info("$subName Found output rule definition in [$currentFilename]");
-  #         }
-  #         my $shrObjP = $shrObj->first_child('p');
-
-#           # Cleanup any old rules coming in except for the default rule
-#         my $defaultOutputRuleValue = $shrObjP->att("dv");
-#         for my $shrObjPcVL ($shrObjP->children('cVL')) {
-#           if ($shrObjPcVL->att("cV") ne $defaultOutputRuleValue) {    # If the current value is not the default value
-#             if ($verbose) {
-#               $partnerApps::logger->info(
-#                                        "$subName Deleting non-default output rule: [" . $shrObjPcVL->att("cV") . "]");
-#             }
-#             $shrObjPcVL->delete;                                      # Remove the output rule element
-#             $fileUpdateCount++;                                       # Note that we made a file update
-#           } ## end if ($shrObjPcVL->att("cV"...))
-#         } ## end for my $shrObjPcVL ($shrObjP...)
-
-  #         # After deleting the old rules, install the ones we got from outputRuleList
-  #         for my $newOutputRule (@outputRules) {
-  #           if ($verbose) { $partnerApps::logger->info("$subName Adding output rule: [" . $newOutputRule . "]"); }
-  #           $shrObjP->insert_new_elt(qq(cVL cV="$newOutputRule" cVdt="System.String"));
-  #           $fileUpdateCount++;                                         # Note that we made a file update
-  #         }
-  #       } ## end if ($shrObjID and lc($shrObjName...))
-  #     } ## end for my $shrObj ($shr->children...)
-  #   } ## end for my $shr ($innerDetailsObj...)
-  # } ## end for my $fileStorageItem...
-
-  # # Update the source file with the new contents if we had changes and not in testMode
-  # if ($fileUpdateCount > 0) {
-  #   if (!$testMode) {
-  #     $partnerApps::logger->info("$subName Changes detected, updating [$currentFilename]");
-  #     partnerApps::createExportFile($XMLObj->sprint, $currentFilename, undef, $utfDisabled);
-  #   }
-  #   else {
-  #     $partnerApps::logger->info("$subName Running in testMode, skipping file update [$currentFilename]");
-  #   }
-  # } ## end if ($fileUpdateCount >...)
-
   if ($verbose) { $partnerApps::logger->info("$subName Complete: [$currentFilename]") }
 
-  return;
+  return $tableInfo;
 } ## end sub loadModelFile
 ##---------------------------------------------------------------------------
 
@@ -331,7 +273,7 @@ partnerApps_generify.pl - Make environment specific files generic or vice versa
  Options:
     f|packageFilepath           String. Directory path where package file(s) live. Defaults to current working directory.
     g|globalFindReplace         String. Global Find and Replace. If any left hand side entry in this colon separated, comma delimited find/replace list is found, replace it with the right side colon entry.
-    o|outputRuleList            String. Comma delimited list of Output Rules to install into relevant packages.
+    o|outputFile            String. Comma delimited list of Output Rules to install into relevant packages.
     p|preserveQuotes            Flag. If set, quotes and backslashes are not removed from find/replace strings.
     utfDisabled                 Flag. If set, disables creating files with encoding(UTF-8).
     fuseLogSafeOutput           0 or 1. If 1, encodes HTML entities in logs so they can be displayed in the fuse web log viewer properly. Defaults to 1.
@@ -342,7 +284,7 @@ partnerApps_generify.pl - Make environment specific files generic or vice versa
 
 =head1 EXAMPLES
 
-  partnerApps_generify.pl  --packageFilepath '~/partnerAppsPackages/generify/' --outputRuleList 'ACXIOM_INTERNAL,PRINT_SHOP' --globalFindReplace '#DB_HOST#:SCHEMA_GOES_HERE,\/redpoint_output_dev:DETECT_LOCATION_SOURCE_PATH_GOES_HERE'
+  partnerApps_generify.pl  --packageFilepath '~/partnerAppsPackages/generify/' --outputFile 'ACXIOM_INTERNAL,PRINT_SHOP' --globalFindReplace '#DB_HOST#:SCHEMA_GOES_HERE,\/redpoint_output_dev:DETECT_LOCATION_SOURCE_PATH_GOES_HERE'
 
 =cut
 ##---------------------------------------------------------------------------
