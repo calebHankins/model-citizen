@@ -216,7 +216,7 @@ sub loadModelFileTable () {
   $tableInfo->{columns} = [];
   for my $column ($columns->children('Column')) {
     $partnerApps::logger->info("column name:" . $column->att("name"));
-    push($tableInfo->{columns}, {name => $column->att("name"), id => $column->att("id")});
+    push(@{$tableInfo->{columns}}, {name => $column->att("name"), id => $column->att("id")});
   }
 
   my $indexes = $tableXMLObj->first_child("indexes");
@@ -244,7 +244,7 @@ sub loadModelFileTable () {
     } ## end if (defined $index->first_child...)
 
     # $partnerApps::logger->info(partnerApps::Dumper($index));
-    push($tableInfo->{indexes}, $indexInfo);
+    push(@{$tableInfo->{indexes}}, $indexInfo);
   } ## end for my $index ($indexes...)
 
   $partnerApps::logger->info("tableName" . partnerApps::Dumper($tableInfo));
