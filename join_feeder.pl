@@ -66,16 +66,11 @@ logScriptConfig();
 my @inputFiles = partnerApps::buildPackageFileList($packageFilepath, '.*');
 logFileInformation(\@inputFiles, 'Input');
 
-# Construct a list of RedPoint system files and log file details. These have some extended functionality
-# my @redpointSystemFiles = partnerApps::buildPackageFileList($packageFilepath, '.rpf');
-# if (@redpointSystemFiles) { logFileInformation(\@redpointSystemFiles, 'Redpoint System'); }
-
-# Global find/replace
-# globalFindReplace();
-
 my $tables = loadModel(\@inputFiles);
 
 my $sql = getSQL($tables);
+
+$partnerApps::logger->info("sql:$sql");
 
 # $partnerApps::logger->info($partnerApps::json->encode($info)); # todo, debugging
 
@@ -257,6 +252,7 @@ sub loadModelFile {
 # Generate sql from table info
 sub getSQL {
   my ($tables) = @_;
+  my $subName = (caller(0))[3];
 
   my $sql = '';
 
@@ -268,14 +264,23 @@ sub getSQL {
       $partnerApps::logger->info("index name:" . $index->{name});
       if (defined $index->{pk}) {
         $partnerApps::logger->info("index:" . $index->{name} . " detected as a pk");
+        my $columnNames = [];
 
         # look up this index's column names using the guids in indexColumnUsage
         for my $columnID (@{$index->{indexColumnUsage}}) {
           $partnerApps::logger->info("  columnID:" . $columnID);
 
+          push(@$columnNames, getColumnNameFromID($tables, $columnID));
+
           # for each of these ids, pull back the column name
 
         } ## end for my $columnID (@{$index...})
+        $partnerApps::logger->info("  column names for index:" . $partnerApps::json->encode($columnNames));
+        my $fieldList = join ',', @$columnNames;
+        $sql .= qq{
+      ALTER TABLE $table->{name}     
+      ADD CONSTRAINT $index->{name} PRIMARY KEY ( $fieldList );
+      };
       } ## end if (defined $index->{pk...})
     } ## end for my $index (@{$table...})
   } ## end for my $table (@$tables)
@@ -284,6 +289,19 @@ sub getSQL {
 
 } ## end sub getSQL
 ##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Generate sql from table info
+sub getColumnNameFromID {
+  my ($tables, $columnID) = @_;
+  my $subName    = (caller(0))[3];
+  my $columnName = '';
+
+  $columnName = "todo lookup name for $columnID ";    # todo
+
+  return $columnName;
+
+} ## end sub getColumnNameFromID
 
 ##---------------------------------------------------------------------------
 # Podusage
