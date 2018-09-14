@@ -175,6 +175,7 @@ sub loadModelFile {
   my ($currentFilename) = @_;
   my $subName = (caller(0))[3];
   my $XMLObj;    # Our XML Twig containing the package file contents
+  my $modelFile;
 
   if ($verbose) { $partnerApps::logger->info("$subName Processing: [$currentFilename]") }
 
@@ -182,7 +183,24 @@ sub loadModelFile {
   eval { $XMLObj = $partnerApps::twig->parsefile($currentFilename); };
   $partnerApps::logger->error(partnerApps::objConversionErrorMsgGenerator($@)) if $@;
 
-  # todo, need to add a split here for fk vs table files
+  # Handle files based on type
+  my $fileType = '';
+  if   ($currentFilename ~~ /table/) { $fileType = 'table'; }
+  else                               { $fileType = 'unknown/'; }
+  $partnerApps::logger->info("$subName detected as a $fileType fileType: [$currentFilename]");
+
+  if ($fileType eq 'table') { $modelFile = loadModelFileTable($XMLObj); }
+
+  if ($verbose) { $partnerApps::logger->info("$subName Complete: [$currentFilename]") }
+
+  return $modelFile;
+} ## end sub loadModelFile
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+sub loadModelFileTable () {
+  my ($XMLObj) = @_;
+  my $subName = (caller(0))[3];
 
   # Table name
   # $partnerApps::logger->info("$XMLObj: " . partnerApps::Dumper($XMLObj));
@@ -231,10 +249,8 @@ sub loadModelFile {
 
   $partnerApps::logger->info("tableName" . partnerApps::Dumper($tableInfo));
 
-  if ($verbose) { $partnerApps::logger->info("$subName Complete: [$currentFilename]") }
-
   return $tableInfo;
-} ## end sub loadModelFile
+} ## end sub loadModelFileTable
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
