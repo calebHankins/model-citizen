@@ -66,14 +66,11 @@ logScriptConfig();
 my @inputFiles = partnerApps::buildPackageFileList($packageFilepath, '.xml');
 logFileInformation(\@inputFiles, 'Input');
 
-sub todo () {
+my $tables = loadModel(\@inputFiles);
 
-  my $tables = loadModel(\@inputFiles);
+my $sql = getSQL($tables);
 
-  my $sql = getSQL($tables);
-
-  if ($outputFile) { partnerApps::createExportFile($sql, $outputFile); }
-} ## end sub todo
+if ($outputFile) { partnerApps::createExportFile($sql, $outputFile); }
 
 # $partnerApps::logger->info($partnerApps::json->encode($info)); # todo, debugging
 
