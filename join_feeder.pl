@@ -165,8 +165,10 @@ sub loadModel {
 
   # Process the list of packages, one file at a time
   my $tablesInfo = [];
-  for my $currentFilename (@$fileList) { push(@$tablesInfo, loadModelFile($currentFilename)); }
-
+  for my $currentFilename (@$fileList) {
+    my $modelFile = loadModelFile($currentFilename);
+    if ($modelFile) { push(@$tablesInfo, loadModelFile($currentFilename)); }
+  }
   return $tablesInfo;
 } ## end sub loadModel
 ##---------------------------------------------------------------------------
