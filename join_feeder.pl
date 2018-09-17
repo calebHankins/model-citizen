@@ -272,7 +272,7 @@ sub loadModelFileTable () {
     } ## end for my $index ($indexes...)
   } ## end if (defined $indexes)
 
-  $partnerApps::logger->info("tableName" . partnerApps::Dumper($tableInfo));
+  if ($verbose) { $partnerApps::logger->info("tableInfo:\n" . partnerApps::Dumper($tableInfo)); }
 
   return $tableInfo;
 } ## end sub loadModelFileTable
@@ -297,7 +297,7 @@ sub loadModelFileForeignKey () {
     $fkInfo->{localFKIndex} = $fkXMLObj->first_child("localFKIndex")->inner_xml;
   }
 
-  if ($verbose) { $partnerApps::logger->info("fkName" . partnerApps::Dumper($fkInfo)); }
+  if ($verbose) { $partnerApps::logger->info("fkName\n" . partnerApps::Dumper($fkInfo)); }
 
   return $fkInfo;
 } ## end sub loadModelFileForeignKey
