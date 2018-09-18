@@ -273,7 +273,7 @@ sub loadModelFileTable () {
 
     $tableInfo->{indexes} = [];
     for my $index ($indexes->children('ind_PK_UK')) {
-      $partnerApps::logger->info("index name:" . $index->att("name"));
+      $partnerApps::logger->info("$subName index name:" . $index->att("name"));
 
       my $indexInfo = {name => $index->att("name"), id => $index->att("id")};
 
@@ -293,7 +293,7 @@ sub loadModelFileTable () {
     } ## end for my $index ($indexes...)
   } ## end if (defined $indexes)
 
-  if ($verbose) { $partnerApps::logger->info("tableInfo:\n" . partnerApps::Dumper($tableInfo)); }
+  if ($verbose) { $partnerApps::logger->info("$subName tableInfo:\n" . partnerApps::Dumper($tableInfo)); }
 
   return $tableInfo;
 } ## end sub loadModelFileTable
@@ -321,7 +321,7 @@ sub loadModelFileForeignKey () {
     $fkInfo->{referredKeyID} = $fkXMLObj->first_child("referredKeyID")->inner_xml;
   }
 
-  if ($verbose) { $partnerApps::logger->info("fkName\n" . partnerApps::Dumper($fkInfo)); }
+  if ($verbose) { $partnerApps::logger->info("$subName fkName\n" . partnerApps::Dumper($fkInfo)); }
 
   return $fkInfo;
 } ## end sub loadModelFileForeignKey
@@ -335,11 +335,12 @@ sub getSQL {
   my $sql          = '';
 
   for my $modelFile (@$modelFiles) {
-    $partnerApps::logger->info("modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]");
+    $partnerApps::logger->info("$subName modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]");
     if ($modelFile->{type} eq 'table') {
       for my $index (@{$modelFile->{indexes}}) {
-        $partnerApps::logger->info("index name:" . $index->{name});
-        if (defined $index->{pk}) { $sql .= getSQLPrimaryKey($index, $modelFile, $modelFiles); }
+        $partnerApps::logger->info("$subName index name:" . $index->{name});
+
+       # if (defined $index->{pk}) { $sql .= getSQLPrimaryKey($index, $modelFile, $modelFiles); } # todo, uncomment this
       }
     } ## end if ($modelFile->{type}...)
     elsif ($modelFile->{type} eq "foreignkey") {
@@ -355,23 +356,48 @@ sub getSQL {
 ##---------------------------------------------------------------------------
 sub getSQLPrimaryKey {
   my ($index, $modelFile, $modelFiles) = @_;
-  my $subName     = (caller(0))[3];
-  my $sql         = '';
-  my $columnNames = [];
+  my $subName = (caller(0))[3];
 
-  $partnerApps::logger->info("index:" . $index->{name} . " detected as a pk");
-
-  # look up this index's column names using the guids in indexColumnUsage
-  for my $columnID (@{$index->{indexColumnUsage}}) {
-    $partnerApps::logger->info("  columnID:" . $columnID);
-    push(@$columnNames, getColumnNameFromID($modelFiles, $columnID));
-  }
-  $partnerApps::logger->info("  column names for index:" . $partnerApps::json->encode($columnNames));
-  my $fieldList = join ',', @$columnNames;
-  $sql .= qq{ ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} PRIMARY KEY ( $fieldList ); \n};
-
-  return $sql;
+  if ($verbose) { $partnerApps::logger->info("$subName index:" . $index->{name} . " detected as a pk"); }
+  my $fieldList = getFieldListFromIndex($index, $modelFile, $modelFiles);
+  return qq{ ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} PRIMARY KEY ( $fieldList ); \n};
 } ## end sub getSQLPrimaryKey
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Return index based on ID
+sub getIndexFromID {
+  my ($tables, $indexID) = @_;
+  my $subName = (caller(0))[3];
+
+  for my $table (@$tables) {
+    for my $index (@{$table->{indexes}}) {
+      if ($index->{id} eq $indexID) { return $index; }
+    }
+  }
+
+  my $error = "ERR_COULD_NOT_RESOLVE_INDEX_FOR_ID_${indexID}";
+  $partnerApps::logger->error("$subName $error");
+  return "ERR_COULD_NOT_RESOLVE_INDEX_FOR_ID_${indexID}";
+} ## end sub getIndexFromID
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+sub getFieldListFromIndex {
+  my ($index, $modelFile, $modelFiles) = @_;
+  my $columnNames = getColumnNamesFromIndex($index, $modelFile, $modelFiles);
+  return join ',', @$columnNames;
+}
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+sub getColumnNamesFromIndex {
+  my ($index, $modelFile, $modelFiles) = @_;
+  my $subName     = (caller(0))[3];
+  my $columnNames = [];
+  for my $columnID (@{$index->{indexColumnUsage}}) { push(@$columnNames, getColumnNameFromID($modelFiles, $columnID)); }
+  return $columnNames;
+} ## end sub getColumnNamesFromIndex
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
@@ -382,21 +408,39 @@ sub getSQLForeignKey {
   my $columnNames = [];
 
   my $hostTableID     = $modelFile->{containerWithKeyObject};
-  my $keyObject       = $modelFile->{keyObject};
+  my $hostKeyID       = $modelFile->{keyObject};
   my $referredTableID = $modelFile->{referredTableID};
+  my $referredKeyID   = $modelFile->{referredKeyID};
 
-# ALTER TABLE pa_vehicle_options
-#     ADD CONSTRAINT pa_vehicle_options_pa_vehicle_options_pkg_fk FOREIGN KEY ( package_key_tok,
-#                                                                               option_key_tok )
-#         REFERENCES pa_vehicle_options_pkg ( package_key_tok,
-#                                             option_key_tok );
+  # Need to convert these index IDs to index objects
+  my $hostKeyIndex     = getIndexFromID($modelFiles, $hostKeyID);
+  my $referredKeyIndex = getIndexFromID($modelFiles, $referredKeyID);
+
+  # Convert host table id to human name
+  my $hostTableName = getTableNameFromID($modelFiles, $hostTableID);
+
+  # Convert host key to human key field list
+  my $hostKeyFieldList = getFieldListFromIndex($hostKeyIndex, $modelFile, $modelFiles);
+
+  # Convert referred table id to human name
+  my $referredTableName = getTableNameFromID($modelFiles, $referredTableID);
+
+  # Convert referred key to human key field list
+  my $referredKeyFieldList = getFieldListFromIndex($referredKeyIndex, $modelFile, $modelFiles);
+
+  $sql = qq{
+            ALTER TABLE $hostTableName ADD CONSTRAINT $modelFile->{name} FOREIGN KEY ( $hostKeyFieldList )
+                    REFERENCES $referredTableName ( $referredKeyFieldList );  
+  };
+
+  $partnerApps::logger->info("$subName \$sql:\n $sql");
 
   return $sql;
 } ## end sub getSQLForeignKey
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
-# Generate human readable column name using guid lookup and an array ref pointed to the table hashes
+# Generate human readable column name using guid lookup
 sub getColumnNameFromID {
   my ($tables, $columnID) = @_;
   my $subName = (caller(0))[3];
@@ -411,6 +455,22 @@ sub getColumnNameFromID {
   $partnerApps::logger->error("$subName $error");
   return "ERR_COULD_NOT_RESOLVE_FIELD_NAME_FOR_ID_${columnID}";
 } ## end sub getColumnNameFromID
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Generate human readable table name using guid lookup
+sub getTableNameFromID {
+  my ($tables, $tableID) = @_;
+  my $subName = (caller(0))[3];
+
+  for my $table (@$tables) {
+    if ($table->{id} eq $tableID) { return $table->{name}; }
+  }
+
+  my $error = "ERR_COULD_NOT_RESOLVE_TABLE_NAME_FOR_ID_${tableID}";
+  $partnerApps::logger->error("$subName $error");
+  return "ERR_COULD_NOT_RESOLVE_TABLE_NAME_FOR_ID_${tableID}";
+} ## end sub getTableNameFromID
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
