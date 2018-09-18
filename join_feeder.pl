@@ -428,11 +428,9 @@ join_feeder.pl
 Convert Oracle Data Modeler files into json and SQl DDL files for easier consumption by other processes
 
  Options:
-    f|packageFilepath           String. Directory path where package file(s) live. Defaults to current working directory.
-    g|globalFindReplace         String. Global Find and Replace. If any left hand side entry in this colon separated, comma delimited find/replace list is found, replace it with the right side colon entry.
-    o|outputFile            String. Comma delimited list of Output Rules to install into relevant packages.
-    p|preserveQuotes            Flag. If set, quotes and backslashes are not removed from find/replace strings.
-    utfDisabled                 Flag. If set, disables creating files with encoding(UTF-8).
+    f|packageFilepath           String. Directory path where data model lives. Defaults to current working directory.
+    o|outputFile                String. Output file path for SQL DDL file built off the model.
+    outputFileJSON              String. Output file path for json file built off the model.
     fuseLogSafeOutput           0 or 1. If 1, encodes HTML entities in logs so they can be displayed in the fuse web log viewer properly. Defaults to 1.
     t|testMode                  Flag. Skip call to create package file but print all of the other information.
     v|verbose                   Flag. Print more verbose output.
