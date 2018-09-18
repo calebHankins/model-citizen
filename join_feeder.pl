@@ -204,21 +204,21 @@ sub loadModelFile {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
+# Load table info from an XML object and return a hash ref of handy info
 sub loadModelFileTable () {
   my ($XMLObj) = @_;
   my $subName = (caller(0))[3];
 
-  # Table name
-  # $partnerApps::logger->info("$XMLObj: " . partnerApps::Dumper($XMLObj));
-  # my $xmlRoot   = $XMLObj->root; # this will actually be Table I think
-  # my $table = $xmlRoot->first_child('Table');
+  # Table info
   my $tableInfo   = {};
   my $tableXMLObj = $XMLObj->root;
-  $tableInfo->{type} = 'table';
-  $tableInfo->{name} = $tableXMLObj->att("name");
-  $tableInfo->{id}   = $tableXMLObj->att("id");
+  $tableInfo->{type}        = 'table';
+  $tableInfo->{name}        = $tableXMLObj->att("name");
+  $tableInfo->{id}          = $tableXMLObj->att("id");
+  $tableInfo->{createdBy}   = $tableXMLObj->first_child("createdBy")->inner_xml;
+  $tableInfo->{createdTime} = $tableXMLObj->first_child("createdTime")->inner_xml;
 
-  #  $partnerApps::logger->info("columns:" . partnerApps::Dumper($columns));
+  # Column info
   my $columns = $tableXMLObj->first_child("columns");
   $tableInfo->{columns} = [];
   for my $column ($columns->children('Column')) {
@@ -239,9 +239,35 @@ sub loadModelFileTable () {
       $colInfo->{associations} = $colAssociations;
     } ## end if (defined $column->first_child...)
 
+    if (defined $column->first_child('logicalDatatype')) {
+      $colInfo->{"logicalDatatype"} = $column->first_child("logicalDatatype")->inner_xml;
+    }
+    if (defined $column->first_child('ownDataTypeParameters')) {
+      $colInfo->{"ownDataTypeParameters"} = $column->first_child("ownDataTypeParameters")->inner_xml;
+    }
+    if (defined $column->first_child('autoIncrementCycle')) {
+      $colInfo->{"autoIncrementCycle"} = $column->first_child("autoIncrementCycle")->inner_xml;
+    }
+    if (defined $column->first_child('createdTime')) {
+      $colInfo->{"createdTime"} = $column->first_child("createdTime")->inner_xml;
+    }
+    if (defined $column->first_child('createdBy')) {
+      $colInfo->{"createdBy"} = $column->first_child("createdBy")->inner_xml;
+    }
+    if (defined $column->first_child('useDomainConstraints')) {
+      $colInfo->{"useDomainConstraints"} = $column->first_child("useDomainConstraints")->inner_xml;
+    }
+    if (defined $column->first_child('nullsAllowed')) {
+      $colInfo->{"nullsAllowed"} = $column->first_child("nullsAllowed")->inner_xml;
+    }
+    if (defined $column->first_child('dataTypeSize')) {
+      $colInfo->{"dataTypeSize"} = $column->first_child("dataTypeSize")->inner_xml;
+    }
+
     push(@{$tableInfo->{columns}}, $colInfo);
   } ## end for my $column ($columns...)
 
+  # Index info
   my $indexes = $tableXMLObj->first_child("indexes");
   if (defined $indexes) {
 
@@ -279,6 +305,7 @@ sub loadModelFileTable () {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
+# Load Foreign Key info from an XML object and return a hash ref of handy info
 sub loadModelFileForeignKey () {
   my ($XMLObj) = @_;
   my $subName = (caller(0))[3];
