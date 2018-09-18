@@ -339,8 +339,7 @@ sub getSQL {
     if ($modelFile->{type} eq 'table') {
       for my $index (@{$modelFile->{indexes}}) {
         $partnerApps::logger->info("$subName index name:" . $index->{name});
-
-       # if (defined $index->{pk}) { $sql .= getSQLPrimaryKey($index, $modelFile, $modelFiles); } # todo, uncomment this
+        if (defined $index->{pk}) { $sql .= getSQLPrimaryKey($index, $modelFile, $modelFiles); }
       }
     } ## end if ($modelFile->{type}...)
     elsif ($modelFile->{type} eq "foreignkey") {
