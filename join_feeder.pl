@@ -421,13 +421,11 @@ Caleb Hankins - chanki
 
 =head1 NAME
 
-partnerApps_generify.pl
+join_feeder.pl
 
 =head1 SYNOPSIS
 
-partnerApps_generify.pl - Make environment specific files generic or vice versa
-
- #NOTE# Script must be ran inside of fuse or after the fuse client env has been sourced. Ex: . $HOME/fuse_local/client.env
+Convert Oracle Data Modeler files into json and SQl DDL files for easier consumption by other processes
 
  Options:
     f|packageFilepath           String. Directory path where package file(s) live. Defaults to current working directory.
@@ -443,7 +441,7 @@ partnerApps_generify.pl - Make environment specific files generic or vice versa
 
 =head1 EXAMPLES
 
-  partnerApps_generify.pl  --packageFilepath '~/partnerAppsPackages/generify/' --outputFile 'ACXIOM_INTERNAL,PRINT_SHOP' --globalFindReplace '#DB_HOST#:SCHEMA_GOES_HERE,\/redpoint_output_dev:DETECT_LOCATION_SOURCE_PATH_GOES_HERE'
+  join_feeder.pl  -f '~/my_data_model_folder/' -o '~/model.sql' --outputFileJSON '~/model.json'
 
 =cut
 ##---------------------------------------------------------------------------
