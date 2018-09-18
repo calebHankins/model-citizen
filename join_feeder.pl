@@ -318,6 +318,12 @@ sub loadModelFileForeignKey () {
   if (defined $fkXMLObj->first_child("localFKIndex")) {
     $fkInfo->{localFKIndex} = $fkXMLObj->first_child("localFKIndex")->inner_xml;
   }
+  if (defined $fkXMLObj->first_child("referredTableID")) {
+    $fkInfo->{referredTableID} = $fkXMLObj->first_child("referredTableID")->inner_xml;
+  }
+  if (defined $fkXMLObj->first_child("referredKeyID")) {
+    $fkInfo->{referredKeyID} = $fkXMLObj->first_child("referredKeyID")->inner_xml;
+  }
 
   if ($verbose) { $partnerApps::logger->info("fkName\n" . partnerApps::Dumper($fkInfo)); }
 
@@ -333,10 +339,15 @@ sub getSQL {
   my $sql          = '';
 
   for my $modelFile (@$modelFiles) {
-    $partnerApps::logger->info("table name:" . $modelFile->{name});
-    for my $index (@{$modelFile->{indexes}}) {
-      $partnerApps::logger->info("index name:" . $index->{name});
-      if (defined $index->{pk}) { $sql .= getSQLPrimaryKey($index, $modelFile, $modelFiles); }
+    $partnerApps::logger->info("modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]");
+    if ($modelFile->{type} eq 'table') {
+      for my $index (@{$modelFile->{indexes}}) {
+        $partnerApps::logger->info("index name:" . $index->{name});
+        if (defined $index->{pk}) { $sql .= getSQLPrimaryKey($index, $modelFile, $modelFiles); }
+      }
+    } ## end if ($modelFile->{type}...)
+    elsif ($modelFile->{type} eq "foreignkey") {
+      if (defined $modelFile->{containerWithKeyObject}) { $sql .= getSQLForeignKey($modelFile, $modelFiles); }
     }
   } ## end for my $modelFile (@$modelFiles)
 
@@ -361,10 +372,24 @@ sub getSQLPrimaryKey {
   }
   $partnerApps::logger->info("  column names for index:" . $partnerApps::json->encode($columnNames));
   my $fieldList = join ',', @$columnNames;
-  $sql .= qq{ ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} PRIMARY KEY ( $fieldList ); };
+  $sql .= qq{ ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} PRIMARY KEY ( $fieldList ); \n};
 
   return $sql;
 } ## end sub getSQLPrimaryKey
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+sub getSQLForeignKey {
+  my ($modelFile, $modelFiles) = @_;
+  my $subName     = (caller(0))[3];
+  my $sql         = '';
+  my $columnNames = [];
+
+  my $hostTableID   = $modelFile->{containerWithKeyObject};
+  my $referredTableID = $modelFile->{referredTableID};
+
+  return $sql;
+} ## end sub getSQLForeignKey
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
