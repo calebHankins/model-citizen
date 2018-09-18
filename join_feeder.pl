@@ -326,35 +326,19 @@ sub loadModelFileForeignKey () {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
-# Generate sql from table info
+# Generate sql from modelFile info
 sub getSQL {
-  my ($tables) = @_;
-  my $subName = (caller(0))[3];
+  my ($modelFiles) = @_;
+  my $subName      = (caller(0))[3];
+  my $sql          = '';
 
-  my $sql = '';
-
-  for my $table (@$tables) {
-    $partnerApps::logger->info("table name:" . $table->{name});
-    for my $index (@{$table->{indexes}}) {
+  for my $modelFile (@$modelFiles) {
+    $partnerApps::logger->info("table name:" . $modelFile->{name});
+    for my $index (@{$modelFile->{indexes}}) {
       $partnerApps::logger->info("index name:" . $index->{name});
-      if (defined $index->{pk}) {
-        $partnerApps::logger->info("index:" . $index->{name} . " detected as a pk");
-        my $columnNames = [];
-
-        # look up this index's column names using the guids in indexColumnUsage
-        for my $columnID (@{$index->{indexColumnUsage}}) {
-          $partnerApps::logger->info("  columnID:" . $columnID);
-          push(@$columnNames, getColumnNameFromID($tables, $columnID));
-        }
-        $partnerApps::logger->info("  column names for index:" . $partnerApps::json->encode($columnNames));
-        my $fieldList = join ',', @$columnNames;
-        $sql .= qq{
-      ALTER TABLE $table->{name}     
-      ADD CONSTRAINT $index->{name} PRIMARY KEY ( $fieldList );
-      };
-      } ## end if (defined $index->{pk...})
-    } ## end for my $index (@{$table...})
-  } ## end for my $table (@$tables)
+      if (defined $index->{pk}) { $sql .= getSQLPrimaryKey($index, $modelFile, $modelFiles); }
+    }
+  } ## end for my $modelFile (@$modelFiles)
 
   return $sql;
 
@@ -362,7 +346,29 @@ sub getSQL {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
-# Generate sql from table info
+sub getSQLPrimaryKey {
+  my ($index, $modelFile, $modelFiles) = @_;
+  my $subName     = (caller(0))[3];
+  my $sql         = '';
+  my $columnNames = [];
+
+  $partnerApps::logger->info("index:" . $index->{name} . " detected as a pk");
+
+  # look up this index's column names using the guids in indexColumnUsage
+  for my $columnID (@{$index->{indexColumnUsage}}) {
+    $partnerApps::logger->info("  columnID:" . $columnID);
+    push(@$columnNames, getColumnNameFromID($modelFiles, $columnID));
+  }
+  $partnerApps::logger->info("  column names for index:" . $partnerApps::json->encode($columnNames));
+  my $fieldList = join ',', @$columnNames;
+  $sql .= qq{ ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} PRIMARY KEY ( $fieldList ); };
+
+  return $sql;
+} ## end sub getSQLPrimaryKey
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Generate human readable column name using guid lookup and an array ref pointed to the table hashes
 sub getColumnNameFromID {
   my ($tables, $columnID) = @_;
   my $subName = (caller(0))[3];
