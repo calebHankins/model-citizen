@@ -275,10 +275,7 @@ sub loadModelFileTable () {
     for my $index ($indexes->children('ind_PK_UK')) {
       $partnerApps::logger->info("index name:" . $index->att("name"));
 
-      # my $indexInfo = {};
       my $indexInfo = {name => $index->att("name"), id => $index->att("id")};
-
-      # pk         => $index->first_child("pk")->inner_xml # this only sometimes exists
 
       # looks like FKs don't have indexColumnUsage
       if (defined $index->first_child("indexState")) {
@@ -292,8 +289,6 @@ sub loadModelFileTable () {
         }
         $indexInfo->{indexColumnUsage} = $indexColumnUsage;
       } ## end if (defined $index->first_child...)
-
-      # $partnerApps::logger->info(partnerApps::Dumper($index));
       push(@{$tableInfo->{indexes}}, $indexInfo);
     } ## end for my $index ($indexes...)
   } ## end if (defined $indexes)
