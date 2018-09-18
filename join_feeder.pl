@@ -307,17 +307,13 @@ sub loadModelFileForeignKey () {
 
   my $fkInfo   = {};
   my $fkXMLObj = $XMLObj->root;
-  $fkInfo->{type}      = 'foreignkey';
-  $fkInfo->{name}      = $fkXMLObj->att("name");
-  $fkInfo->{id}        = $fkXMLObj->att("id");
-  $fkInfo->{keyObject} = $fkXMLObj->first_child("keyObject")->inner_xml;
+  $fkInfo->{type}                   = 'foreignkey';
+  $fkInfo->{name}                   = $fkXMLObj->att("name");
+  $fkInfo->{id}                     = $fkXMLObj->att("id");
+  $fkInfo->{containerWithKeyObject} = $fkXMLObj->att("containerWithKeyObject");
+  $fkInfo->{localFKIndex}           = $fkXMLObj->att("localFKIndex");
+  $fkInfo->{keyObject}              = $fkXMLObj->first_child("keyObject")->inner_xml;
 
-  if (defined $fkXMLObj->first_child("containerWithKeyObject")) {
-    $fkInfo->{containerWithKeyObject} = $fkXMLObj->first_child("containerWithKeyObject")->inner_xml;
-  }
-  if (defined $fkXMLObj->first_child("localFKIndex")) {
-    $fkInfo->{localFKIndex} = $fkXMLObj->first_child("localFKIndex")->inner_xml;
-  }
   if (defined $fkXMLObj->first_child("referredTableID")) {
     $fkInfo->{referredTableID} = $fkXMLObj->first_child("referredTableID")->inner_xml;
   }
@@ -385,8 +381,15 @@ sub getSQLForeignKey {
   my $sql         = '';
   my $columnNames = [];
 
-  my $hostTableID   = $modelFile->{containerWithKeyObject};
+  my $hostTableID     = $modelFile->{containerWithKeyObject};
+  my $keyObject       = $modelFile->{keyObject};
   my $referredTableID = $modelFile->{referredTableID};
+
+# ALTER TABLE pa_vehicle_options
+#     ADD CONSTRAINT pa_vehicle_options_pa_vehicle_options_pkg_fk FOREIGN KEY ( package_key_tok,
+#                                                                               option_key_tok )
+#         REFERENCES pa_vehicle_options_pkg ( package_key_tok,
+#                                             option_key_tok );
 
   return $sql;
 } ## end sub getSQLForeignKey
