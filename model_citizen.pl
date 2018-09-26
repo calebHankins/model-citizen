@@ -499,7 +499,7 @@ Export Oracle Data Modeler files as json and or SQL DDL for easier consumption b
 
 =head1 EXAMPLES
 
-  perl model_citizen.pl  --outputFileSQL ./scratch/ddl.sql --outputFileJSON ./scratch/model.json -f C:\git\datamodels\MY_AWESOME_DATA_MODEL\
+  perl model_citizen.pl  --outputFileSQL ./scratch/ddl.sql --outputFileJSON ./scratch/model.json --modelFilepath C:\git\datamodels\MY_AWESOME_DATA_MODEL\
 
 =cut
 ##---------------------------------------------------------------------------
