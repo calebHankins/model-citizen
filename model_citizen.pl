@@ -165,7 +165,7 @@ sub loadModel {
   my $tablesInfo = [];
   for my $currentFilename (@$fileList) {
     my $modelFile = loadModelFile($currentFilename);
-    if ($modelFile) { push(@$tablesInfo, loadModelFile($currentFilename)); }
+    if ($modelFile) { push(@$tablesInfo,$modelFile); }
   }
   return $tablesInfo;
 } ## end sub loadModel
