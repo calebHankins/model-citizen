@@ -12,6 +12,22 @@ Export Oracle Data Modeler files as json and or SQL DDL for easier consumption b
 
 Install dependent perl libraries via your favorite management system
 
+Requires the following perl modules and their dependencies:
+
+```perl
+use JSON;                        # JSON (JavaScript Object Notation) encoder/decoder
+use XML::Simple;                 # An API for simple XML files
+use XML::Twig;                   # A perl module for processing huge XML documents in tree mode
+use LWP::UserAgent;              # Web user agent class
+use Data::Dumper;                # Stringified perl data structures, suitable for both printing and eval
+use HTML::Entities;              # Encode or decode strings with HTML entities
+use URI::Escape;                 # Percent-encode and percent-decode unsafe characters
+use File::Path qw(make_path);    # Create directory trees
+use File::Basename;              # Parse file paths into directory, filename and suffix
+use Text::ParseWords;            # Parse text into an array of tokens or array of arrays
+use Log::Log4perl;               # Log4j implementation for Perl
+```
+
 ### Example commands to install Log::Log4perl on various platforms
 - `cpan install Log::Log4perl (cpan)`
 - `ppm install Log-Log4perl (ActivePerl)`
