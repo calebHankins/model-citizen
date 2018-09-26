@@ -1,21 +1,21 @@
 #!/usr/bin/perl
 #/*#########################################################################################
-#                       (C) Copyright Acxiom Corporation 2017
+#                       (C) Copyright Acxiom Corporation 2018
 #                               All Rights Reserved.
 ############################################################################################
 #
-# Script: partnerApps_generify.pl
+# Script: model_citizen.pl
 # Author: Caleb Hankins - chanki
-# Date:   2017-09-07
+# Date:   2018-09-13
 #
-# Purpose: Make environment specific files generic or vice versa
+# Purpose: Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes 
 #
 ############################################################################################
 # MODIFICATION HISTORY
 ##-----------------------------------------------------------------------------------------
 # DATE        PROGRAMMER                   DESCRIPTION
 ##-----------------------------------------------------------------------------------------
-# 2017-09-07  Caleb Hankins - chanki       Initial Copy
+# 2018-09-13  Caleb Hankins - chanki       Initial Copy
 ###########################################################################################*/
 
 use strict;
@@ -31,24 +31,24 @@ STDOUT->autoflush(1);
 STDERR->autoflush(1);
 
 # User options that we'll set using GetOptions()
-my $packageFilepath   = cwd();    # Default dir to current working dir if no path is specified
-my $outputFile        = '';
+my $modelFilepath     = cwd();    # Default dir to current working dir if no path is specified
+my $outputFileSQL     = '';
 my $outputFileJSON    = '';
 my $globalFindReplace = '';
 my $preserveQuotes    = '';       # Default to stripping quotes from find/replace strings
 my $utfDisabled       = '';       # Default to creating files with encoding(UTF-8)
-my $fuseLogSafeOutput = 1;        # Default to make log output 'Fuse safe'
+my $webLogSafeOutput  = 0;        # Default to not escape html entities when printing logs
 my $testMode          = '';
 my $verbose           = '';
 
 my $rc = GetOptions(
-  'f|packageFilepath=s'   => \$packageFilepath,
-  'o|outputFile=s'        => \$outputFile,
-  'outputFileJSON=s'      => \$outputFileJSON,
-  'g|globalFindReplace=s' => \$globalFindReplace,
-  'p|preserveQuotes'      => \$preserveQuotes,
-  'utfDisabled'           => \$utfDisabled,
-  'fuseLogSafeOutput=s'   => \$fuseLogSafeOutput,
+  'f|modelFilepath=s'            => \$modelFilepath,
+  'o|outputFile|outputFileSQL=s' => \$outputFileSQL,
+  'outputFileJSON=s'             => \$outputFileJSON,
+  'g|globalFindReplace=s'        => \$globalFindReplace,
+  'p|preserveQuotes'             => \$preserveQuotes,
+  'utfDisabled'                  => \$utfDisabled,
+  'webLogSafeOutput=s'           => \$webLogSafeOutput,
 
   't|testMode' => \$testMode,
   'v|verbose'  => \$verbose,
@@ -65,14 +65,14 @@ sanityCheckOptions();
 logScriptConfig();
 
 # Construct a list of files to munge and log file details
-my @inputFiles = partnerApps::buildPackageFileList($packageFilepath, '.xml');
-logFileInformation(\@inputFiles, 'Input');
+my @inputFiles = partnerApps::buildPackageFileList($modelFilepath, '.xml');
+if ($verbose) { logFileInformation(\@inputFiles, 'Input'); }
 
 my $model = loadModel(\@inputFiles);
 if ($outputFileJSON) { partnerApps::createExportFile($partnerApps::json->encode($model), $outputFileJSON); }
 
 my $sql = getSQL($model);
-if ($outputFile) { partnerApps::createExportFile($sql, $outputFile); }
+if ($outputFileSQL) { partnerApps::createExportFile($sql, $outputFileSQL); }
 
 # $partnerApps::logger->info($partnerApps::json->encode($info)); # todo, debugging
 
@@ -93,11 +93,11 @@ sub sanityCheckOptions {
   my $subName = (caller(0))[3];
 
   # Shell style filename expansions for things in the path like tilde or wildcards
-  $packageFilepath = glob($packageFilepath);
-  partnerApps::checkRequiredParm($packageFilepath, 'packageFilepath');
+  $modelFilepath = glob($modelFilepath);
+  partnerApps::checkRequiredParm($modelFilepath, 'modelFilepath');
 
-  $partnerApps::verbose           = $verbose;            # Set partnerApps' verbose flag to the user supplied option
-  $partnerApps::fuseLogSafeOutput = $fuseLogSafeOutput;  # Set the Fuse log-safe output flag to the user supplied option
+  $partnerApps::verbose           = $verbose;             # Set partnerApps' verbose flag to the user supplied option
+  $partnerApps::fuseLogSafeOutput = $webLogSafeOutput;    # Set the web log-safe output flag to the user supplied option
 
   # Check for errors before starting processing
   if ($partnerApps::logger->get_count("ERROR") > 0) {
@@ -120,15 +120,13 @@ sub sanityCheckOptions {
 sub logScriptConfig {
   $partnerApps::logger->info("[Script Config Information]");
   $partnerApps::logger->info("  script path:             [$0]");
-  $partnerApps::logger->info("  packageFilepath:         [$packageFilepath]");
-  $partnerApps::logger->info("  globalFindReplace:       [$globalFindReplace]");
-  $partnerApps::logger->info("  outputFile:          [$outputFile]");
-  $utfDisabled
-    ? $partnerApps::logger->info("  utf Encoding:            [Disabled]")
-    : $partnerApps::logger->info("  utf Encoding:            [Enabled]");
-  $fuseLogSafeOutput
-    ? $partnerApps::logger->info("  fuseLogSafeOutput:       [Enabled]")
-    : $partnerApps::logger->info("  fuseLogSafeOutput:       [Disabled]");
+  $partnerApps::logger->info("  modelFilepath:           [$modelFilepath]");
+  $partnerApps::logger->info("  outputFileSQL:           [$outputFileSQL]");
+  $partnerApps::logger->info("  outputFileJSON:          [$outputFileJSON]");
+
+  $webLogSafeOutput
+    ? $partnerApps::logger->info("  webLogSafeOutput:        [Enabled]")
+    : $partnerApps::logger->info("  webLogSafeOutput:        [Disabled]");
   $testMode
     ? $partnerApps::logger->info("  testMode:                [Enabled]")
     : $partnerApps::logger->info("  testMode:                [Disabled]");
@@ -146,7 +144,7 @@ sub logScriptConfig {
 sub logFileInformation {
   my ($files, $fileType) = @_;
   $partnerApps::logger->info("[$fileType File Information]");
-  $partnerApps::logger->info("  filepath: [$packageFilepath]");
+  $partnerApps::logger->info("  filepath: [$modelFilepath]");
   for (my $i = 0; $i < @{$files}; $i++) {
     my $formattedIndex = sprintf '%4s', $i;    # Left pad index with spaces for prettier logging
     $partnerApps::logger->info("$formattedIndex:  [$files->[$i]]");
@@ -483,25 +481,25 @@ Caleb Hankins - chanki
 
 =head1 NAME
 
-join_feeder.pl
+model_citizen.pl
 
 =head1 SYNOPSIS
 
-Convert Oracle Data Modeler files into json and SQl DDL files for easier consumption by other processes
+Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes 
 
  Options:
-    f|packageFilepath           String. Directory path where data model lives. Defaults to current working directory.
-    o|outputFile                String. Output file path for SQL DDL file built off the model.
+    f|modelFilepath             String. Directory path where data model lives. Defaults to current working directory.
+    o|outputFile|outputFileSQL  String. Output file path for SQL DDL file built off the model.
     outputFileJSON              String. Output file path for json file built off the model.
-    fuseLogSafeOutput           0 or 1. If 1, encodes HTML entities in logs so they can be displayed in the fuse web log viewer properly. Defaults to 1.
-    t|testMode                  Flag. Skip call to create package file but print all of the other information.
+    webLogSafeOutput            0 or 1. If 1, encodes HTML entities in logs so they can be displayed in a web log viewer properly. Defaults to 0.
+    t|testMode                  Flag. Skip call to create output file(s) but print all of the other information.
     v|verbose                   Flag. Print more verbose output.
     help                        Print brief help information.
     man                         Read the manual, includes examples.
 
 =head1 EXAMPLES
 
-  join_feeder.pl  -f '~/my_data_model_folder/' -o '~/model.sql' --outputFileJSON '~/model.json'
+  perl model_citizen.pl  --outputFileSQL ./scratch/ddl.sql --outputFileJSON ./scratch/model.json -f C:\git\datamodels\MY_AWESOME_DATA_MODEL\
 
 =cut
 ##---------------------------------------------------------------------------
