@@ -78,24 +78,36 @@ my $types;
 if ($typesFilePath) {
   $partnerApps::logger->info("Loading type info lookup from [$typesFilePath]...");
   $types = loadTypes($typesFilePath);
-}
+  partnerApps::createExportFile($partnerApps::json->encode($types), './scratch/types.json');    # todo
+
+  # debug
+  my $debugTypeInfoVARCHAR2 = getTypeInfo($types, 'LOGDT024', 'Oracle Database 12c'); # try to lookup an Oracle VARCHAR2
+  $partnerApps::logger->info(" debugTypeInfoVARCHAR2:\n" . partnerApps::Dumper($debugTypeInfoVARCHAR2));
+
+  my $debugTypeInfoDT = getTypeInfo($types, 'LOGDT007', 'Oracle Database 12c');       # try to lookup an Oracle VARCHAR2
+  $partnerApps::logger->info(" debugTypeInfoDT:\n" . partnerApps::Dumper($debugTypeInfoDT));
+
+} ## end if ($typesFilePath)
+
+sub temp {
 
 # Load files to form our model
-$partnerApps::logger->info("Parsing data model files loaded from from [$modelFilepath]...");
-my $model = loadModel(\@inputFiles);
+  $partnerApps::logger->info("Parsing data model files loaded from from [$modelFilepath]...");
+  my $model = loadModel(\@inputFiles);
 
 # Export model as json (if asked)
-if ($outputFileJSON) {
-  $partnerApps::logger->info("Exporting data model as json to [$outputFileJSON]...");
-  partnerApps::createExportFile($partnerApps::json->encode($model), $outputFileJSON);
-}
+  if ($outputFileJSON) {
+    $partnerApps::logger->info("Exporting data model as json to [$outputFileJSON]...");
+    partnerApps::createExportFile($partnerApps::json->encode($model), $outputFileJSON);
+  }
 
 # Export model as SQL (if asked)
-if ($outputFileSQL) {
-  $partnerApps::logger->info("Exporting data model as sql to [$outputFileSQL]...");
-  my $sql = getSQL($model);
-  partnerApps::createExportFile($sql, $outputFileSQL);
-}
+  if ($outputFileSQL) {
+    $partnerApps::logger->info("Exporting data model as sql to [$outputFileSQL]...");
+    my $sql = getSQL($model);
+    partnerApps::createExportFile($sql, $outputFileSQL);
+  }
+} ## end sub temp
 
 # Log out warning if we couldn't find any files to load
 if (!@inputFiles > 0) {
@@ -178,37 +190,94 @@ sub logFileInformation {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
-# Load types lookup information
+# Load type lookup information
 sub loadTypes {
   my ($currentFilename) = @_;
   my $subName = (caller(0))[3];
   my $XMLObj;    # Our XML Twig containing the file contents
 
+  # logtypes
+  # logicaltype []
+  # name
+  # objectid
+  # default
+  # mapping []
+  # rdbms (attr)
+  # text (element text)
+  # native_to_logical_mapping
+  # ud_native_db_types
+
   # Convert plain XML text to a twig object
   eval { $XMLObj = $partnerApps::twig->parsefile($currentFilename); };
   $partnerApps::logger->error(partnerApps::objConversionErrorMsgGenerator($@)) if $@;
 
-  my $types   = {};
+  my $types       = {};
   my $typesXMLObj = $XMLObj->root;
-  $fkInfo->{type}                   = 'foreignkey';
-  $fkInfo->{name}                   = $fkXMLObj->att("name");
-  $fkInfo->{id}                     = $fkXMLObj->att("id");
-  $fkInfo->{containerWithKeyObject} = $fkXMLObj->att("containerWithKeyObject");
-  $fkInfo->{localFKIndex}           = $fkXMLObj->att("localFKIndex");
-  $fkInfo->{keyObject}              = $fkXMLObj->first_child("keyObject")->inner_xml;
 
-  if (defined $fkXMLObj->first_child("referredTableID")) {
-    $fkInfo->{referredTableID} = $fkXMLObj->first_child("referredTableID")->inner_xml;
-  }
-  if (defined $fkXMLObj->first_child("referredKeyID")) {
-    $fkInfo->{referredKeyID} = $fkXMLObj->first_child("referredKeyID")->inner_xml;
-  }
+  my $logicalTypes = [];
+  $types->{logicalTypes} = $logicalTypes;
+  for my $logicalType ($typesXMLObj->children('logicaltype')) {
+    my $logicalTypeInfo = {};
+    $logicalTypeInfo->{name}     = $logicalType->att('name');
+    $logicalTypeInfo->{objectid} = $logicalType->att('objectid');
 
-  if ($verbose) { $partnerApps::logger->info("$subName fkName\n" . partnerApps::Dumper($fkInfo)); }
+    my $mappings = [];
+    $logicalTypeInfo->{mappings} = $mappings;
+    for my $mapping ($logicalType->children('mapping')) {
+      my $mappingInfo = {};
+      $mappingInfo->{rdbms}   = $mapping->att('rdbms');
+      $mappingInfo->{mapping} = $mapping->inner_xml;
+      push(@{$mappings}, $mappingInfo);
+    } ## end for my $mapping ($logicalType...)
 
+    push(@{$logicalTypes}, $logicalTypeInfo);
+
+    # my $colInfo = {name => $column->att('name'), id => $column->att('id')};
+  } ## end for my $logicalType ($typesXMLObj...)
+
+  # if ($verbose) {
+  # $partnerApps::logger->info("$subName types:\n" . partnerApps::Dumper($types));
+
+  #  }
 
   return $types;
 } ## end sub loadTypes
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Given the type lookup hash ref, logical type id, and the target RDBMS, return a hash ref of type info
+sub getTypeInfo {
+  my ($types, $logicalDataType, $RDBMS) = @_;
+  my $subName  = (caller(0))[3];
+  my $typeInfo = {};
+
+  for my $type (@{$types->{logicalTypes}}) {
+    if ($type->{objectid} eq $logicalDataType) {
+      $typeInfo->{name} = $type->{name};
+      for my $mapping (@{$type->{mappings}}) {
+        if ($mapping->{rdbms} eq $RDBMS) {
+          $typeInfo->{mapping} = $mapping->{mapping};
+          last;
+        }
+      } ## end for my $mapping (@{$type...})
+      last;
+    } ## end if ($type->{objectid} ...)
+  } ## end for my $type (@{$types->...})
+
+  # todo, somewhere need to translate the mapping text into instructions to generate the ddl
+  # so these bits:
+  #     <Column name="MY_COOL_FIELD" ...
+  #     <logicalDatatype>LOGDT024</logicalDatatype>
+  #     <dataTypeSize>255 CHAR</dataTypeSize>
+  #     <ownDataTypeParameters>255 CHAR,,</ownDataTypeParameters>
+  # and this mapping:
+  #  { 'mapping' => 'VARCHAR2, size', 'name' => 'VARCHAR' };
+  # need to translate downstream to this SQL:
+  #  MY_COOL_FIELD          VARCHAR2(255 CHAR),
+
+  return $typeInfo;
+} ## end sub getTypeInfo
+
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
