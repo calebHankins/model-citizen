@@ -8,7 +8,7 @@
 # Author: Caleb Hankins - chanki
 # Date:   2018-09-13
 #
-# Purpose: Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes 
+# Purpose: Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes
 #
 ############################################################################################
 # MODIFICATION HISTORY
@@ -65,16 +65,25 @@ sanityCheckOptions();
 logScriptConfig();
 
 # Construct a list of files to munge and log file details
+$partnerApps::logger->info("Opening data model from [$modelFilepath]...");
 my @inputFiles = partnerApps::buildPackageFileList($modelFilepath, '.xml');
 if ($verbose) { logFileInformation(\@inputFiles, 'Input'); }
+my $inputFileCnt = @inputFiles;
+$partnerApps::logger->info("[$inputFileCnt] files have been identified for analysis.");
 
+$partnerApps::logger->info("Parsing data model files loaded from from [$modelFilepath]...");
 my $model = loadModel(\@inputFiles);
-if ($outputFileJSON) { partnerApps::createExportFile($partnerApps::json->encode($model), $outputFileJSON); }
 
-my $sql = getSQL($model);
-if ($outputFileSQL) { partnerApps::createExportFile($sql, $outputFileSQL); }
+if ($outputFileJSON) {
+  $partnerApps::logger->info("Exporting data model as json to [$outputFileJSON]...");
+  partnerApps::createExportFile($partnerApps::json->encode($model), $outputFileJSON);
+}
 
-# $partnerApps::logger->info($partnerApps::json->encode($info)); # todo, debugging
+if ($outputFileSQL) {
+  $partnerApps::logger->info("Exporting data model as sql to [$outputFileSQL]...");
+  my $sql = getSQL($model);
+  partnerApps::createExportFile($sql, $outputFileSQL);
+}
 
 # Log out warning if we couldn't find any files to load
 if (!@inputFiles > 0) {
@@ -165,7 +174,7 @@ sub loadModel {
   my $tablesInfo = [];
   for my $currentFilename (@$fileList) {
     my $modelFile = loadModelFile($currentFilename);
-    if ($modelFile) { push(@$tablesInfo,$modelFile); }
+    if ($modelFile) { push(@$tablesInfo, $modelFile); }
   }
   return $tablesInfo;
 } ## end sub loadModel
@@ -190,7 +199,7 @@ sub loadModelFile {
   if    ($currentFilename ~~ /table/)      { $fileType = 'table'; }
   elsif ($currentFilename ~~ /foreignkey/) { $fileType = 'foreignkey'; }
   else                                     { $fileType = 'unknown'; }
-  $partnerApps::logger->info("$subName detected as a $fileType fileType: [$currentFilename]");
+  if ($verbose) { $partnerApps::logger->info("$subName detected as a $fileType fileType: [$currentFilename]"); }
 
   if ($fileType eq 'table')      { $modelFile = loadModelFileTable($XMLObj); }
   if ($fileType eq 'foreignkey') { $modelFile = loadModelFileForeignKey($XMLObj); }
@@ -271,7 +280,7 @@ sub loadModelFileTable () {
 
     $tableInfo->{indexes} = [];
     for my $index ($indexes->children('ind_PK_UK')) {
-      $partnerApps::logger->info("$subName index name:" . $index->att("name"));
+      if ($verbose) { $partnerApps::logger->info("$subName index name:" . $index->att("name")); }
 
       my $indexInfo = {name => $index->att("name"), id => $index->att("id")};
 
@@ -333,10 +342,12 @@ sub getSQL {
   my $sql          = '';
 
   for my $modelFile (@$modelFiles) {
-    $partnerApps::logger->info("$subName modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]");
+    if ($verbose) {
+      $partnerApps::logger->info("$subName modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]");
+    }
     if ($modelFile->{type} eq 'table') {
       for my $index (@{$modelFile->{indexes}}) {
-        $partnerApps::logger->info("$subName index name:" . $index->{name});
+        if ($verbose) { $partnerApps::logger->info("$subName index name:" . $index->{name}); }
         if (defined $index->{pk}) { $sql .= getSQLPrimaryKey($index, $modelFile, $modelFiles); }
       }
     } ## end if ($modelFile->{type}...)
@@ -344,9 +355,7 @@ sub getSQL {
       if (defined $modelFile->{containerWithKeyObject}) { $sql .= getSQLForeignKey($modelFile, $modelFiles); }
     }
   } ## end for my $modelFile (@$modelFiles)
-
   return $sql;
-
 } ## end sub getSQL
 ##---------------------------------------------------------------------------
 
@@ -430,7 +439,7 @@ sub getSQLForeignKey {
                     REFERENCES $referredTableName ( $referredKeyFieldList );  
   };
 
-  $partnerApps::logger->info("$subName \$sql:\n $sql");
+  if ($verbose) { $partnerApps::logger->info("$subName \$sql:\n $sql"); }
 
   return $sql;
 } ## end sub getSQLForeignKey
