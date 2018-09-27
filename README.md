@@ -45,7 +45,7 @@ perl model_citizen.pl --help
 
 ```powershell
 # Load up data modeler files and generate a DDL SQL output file and a json output file
-perl model_citizen.pl  --outputFileSQL ./scratch/ddl.sql --outputFileJSON ./scratch/model.json -f C:\git\datamodels\MY_AWESOME_DATA_MODEL\
+perl model_citizen.pl  --outputFileSQL ./scratch/ddl.sql --outputFileJSON ./scratch/model.json --modelFilepath C:\git\datamodels\MY_AWESOME_DATA_MODEL\
 
 ```
 
