@@ -31,24 +31,22 @@ STDOUT->autoflush(1);
 STDERR->autoflush(1);
 
 # User options that we'll set using GetOptions()
-my $modelFilepath     = cwd();    # Default dir to current working dir if no path is specified
-my $typesFilePath     = '';
-my $outputFileSQL     = '';
-my $outputFileJSON    = '';
-my $globalFindReplace = '';
-my $preserveQuotes    = '';       # Default to stripping quotes from find/replace strings
-my $utfDisabled       = '';       # Default to creating files with encoding(UTF-8)
-my $webLogSafeOutput  = 0;        # Default to not escape html entities when printing logs
-my $testMode          = '';
-my $verbose           = '';
+my $modelFilepath    = cwd();                    # Default dir to current working dir if no path is specified
+my $RDBMS            = 'Oracle Database 12c';    # Default RDBMS SQL to generate
+my $typesFilePath    = '';
+my $outputFileSQL    = '';
+my $outputFileJSON   = '';
+my $utfDisabled      = '';                       # Default to creating files with encoding(UTF-8)
+my $webLogSafeOutput = 0;                        # Default to not escape html entities when printing logs
+my $testMode         = '';
+my $verbose          = '';
 
 my $rc = GetOptions(
   'f|modelFilepath=s'            => \$modelFilepath,
+  'RDBMS|rdbms=s'                => \$RDBMS,
   'typesFilePath=s'              => \$typesFilePath,
   'o|outputFile|outputFileSQL=s' => \$outputFileSQL,
   'outputFileJSON=s'             => \$outputFileJSON,
-  'g|globalFindReplace=s'        => \$globalFindReplace,
-  'p|preserveQuotes'             => \$preserveQuotes,
   'utfDisabled'                  => \$utfDisabled,
   'webLogSafeOutput=s'           => \$webLogSafeOutput,
 
@@ -157,6 +155,7 @@ sub logScriptConfig {
   $partnerApps::logger->info("  typesFilePath:           [$typesFilePath]");
   $partnerApps::logger->info("  outputFileSQL:           [$outputFileSQL]");
   $partnerApps::logger->info("  outputFileJSON:          [$outputFileJSON]");
+  $partnerApps::logger->info("  RDBMS:                   [$RDBMS]");
 
   $webLogSafeOutput
     ? $partnerApps::logger->info("  webLogSafeOutput:        [Enabled]")
