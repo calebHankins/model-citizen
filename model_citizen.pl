@@ -32,6 +32,7 @@ STDERR->autoflush(1);
 
 # User options that we'll set using GetOptions()
 my $modelFilepath     = cwd();    # Default dir to current working dir if no path is specified
+my $typesFilePath     = '';
 my $outputFileSQL     = '';
 my $outputFileJSON    = '';
 my $globalFindReplace = '';
@@ -43,6 +44,7 @@ my $verbose           = '';
 
 my $rc = GetOptions(
   'f|modelFilepath=s'            => \$modelFilepath,
+  'typesFilePath=s'              => \$typesFilePath,
   'o|outputFile|outputFileSQL=s' => \$outputFileSQL,
   'outputFileJSON=s'             => \$outputFileJSON,
   'g|globalFindReplace=s'        => \$globalFindReplace,
@@ -71,14 +73,24 @@ if ($verbose) { logFileInformation(\@inputFiles, 'Input'); }
 my $inputFileCnt = @inputFiles;
 $partnerApps::logger->info("[$inputFileCnt] files have been identified for analysis.");
 
+# Load type lookup info
+my $types;
+if ($typesFilePath) {
+  $partnerApps::logger->info("Loading type info lookup from [$typesFilePath]...");
+  $types = loadTypes($typesFilePath);
+}
+
+# Load files to form our model
 $partnerApps::logger->info("Parsing data model files loaded from from [$modelFilepath]...");
 my $model = loadModel(\@inputFiles);
 
+# Export model as json (if asked)
 if ($outputFileJSON) {
   $partnerApps::logger->info("Exporting data model as json to [$outputFileJSON]...");
   partnerApps::createExportFile($partnerApps::json->encode($model), $outputFileJSON);
 }
 
+# Export model as SQL (if asked)
 if ($outputFileSQL) {
   $partnerApps::logger->info("Exporting data model as sql to [$outputFileSQL]...");
   my $sql = getSQL($model);
@@ -130,6 +142,7 @@ sub logScriptConfig {
   $partnerApps::logger->info("[Script Config Information]");
   $partnerApps::logger->info("  script path:             [$0]");
   $partnerApps::logger->info("  modelFilepath:           [$modelFilepath]");
+  $partnerApps::logger->info("  typesFilePath:           [$typesFilePath]");
   $partnerApps::logger->info("  outputFileSQL:           [$outputFileSQL]");
   $partnerApps::logger->info("  outputFileJSON:          [$outputFileJSON]");
 
@@ -165,12 +178,46 @@ sub logFileInformation {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
+# Load types lookup information
+sub loadTypes {
+  my ($currentFilename) = @_;
+  my $subName = (caller(0))[3];
+  my $XMLObj;    # Our XML Twig containing the file contents
+
+  # Convert plain XML text to a twig object
+  eval { $XMLObj = $partnerApps::twig->parsefile($currentFilename); };
+  $partnerApps::logger->error(partnerApps::objConversionErrorMsgGenerator($@)) if $@;
+
+  my $types   = {};
+  my $typesXMLObj = $XMLObj->root;
+  $fkInfo->{type}                   = 'foreignkey';
+  $fkInfo->{name}                   = $fkXMLObj->att("name");
+  $fkInfo->{id}                     = $fkXMLObj->att("id");
+  $fkInfo->{containerWithKeyObject} = $fkXMLObj->att("containerWithKeyObject");
+  $fkInfo->{localFKIndex}           = $fkXMLObj->att("localFKIndex");
+  $fkInfo->{keyObject}              = $fkXMLObj->first_child("keyObject")->inner_xml;
+
+  if (defined $fkXMLObj->first_child("referredTableID")) {
+    $fkInfo->{referredTableID} = $fkXMLObj->first_child("referredTableID")->inner_xml;
+  }
+  if (defined $fkXMLObj->first_child("referredKeyID")) {
+    $fkInfo->{referredKeyID} = $fkXMLObj->first_child("referredKeyID")->inner_xml;
+  }
+
+  if ($verbose) { $partnerApps::logger->info("$subName fkName\n" . partnerApps::Dumper($fkInfo)); }
+
+
+  return $types;
+} ## end sub loadTypes
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
 # Loop over list of model files and load model info
 sub loadModel {
   my ($fileList) = @_;
   my $subName = (caller(0))[3];
 
-  # Process the list of packages, one file at a time
+  # Process the list of model files, one file at a time
   my $tablesInfo = [];
   for my $currentFilename (@$fileList) {
     my $modelFile = loadModelFile($currentFilename);
@@ -185,7 +232,7 @@ sub loadModel {
 sub loadModelFile {
   my ($currentFilename) = @_;
   my $subName = (caller(0))[3];
-  my $XMLObj;    # Our XML Twig containing the package file contents
+  my $XMLObj;    # Our XML Twig containing the file contents
   my $modelFile;
 
   if ($verbose) { $partnerApps::logger->info("$subName Processing: [$currentFilename]") }
