@@ -1,5 +1,7 @@
 # MODEL-CITIZEN
 
+_I am the very model of a modern meta generator_
+
 Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes 
 
 - [MODEL-CITIZEN](#model-citizen)
