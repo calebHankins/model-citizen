@@ -78,34 +78,31 @@ if ($typesFilePath) {
   $types = loadTypes($typesFilePath);
   partnerApps::createExportFile($partnerApps::json->encode($types), './scratch/types.json');    # todo
 
-  # debug
-  my $debugTypeInfoVARCHAR2 = getTypeInfo($types, 'LOGDT024', 'Oracle Database 12c'); # try to lookup an Oracle VARCHAR2
-  $partnerApps::logger->info(" debugTypeInfoVARCHAR2:\n" . partnerApps::Dumper($debugTypeInfoVARCHAR2));
+# # debug, todo remove
+# my $debugTypeInfoVARCHAR2 = getTypeInfo($types, 'LOGDT024', 'Oracle Database 12c'); # try to lookup an Oracle VARCHAR2
+# $partnerApps::logger->info(" debugTypeInfoVARCHAR2:\n" . partnerApps::Dumper($debugTypeInfoVARCHAR2));
 
-  my $debugTypeInfoDT = getTypeInfo($types, 'LOGDT007', 'Oracle Database 12c');       # try to lookup an Oracle VARCHAR2
-  $partnerApps::logger->info(" debugTypeInfoDT:\n" . partnerApps::Dumper($debugTypeInfoDT));
+# my $debugTypeInfoDT = getTypeInfo($types, 'LOGDT007', 'Oracle Database 12c');       # try to lookup an Oracle VARCHAR2
+# $partnerApps::logger->info(" debugTypeInfoDT:\n" . partnerApps::Dumper($debugTypeInfoDT));
 
 } ## end if ($typesFilePath)
 
-sub temp {
-
 # Load files to form our model
-  $partnerApps::logger->info("Parsing data model files loaded from from [$modelFilepath]...");
-  my $model = loadModel(\@inputFiles);
+$partnerApps::logger->info("Parsing data model files loaded from from [$modelFilepath]...");
+my $model = loadModel(\@inputFiles);
 
 # Export model as json (if asked)
-  if ($outputFileJSON) {
-    $partnerApps::logger->info("Exporting data model as json to [$outputFileJSON]...");
-    partnerApps::createExportFile($partnerApps::json->encode($model), $outputFileJSON);
-  }
+if ($outputFileJSON) {
+  $partnerApps::logger->info("Exporting data model as json to [$outputFileJSON]...");
+  partnerApps::createExportFile($partnerApps::json->encode($model), $outputFileJSON);
+}
 
 # Export model as SQL (if asked)
-  if ($outputFileSQL) {
-    $partnerApps::logger->info("Exporting data model as sql to [$outputFileSQL]...");
-    my $sql = getSQL($model);
-    partnerApps::createExportFile($sql, $outputFileSQL);
-  }
-} ## end sub temp
+if ($outputFileSQL) {
+  $partnerApps::logger->info("Exporting data model as sql to [$outputFileSQL]...");
+  my $sql = getSQL($model);
+  partnerApps::createExportFile($sql, $outputFileSQL);
+}
 
 # Log out warning if we couldn't find any files to load
 if (!@inputFiles > 0) {
@@ -194,17 +191,6 @@ sub loadTypes {
   my ($currentFilename) = @_;
   my $subName = (caller(0))[3];
   my $XMLObj;    # Our XML Twig containing the file contents
-
-  # logtypes
-  # logicaltype []
-  # name
-  # objectid
-  # default
-  # mapping []
-  # rdbms (attr)
-  # text (element text)
-  # native_to_logical_mapping
-  # ud_native_db_types
 
   # Convert plain XML text to a twig object
   eval { $XMLObj = $partnerApps::twig->parsefile($currentFilename); };
@@ -461,6 +447,11 @@ sub getSQL {
       $partnerApps::logger->info("$subName modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]");
     }
     if ($modelFile->{type} eq 'table') {
+
+      # Create table SQL
+      $sql .= getSQLCreateTable($modelFile, $modelFiles);
+
+      # Create PK SQL
       for my $index (@{$modelFile->{indexes}}) {
         if ($verbose) { $partnerApps::logger->info("$subName index name:" . $index->{name}); }
         if (defined $index->{pk}) { $sql .= getSQLPrimaryKey($index, $modelFile, $modelFiles); }
@@ -472,6 +463,31 @@ sub getSQL {
   } ## end for my $modelFile (@$modelFiles)
   return $sql;
 } ## end sub getSQL
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+sub getSQLCreateTable {
+  my ($modelFile, $modelFiles) = @_;
+  my $subName        = (caller(0))[3];
+  my $createTableSQL = '';
+
+  $createTableSQL .= qq{\nCREATE TABLE $modelFile->{name} ( \n};
+
+  # Field list
+  my $fieldList = [];
+  for my $column (@{$modelFile->{columns}}) {
+    # Lookup type info using logical type
+    my $typeInfo = getTypeInfo($types, $column->{logicalDatatype}, $RDBMS);
+    # $createTableSQL .= qq{ $column->{name}  $typeInfo->{mapping}   \n };
+    push (@{$fieldList}, qq{ $column->{name}  $typeInfo->{mapping} } );
+  } ## end for my $column (@{$modelFile...})
+
+  $createTableSQL .= join ",\n", @$fieldList;
+
+  $createTableSQL .= qq{ ); \n\n};
+
+  return $createTableSQL;
+} ## end sub getSQLCreateTable
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
