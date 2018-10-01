@@ -98,9 +98,9 @@ if ($outputFileJSON) {
 }
 
 # Export model as SQL (if asked)
-if ($outputFileSQL) {
-  $partnerApps::logger->info("Exporting data model as sql to [$outputFileSQL]...");
-  my $sql = getSQL($model);
+if ($outputFileSQL && $types && $RDBMS) {
+  $partnerApps::logger->info("Exporting data model as $RDBMS sql to [$outputFileSQL]...");
+  my $sql = getSQL($model, $types, $RDBMS);
   partnerApps::createExportFile($sql, $outputFileSQL);
 }
 
@@ -438,9 +438,9 @@ sub loadModelFileForeignKey () {
 ##---------------------------------------------------------------------------
 # Generate sql from modelFile info
 sub getSQL {
-  my ($modelFiles) = @_;
-  my $subName      = (caller(0))[3];
-  my $sql          = '';
+  my ($modelFiles, $types, $RDBMS) = @_;
+  my $subName = (caller(0))[3];
+  my $sql     = '';
 
   for my $modelFile (@$modelFiles) {
     if ($verbose) {
@@ -449,7 +449,7 @@ sub getSQL {
     if ($modelFile->{type} eq 'table') {
 
       # Create table SQL
-      $sql .= getSQLCreateTable($modelFile, $modelFiles);
+      $sql .= getSQLCreateTable($modelFile, $types, $RDBMS);
 
       # Create PK SQL
       for my $index (@{$modelFile->{indexes}}) {
@@ -467,7 +467,7 @@ sub getSQL {
 
 ##---------------------------------------------------------------------------
 sub getSQLCreateTable {
-  my ($modelFile, $modelFiles) = @_;
+  my ($modelFile, $types, $RDBMS) = @_;
   my $subName        = (caller(0))[3];
   my $createTableSQL = '';
 
@@ -476,10 +476,16 @@ sub getSQLCreateTable {
   # Field list
   my $fieldList = [];
   for my $column (@{$modelFile->{columns}}) {
+
     # Lookup type info using logical type
     my $typeInfo = getTypeInfo($types, $column->{logicalDatatype}, $RDBMS);
+    ## this will give us something like "NUMBER, precision, scale" in $typeInfo->{mapping}
+    ## need to use this info along with the column info to generate the rest of the SQL
+
+    my $fieldSQL = getFieldSQL($column, $typeInfo);
+
     # $createTableSQL .= qq{ $column->{name}  $typeInfo->{mapping}   \n };
-    push (@{$fieldList}, qq{ $column->{name}  $typeInfo->{mapping} } );
+    push(@{$fieldList}, qq{ $fieldSQL });
   } ## end for my $column (@{$modelFile...})
 
   $createTableSQL .= join ",\n", @$fieldList;
@@ -488,6 +494,84 @@ sub getSQLCreateTable {
 
   return $createTableSQL;
 } ## end sub getSQLCreateTable
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Use the type information to generate RDBMS specific SQL for a field
+sub getFieldSQL {
+  my ($column, $typeInfo) = @_;
+  my $subName = (caller(0))[3];
+
+  # my $fieldSQL = '';
+
+  # my $fieldSQL = qq{$column->{name}  $typeInfo->{mapping}};
+
+  # mappings are like this
+  # $typeInfo->{mapping}
+  # NUMBER, precision, scale
+  # VARCHAR2, size
+  # DATE
+
+  # column info is like
+  #   "dataTypeSize" : "4000 CHAR",
+  # "ownDataTypeParameters" : "4000 CHAR,,",
+  # "logicalDatatype" : "LOGDT024",
+  # "nullsAllowed" : "true"
+  #
+  # "ownDataTypeParameters" : ",13,0",
+  # "logicalDatatype" : "LOGDT019",
+  # "name" : "INDIV_ID",
+  # "nullsAllowed" : "true",
+  #
+  # "name" : "EMAIL_ID",
+  # "ownDataTypeParameters" : ",13,",
+  # "logicalDatatype" : "LOGDT019"
+  #
+  #  "nullsAllowed" : "true",
+  # "name" : "MAINT_DT",
+  # "ownDataTypeParameters" : ",,",
+  # "logicalDatatype" : "LOGDT007",
+
+  # this might always be a 3 part array
+  # 0 == size (might also include the datatype in the case of strings)
+  # 1 == precision
+  # 2 == scale
+
+  # $fieldSQL .= qq{$column->{name} };
+
+  # Split ownDataTypeParameters, then need to know what datatype we're working with to apply the rules (?)
+  my @ownDataTypeParameters = split(/,/, $column->{ownDataTypeParameters}, 3);  # These are the values we need to sub in
+  my @mapping = split(/,/, $typeInfo->{mapping});    # These are the rules to use when subbing values in
+
+  # $partnerApps::logger->info("$subName mapping:\n" . partnerApps::Dumper(@mapping));    # todo, remove
+  # $partnerApps::logger->info("$subName ownDataTypeParameters:\n" . partnerApps::Dumper(@ownDataTypeParameters))
+  #   ;                                                                                   # todo, remove
+
+  my @fieldDetails;
+  for my $map (@mapping) {
+    $map =~ s/^\s+|\s+$//g;    # Trim any whitespace
+    if ($map eq 'size') {
+      if ($ownDataTypeParameters[0]) { push(@fieldDetails, $ownDataTypeParameters[0]); }
+    }
+    if ($map eq 'precision') {
+      if ($ownDataTypeParameters[1]) { push(@fieldDetails, $ownDataTypeParameters[1]); }
+    }
+    if ($map eq 'scale') {
+      if ($ownDataTypeParameters[2]) { push(@fieldDetails, $ownDataTypeParameters[2]); }
+    }
+  } ## end for my $map (@mapping)
+
+  my $fieldDetailsSQL = '';
+  if (@fieldDetails) {
+    $fieldDetailsSQL .= '(';
+    $fieldDetailsSQL .= join ",", @fieldDetails;
+    $fieldDetailsSQL .= ')';
+  }
+  if (!defined($column->{nullsAllowed})) { $fieldDetailsSQL .= ' NOT NULL '; }
+  my $fieldSQL = qq{$column->{name}  $mapping[0] $fieldDetailsSQL };
+
+  return $fieldSQL;
+} ## end sub getFieldSQL
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
