@@ -91,17 +91,17 @@ if ($typesFilePath) {
 $partnerApps::logger->info("Parsing data model files loaded from from [$modelFilepath]...");
 my $model = loadModel(\@inputFiles);
 
-# Export model as json (if asked)
-if ($outputFileJSON) {
-  $partnerApps::logger->info("Exporting data model as json to [$outputFileJSON]...");
-  partnerApps::createExportFile($partnerApps::json->encode($model), $outputFileJSON);
-}
-
 # Export model as SQL (if asked)
 if ($outputFileSQL && $types && $RDBMS) {
   $partnerApps::logger->info("Exporting data model as $RDBMS sql to [$outputFileSQL]...");
   my $sql = getSQL($model, $types, $RDBMS);
   partnerApps::createExportFile($sql, $outputFileSQL);
+}
+
+# Export model as json (if asked)
+if ($outputFileJSON) {
+  $partnerApps::logger->info("Exporting data model as json to [$outputFileJSON]...");
+  partnerApps::createExportFile($partnerApps::json->encode($model), $outputFileJSON);
 }
 
 # Log out warning if we couldn't find any files to load
@@ -490,7 +490,7 @@ sub getSQLCreateTable {
 
   $createTableSQL .= join ",\n", @$fieldList;
 
-  $createTableSQL .= qq{ ); \n\n};
+  $createTableSQL .= qq{\n); \n\n};
 
   return $createTableSQL;
 } ## end sub getSQLCreateTable
@@ -549,26 +549,50 @@ sub getFieldSQL {
 
   my @fieldDetails;
   for my $map (@mapping) {
-    $map =~ s/^\s+|\s+$//g;    # Trim any whitespace
+    $map =~ s/^\s+|\s+$//g;    # Trim whitespace
     if ($map eq 'size') {
-      if ($ownDataTypeParameters[0]) { push(@fieldDetails, $ownDataTypeParameters[0]); }
-    }
+      if ($ownDataTypeParameters[0]) {
+        my $size = $ownDataTypeParameters[0];
+        $size =~ s/^\s+|\s+$//g;    # Trim whitespace
+        push(@fieldDetails, $size);
+        $column->{size} = $size;
+      } ## end if ($ownDataTypeParameters...)
+    } ## end if ($map eq 'size')
     if ($map eq 'precision') {
-      if ($ownDataTypeParameters[1]) { push(@fieldDetails, $ownDataTypeParameters[1]); }
-    }
+      if ($ownDataTypeParameters[1]) {
+        my $precision = $ownDataTypeParameters[1];
+        $precision =~ s/^\s+|\s+$//g;    # Trim whitespace
+        push(@fieldDetails, $precision);
+        $column->{precision} = $precision;
+      } ## end if ($ownDataTypeParameters...)
+    } ## end if ($map eq 'precision')
     if ($map eq 'scale') {
-      if ($ownDataTypeParameters[2]) { push(@fieldDetails, $ownDataTypeParameters[2]); }
-    }
+      if ($ownDataTypeParameters[2]) {
+        my $scale = $ownDataTypeParameters[2];
+        $scale =~ s/^\s+|\s+$//g;        # Trim whitespace
+        push(@fieldDetails, $scale);
+        $column->{scale} = $scale;
+      } ## end if ($ownDataTypeParameters...)
+    } ## end if ($map eq 'scale')
   } ## end for my $map (@mapping)
 
+  # Add size/precision/scale information if we have any
   my $fieldDetailsSQL = '';
   if (@fieldDetails) {
     $fieldDetailsSQL .= '(';
-    $fieldDetailsSQL .= join ",", @fieldDetails;
+    $fieldDetailsSQL .= join ',', @fieldDetails;
     $fieldDetailsSQL .= ')';
   }
-  if (!defined($column->{nullsAllowed})) { $fieldDetailsSQL .= ' NOT NULL '; }
-  my $fieldSQL = qq{$column->{name}  $mapping[0] $fieldDetailsSQL };
+
+  
+  if (!defined($column->{nullsAllowed})) { $fieldDetailsSQL .= ' NOT NULL'; }
+
+  # Assemble field components into SQL
+  my $fieldSQL = qq{$column->{name} $mapping[0] $fieldDetailsSQL};
+  $fieldSQL =~ s/^\s+|\s+$//g;    # Trim whitespace
+
+  # Update the model with the derived values # Todo, make RDBMS specific (subdocument?)
+  $column->{fieldSQL} = $fieldSQL;    # SQL
 
   return $fieldSQL;
 } ## end sub getFieldSQL
