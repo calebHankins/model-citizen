@@ -24,6 +24,7 @@ use IO::Handle;                # Supply object methods for I/O handles
 use Getopt::Long;              # Extended processing of command line options
 use Pod::Usage;                # Print a usage message from embedded pod documentation
 use Cwd qw( cwd abs_path );    # Get current working directory and absolute file paths
+use File::Basename;            # Parse file paths into directory, filename and suffix
 use partnerApps;               # partnerApps helper code for acxiom integration
 
 # turn on auto-flush / hot pipes
@@ -31,13 +32,14 @@ STDOUT->autoflush(1);
 STDERR->autoflush(1);
 
 # User options that we'll set using GetOptions()
-my $modelFilepath    = cwd();                    # Default dir to current working dir if no path is specified
-my $RDBMS            = 'Oracle Database 12c';    # Default RDBMS SQL to generate
-my $typesFilePath    = '';
-my $outputFileSQL    = '';
+my $typesFilePath = dirname(__FILE__) . '/types/types.xml'; # Default file to use for type lookup info
+my $modelFilepath = cwd();                                  # Default dir to current working dir if no path is specified
+my $RDBMS         = 'Oracle Database 12c';                  # Default RDBMS SQL to generate
+# my  $outputDirectory = dirname(__FILE__) . '/scratch/'; # todo, change to a output directory and dump all the things here to support multi-target rdbms
+my $outputFileSQL = '';
 my $outputFileJSON   = '';
-my $utfDisabled      = '';                       # Default to creating files with encoding(UTF-8)
-my $webLogSafeOutput = 0;                        # Default to not escape html entities when printing logs
+my $utfDisabled      = '';                                  # Default to creating files with encoding(UTF-8)
+my $webLogSafeOutput = 0;                                   # Default to not escape html entities when printing logs
 my $testMode         = '';
 my $verbose          = '';
 
@@ -77,15 +79,7 @@ if ($typesFilePath) {
   $partnerApps::logger->info("Loading type info lookup from [$typesFilePath]...");
   $types = loadTypes($typesFilePath);
   partnerApps::createExportFile($partnerApps::json->encode($types), './scratch/types.json');    # todo
-
-# # debug, todo remove
-# my $debugTypeInfoVARCHAR2 = getTypeInfo($types, 'LOGDT024', 'Oracle Database 12c'); # try to lookup an Oracle VARCHAR2
-# $partnerApps::logger->info(" debugTypeInfoVARCHAR2:\n" . partnerApps::Dumper($debugTypeInfoVARCHAR2));
-
-# my $debugTypeInfoDT = getTypeInfo($types, 'LOGDT007', 'Oracle Database 12c');       # try to lookup an Oracle VARCHAR2
-# $partnerApps::logger->info(" debugTypeInfoDT:\n" . partnerApps::Dumper($debugTypeInfoDT));
-
-} ## end if ($typesFilePath)
+}
 
 # Load files to form our model
 $partnerApps::logger->info("Parsing data model files loaded from from [$modelFilepath]...");
@@ -236,18 +230,20 @@ sub getTypeInfo {
   my $subName  = (caller(0))[3];
   my $typeInfo = {};
 
-  for my $type (@{$types->{logicalTypes}}) {
-    if ($type->{objectid} eq $logicalDataType) {
-      $typeInfo->{name} = $type->{name};
-      for my $mapping (@{$type->{mappings}}) {
-        if ($mapping->{rdbms} eq $RDBMS) {
-          $typeInfo->{mapping} = $mapping->{mapping};
-          last;
-        }
-      } ## end for my $mapping (@{$type...})
-      last;
-    } ## end if ($type->{objectid} ...)
-  } ## end for my $type (@{$types->...})
+  if (defined($logicalDataType) and defined($types) and defined($RDBMS)) {
+    for my $type (@{$types->{logicalTypes}}) {
+      if ($type->{objectid} eq $logicalDataType) {
+        $typeInfo->{name} = $type->{name};
+        for my $mapping (@{$type->{mappings}}) {
+          if ($mapping->{rdbms} eq $RDBMS) {
+            $typeInfo->{mapping} = $mapping->{mapping};
+            last;
+          }
+        } ## end for my $mapping (@{$type...})
+        last;
+      } ## end if ($type->{objectid} ...)
+    } ## end for my $type (@{$types->...})
+  } ## end if (defined($logicalDataType...))
 
   # todo, somewhere need to translate the mapping text into instructions to generate the ddl
   # so these bits:
@@ -482,7 +478,7 @@ sub getSQLCreateTable {
     ## this will give us something like "NUMBER, precision, scale" in $typeInfo->{mapping}
     ## need to use this info along with the column info to generate the rest of the SQL
 
-    my $fieldSQL = getFieldSQL($column, $typeInfo);
+    my $fieldSQL = getFieldSQL($column, $typeInfo, $RDBMS);
 
     # $createTableSQL .= qq{ $column->{name}  $typeInfo->{mapping}   \n };
     push(@{$fieldList}, qq{ $fieldSQL });
@@ -499,100 +495,76 @@ sub getSQLCreateTable {
 ##---------------------------------------------------------------------------
 # Use the type information to generate RDBMS specific SQL for a field
 sub getFieldSQL {
-  my ($column, $typeInfo) = @_;
-  my $subName = (caller(0))[3];
-
-  # my $fieldSQL = '';
-
-  # my $fieldSQL = qq{$column->{name}  $typeInfo->{mapping}};
-
-  # mappings are like this
-  # $typeInfo->{mapping}
-  # NUMBER, precision, scale
-  # VARCHAR2, size
-  # DATE
-
-  # column info is like
-  #   "dataTypeSize" : "4000 CHAR",
-  # "ownDataTypeParameters" : "4000 CHAR,,",
-  # "logicalDatatype" : "LOGDT024",
-  # "nullsAllowed" : "true"
-  #
-  # "ownDataTypeParameters" : ",13,0",
-  # "logicalDatatype" : "LOGDT019",
-  # "name" : "INDIV_ID",
-  # "nullsAllowed" : "true",
-  #
-  # "name" : "EMAIL_ID",
-  # "ownDataTypeParameters" : ",13,",
-  # "logicalDatatype" : "LOGDT019"
-  #
-  #  "nullsAllowed" : "true",
-  # "name" : "MAINT_DT",
-  # "ownDataTypeParameters" : ",,",
-  # "logicalDatatype" : "LOGDT007",
-
-  # this might always be a 3 part array
-  # 0 == size (might also include the datatype in the case of strings)
-  # 1 == precision
-  # 2 == scale
-
-  # $fieldSQL .= qq{$column->{name} };
+  my ($column, $typeInfo, $RDBMS) = @_;
+  my $subName         = (caller(0))[3];
+  my $fieldDetailsSQL = '';
+  my @mapping;
+  my $fieldDatatype = '';
 
   # Split ownDataTypeParameters, then need to know what datatype we're working with to apply the rules (?)
-  my @ownDataTypeParameters = split(/,/, $column->{ownDataTypeParameters}, 3);  # These are the values we need to sub in
-  my @mapping = split(/,/, $typeInfo->{mapping});    # These are the rules to use when subbing values in
-
-  # $partnerApps::logger->info("$subName mapping:\n" . partnerApps::Dumper(@mapping));    # todo, remove
-  # $partnerApps::logger->info("$subName ownDataTypeParameters:\n" . partnerApps::Dumper(@ownDataTypeParameters))
-  #   ;                                                                                   # todo, remove
-
-  my @fieldDetails;
-  for my $map (@mapping) {
-    $map =~ s/^\s+|\s+$//g;    # Trim whitespace
-    if ($map eq 'size') {
-      if ($ownDataTypeParameters[0]) {
-        my $size = $ownDataTypeParameters[0];
-        $size =~ s/^\s+|\s+$//g;    # Trim whitespace
-        push(@fieldDetails, $size);
-        $column->{size} = $size;
-      } ## end if ($ownDataTypeParameters...)
-    } ## end if ($map eq 'size')
-    if ($map eq 'precision') {
-      if ($ownDataTypeParameters[1]) {
-        my $precision = $ownDataTypeParameters[1];
-        $precision =~ s/^\s+|\s+$//g;    # Trim whitespace
-        push(@fieldDetails, $precision);
-        $column->{precision} = $precision;
-      } ## end if ($ownDataTypeParameters...)
-    } ## end if ($map eq 'precision')
-    if ($map eq 'scale') {
-      if ($ownDataTypeParameters[2]) {
-        my $scale = $ownDataTypeParameters[2];
-        $scale =~ s/^\s+|\s+$//g;        # Trim whitespace
-        push(@fieldDetails, $scale);
-        $column->{scale} = $scale;
-      } ## end if ($ownDataTypeParameters...)
-    } ## end if ($map eq 'scale')
-  } ## end for my $map (@mapping)
-
-  # Add size/precision/scale information if we have any
-  my $fieldDetailsSQL = '';
-  if (@fieldDetails) {
-    $fieldDetailsSQL .= '(';
-    $fieldDetailsSQL .= join ',', @fieldDetails;
-    $fieldDetailsSQL .= ')';
+  if (defined($typeInfo->{mapping})) {
+    @mapping                 = split(/,/, $typeInfo->{mapping});    # These are the rules to use when subbing values in
+    $fieldDatatype           = $mapping[0];
+    $column->{fieldDatatype} = $fieldDatatype;                      # Save in model
   }
 
-  
+  # Use mapping and ownDataTypeParameters to generate the RDBMS specific info
+  if (defined($column->{ownDataTypeParameters}) && defined($typeInfo->{mapping})) {
+    my @ownDataTypeParameters
+      = split(/,/, $column->{ownDataTypeParameters}, 3);            # These are the values we need to sub in
+
+    # Look for defined size/precision/scale information
+    # It appears that ownDataTypeParameters is a 3 part array
+    # map is a rdbms specific mapping of ownDataTypeParameters
+    # 0 == size (might also include the datatype in the case of strings)
+    # 1 == precision
+    # 2 == scale
+    my @fieldDetails;
+    for my $map (@mapping) {
+      $map =~ s/^\s+|\s+$//g;    # Trim whitespace
+      if ($map eq 'size') {
+        if ($ownDataTypeParameters[0]) {
+          my $size = $ownDataTypeParameters[0];
+          $size =~ s/^\s+|\s+$//g;    # Trim whitespace
+          push(@fieldDetails, $size);
+          $column->{size} = $size;    # Save in model
+        } ## end if ($ownDataTypeParameters...)
+      } ## end if ($map eq 'size')
+      if ($map eq 'precision') {
+        if ($ownDataTypeParameters[1]) {
+          my $precision = $ownDataTypeParameters[1];
+          $precision =~ s/^\s+|\s+$//g;    # Trim whitespace
+          push(@fieldDetails, $precision);
+          $column->{precision} = $precision;    # Save in model
+        } ## end if ($ownDataTypeParameters...)
+      } ## end if ($map eq 'precision')
+      if ($map eq 'scale') {
+        if ($ownDataTypeParameters[2]) {
+          my $scale = $ownDataTypeParameters[2];
+          $scale =~ s/^\s+|\s+$//g;             # Trim whitespace
+          push(@fieldDetails, $scale);
+          $column->{scale} = $scale;            # Save in model
+        } ## end if ($ownDataTypeParameters...)
+      } ## end if ($map eq 'scale')
+    } ## end for my $map (@mapping)
+
+    # Add size/precision/scale information if we have any
+
+    if (@fieldDetails) {
+      $fieldDetailsSQL .= '(';
+      $fieldDetailsSQL .= join ',', @fieldDetails;
+      $fieldDetailsSQL .= ')';
+    }
+  } ## end if (defined($column->{...}))
+
   if (!defined($column->{nullsAllowed})) { $fieldDetailsSQL .= ' NOT NULL'; }
 
   # Assemble field components into SQL
-  my $fieldSQL = qq{$column->{name} $mapping[0] $fieldDetailsSQL};
+  my $fieldSQL = qq{$column->{name} $fieldDatatype $fieldDetailsSQL};
   $fieldSQL =~ s/^\s+|\s+$//g;    # Trim whitespace
 
   # Update the model with the derived values # Todo, make RDBMS specific (subdocument?)
-  $column->{fieldSQL} = $fieldSQL;    # SQL
+  $column->{fieldSQL} = $fieldSQL;    # Save in model
 
   return $fieldSQL;
 } ## end sub getFieldSQL
@@ -605,7 +577,7 @@ sub getSQLPrimaryKey {
 
   if ($verbose) { $partnerApps::logger->info("$subName index:" . $index->{name} . " detected as a pk"); }
   my $fieldList = getFieldListFromIndex($index, $modelFile, $modelFiles);
-  return qq{ ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} PRIMARY KEY ( $fieldList ); \n};
+  return qq{ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} PRIMARY KEY ( $fieldList );\n};
 } ## end sub getSQLPrimaryKey
 ##---------------------------------------------------------------------------
 
@@ -737,6 +709,8 @@ Export Oracle Data Modeler files as json and or SQL DDL for easier consumption b
 
  Options:
     f|modelFilepath             String. Directory path where data model lives. Defaults to current working directory.
+    typesFilePath               String. File path of XML file containing type lookup information. This file can be located in your Oracle Data Modeler install directory at ${MODELER_HOME}/datamodeler/datamodeler/types/types.xml
+    RDBMS|rdbms                 String. Target RDBMS system type. Defaults to 'Oracle Database 12c'.
     o|outputFile|outputFileSQL  String. Output file path for SQL DDL file built off the model.
     outputFileJSON              String. Output file path for json file built off the model.
     webLogSafeOutput            0 or 1. If 1, encodes HTML entities in logs so they can be displayed in a web log viewer properly. Defaults to 0.
