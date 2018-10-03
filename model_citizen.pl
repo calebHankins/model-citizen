@@ -245,17 +245,6 @@ sub getTypeInfo {
     } ## end for my $type (@{$types->...})
   } ## end if (defined($logicalDataType...))
 
-  # todo, somewhere need to translate the mapping text into instructions to generate the ddl
-  # so these bits:
-  #     <Column name="MY_COOL_FIELD" ...
-  #     <logicalDatatype>LOGDT024</logicalDatatype>
-  #     <dataTypeSize>255 CHAR</dataTypeSize>
-  #     <ownDataTypeParameters>255 CHAR,,</ownDataTypeParameters>
-  # and this mapping:
-  #  { 'mapping' => 'VARCHAR2, size', 'name' => 'VARCHAR' };
-  # need to translate downstream to this SQL:
-  #  MY_COOL_FIELD          VARCHAR2(255 CHAR),
-
   return $typeInfo;
 } ## end sub getTypeInfo
 
