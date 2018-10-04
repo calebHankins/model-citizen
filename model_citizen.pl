@@ -35,8 +35,9 @@ STDERR->autoflush(1);
 my $typesFilePath = dirname(__FILE__) . '/types/types.xml'; # Default file to use for type lookup info
 my $modelFilepath = cwd();                                  # Default dir to current working dir if no path is specified
 my $RDBMS         = 'Oracle Database 12c';                  # Default RDBMS SQL to generate
+
 # my  $outputDirectory = dirname(__FILE__) . '/scratch/'; # todo, change to a output directory and dump all the things here to support multi-target rdbms
-my $outputFileSQL = '';
+my $outputFileSQL    = '';
 my $outputFileJSON   = '';
 my $utfDisabled      = '';                                  # Default to creating files with encoding(UTF-8)
 my $webLogSafeOutput = 0;                                   # Default to not escape html entities when printing logs
@@ -117,6 +118,10 @@ sub sanityCheckOptions {
   # Shell style filename expansions for things in the path like tilde or wildcards
   $modelFilepath = glob($modelFilepath);
   partnerApps::checkRequiredParm($modelFilepath, 'modelFilepath');
+  $typesFilePath = glob($typesFilePath);
+  partnerApps::checkRequiredParm($typesFilePath, 'typesFilePath');
+
+  partnerApps::checkRequiredParm($RDBMS, 'RDBMS');
 
   $partnerApps::verbose           = $verbose;             # Set partnerApps' verbose flag to the user supplied option
   $partnerApps::fuseLogSafeOutput = $webLogSafeOutput;    # Set the web log-safe output flag to the user supplied option
