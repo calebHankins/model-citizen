@@ -438,8 +438,10 @@ sub loadModelFileForeignKey () {
 # Generate sql from modelFile info
 sub getSQL {
   my ($modelFiles, $types, $RDBMS) = @_;
-  my $subName = (caller(0))[3];
-  my $sql     = '';
+  my $subName  = (caller(0))[3];
+  my $sql      = '';
+  my $tableSQL = '';
+  my $fkSQL    = '';
 
   for my $modelFile (@$modelFiles) {
     if ($verbose) {
@@ -448,23 +450,27 @@ sub getSQL {
     if ($modelFile->{type} eq 'table') {
 
       # Create table SQL
-      $sql .= getSQLCreateTable($modelFile, $types, $RDBMS);
+      $tableSQL .= getSQLCreateTable($modelFile, $types, $RDBMS);
 
       # Create index SQL
       for my $index (@{$modelFile->{indexes}}) {
         if ($verbose) { $partnerApps::logger->info("$subName index name:" . $index->{name}); }
         if (defined $index->{indexState}) {
-          if (defined $index->{pk}) { $sql .= getSQLPrimaryKey($index, $modelFile, $modelFiles); }
+          if (defined $index->{pk}) { $tableSQL .= getSQLPrimaryKey($index, $modelFile, $modelFiles); }
           elsif ($index->{indexState} eq 'Unique Plain Index' or $index->{indexState} eq 'Unique Constraint') {
-            $sql .= getSQLUniqueKey($index, $modelFile, $modelFiles);
+            $tableSQL .= getSQLUniqueKey($index, $modelFile, $modelFiles);
           }
         } ## end if (defined $index->{indexState...})
       } ## end for my $index (@{$modelFile...})
     } ## end if ($modelFile->{type}...)
     elsif ($modelFile->{type} eq "foreignkey") {
-      if (defined $modelFile->{containerWithKeyObject}) { $sql .= getSQLForeignKey($modelFile, $modelFiles); }
+      if (defined $modelFile->{containerWithKeyObject}) { $fkSQL .= getSQLForeignKey($modelFile, $modelFiles); }
     }
   } ## end for my $modelFile (@$modelFiles)
+
+  # Write fk after all table objects to avoid dependency issues
+  $sql = qq{$tableSQL\n$fkSQL\n};
+
   return $sql;
 } ## end sub getSQL
 ##---------------------------------------------------------------------------
@@ -678,10 +684,11 @@ sub getSQLForeignKey {
   # Convert referred key to human key field list
   my $referredKeyFieldList = getFieldListFromIndex($referredKeyIndex, $modelFile, $modelFiles);
 
-  $sql = qq{
-            ALTER TABLE $hostTableName ADD CONSTRAINT $modelFile->{name} FOREIGN KEY ( $hostKeyFieldList )
-                    REFERENCES $referredTableName ( $referredKeyFieldList );  
-  };
+  $sql = qq{ALTER TABLE $hostTableName
+    ADD CONSTRAINT $modelFile->{name} FOREIGN KEY ( $hostKeyFieldList )
+      REFERENCES $referredTableName ( $referredKeyFieldList );\n\n};
+
+  $modelFile->{fkSQL} = $sql;    # todo, review sql storage in model
 
   if ($verbose) { $partnerApps::logger->info("$subName \$sql:\n $sql"); }
 
