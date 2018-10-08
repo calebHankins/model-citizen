@@ -455,9 +455,10 @@ sub getSQL {
         if ($verbose) { $partnerApps::logger->info("$subName index name:" . $index->{name}); }
         if (defined $index->{indexState}) {
           if (defined $index->{pk}) { $sql .= getSQLPrimaryKey($index, $modelFile, $modelFiles); }
-          elsif ($index->{indexState} eq 'Unique Plain Index') { $sql .= getSQLUniqueKey($index, $modelFile, $modelFiles); }
-          elsif ($index->{indexState} eq 'Unique Constraint') { $sql .= getSQLUniqueKey($index, $modelFile, $modelFiles); }
-        }
+          elsif ($index->{indexState} eq 'Unique Plain Index' or $index->{indexState} eq 'Unique Constraint') {
+            $sql .= getSQLUniqueKey($index, $modelFile, $modelFiles);
+          }
+        } ## end if (defined $index->{indexState...})
       } ## end for my $index (@{$modelFile...})
     } ## end if ($modelFile->{type}...)
     elsif ($modelFile->{type} eq "foreignkey") {
@@ -598,7 +599,7 @@ sub getSQLPrimaryKey {
 
   if ($verbose) { $partnerApps::logger->info("$subName index:" . $index->{name} . " detected as a pk"); }
   my $fieldList = getFieldListFromIndex($index, $modelFile, $modelFiles);
-  return qq{ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} PRIMARY KEY ( $fieldList );\n};
+  return qq{ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} PRIMARY KEY ( $fieldList );\n\n};
 } ## end sub getSQLPrimaryKey
 ##---------------------------------------------------------------------------
 
@@ -609,8 +610,8 @@ sub getSQLUniqueKey {
 
   if ($verbose) { $partnerApps::logger->info("$subName index:" . $index->{name} . " detected as a unique key"); }
   my $fieldList = getFieldListFromIndex($index, $modelFile, $modelFiles);
-  return qq{ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} UNIQUE ( $fieldList );\n};
-} ## end sub getSQLPrimaryKey
+  return qq{ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} UNIQUE ( $fieldList );\n\n};
+} ## end sub getSQLUniqueKey
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
