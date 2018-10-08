@@ -454,14 +454,8 @@ sub getSQL {
 
       # Create index SQL
       for my $index (@{$modelFile->{indexes}}) {
-        if ($verbose) { $partnerApps::logger->info("$subName index name:" . $index->{name}); }
-        if (defined $index->{indexState}) {
-          if (defined $index->{pk}) { $tableSQL .= getSQLPrimaryKey($index, $modelFile, $modelFiles); }
-          elsif ($index->{indexState} eq 'Unique Plain Index' or $index->{indexState} eq 'Unique Constraint') {
-            $tableSQL .= getSQLUniqueKey($index, $modelFile, $modelFiles);
-          }
-        } ## end if (defined $index->{indexState...})
-      } ## end for my $index (@{$modelFile...})
+        $tableSQL .= getSQLIndex($index, $modelFile, $modelFiles);
+      }
     } ## end if ($modelFile->{type}...)
     elsif ($modelFile->{type} eq "foreignkey") {
       if (defined $modelFile->{containerWithKeyObject}) { $fkSQL .= getSQLForeignKey($modelFile, $modelFiles); }
@@ -601,31 +595,31 @@ sub getFieldSQL {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
-sub getSQLPrimaryKey {
+# Get SQL for indexes (Primary Key, Unique key)
+sub getSQLIndex {
   my ($index, $modelFile, $modelFiles) = @_;
   my $subName = (caller(0))[3];
   my $sql     = '';
 
-  if ($verbose) { $partnerApps::logger->info("$subName index:" . $index->{name} . " detected as a pk"); }
-  my $fieldList = getFieldListFromIndex($index, $modelFile, $modelFiles);
-  $sql = qq{ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} PRIMARY KEY ( $fieldList );\n\n};
-  $index->{sql} = $sql; # todo, revisit sql storage in model
-  return $sql;
-} ## end sub getSQLPrimaryKey
-##---------------------------------------------------------------------------
+  if ($verbose) { $partnerApps::logger->info("$subName index name:" . $index->{name}); }
+  if (defined $index->{indexState}) {
+    my $keyTypeSQL = '';
+    if (defined $index->{pk}) {
+      $keyTypeSQL = 'PRIMARY KEY';
+    }
+    elsif ($index->{indexState} eq 'Unique Plain Index' or $index->{indexState} eq 'Unique Constraint') {
+      $keyTypeSQL = 'UNIQUE';
+    }
 
-##---------------------------------------------------------------------------
-sub getSQLUniqueKey {
-  my ($index, $modelFile, $modelFiles) = @_;
-  my $subName = (caller(0))[3];
-  my $sql     = '';
+    if ($verbose) { $partnerApps::logger->info("$subName index:" . $index->{name} . " detected as $keyTypeSQL"); }
 
-  if ($verbose) { $partnerApps::logger->info("$subName index:" . $index->{name} . " detected as a unique key"); }
-  my $fieldList = getFieldListFromIndex($index, $modelFile, $modelFiles);
-  $sql = qq{ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} UNIQUE ( $fieldList );\n\n};
-  $index->{sql} = $sql; # todo, revisit sql storage in model
+    my $fieldList = getFieldListFromIndex($index, $modelFile, $modelFiles);
+    $sql = qq{ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} $keyTypeSQL ( $fieldList );\n\n};
+    $index->{sql} = $sql;    # todo, revisit sql storage in model
+  } ## end if (defined $index->{indexState...})
+
   return $sql;
-} ## end sub getSQLUniqueKey
+} ## end sub getSQLIndex
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
