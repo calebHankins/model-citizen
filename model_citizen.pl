@@ -363,9 +363,9 @@ sub loadModelFileTable () {
     }
     if (defined $column->first_child('commentInRDBMS')) {
 
-      # These comment might have encoded new lines, replace the encoded version with new line
+      # These comments might have encoded new lines, replace the encoded version with new line
       my $comment = $column->first_child("commentInRDBMS")->inner_xml;
-      $comment =~ s/&lt;br\/>/\n/g;
+      $comment =~ s/&lt;br\/>/\n/g; # todo, review this substitution. might need to further escape newlines
       $colInfo->{"commentInRDBMS"} = $comment;
     } ## end if (defined $column->first_child...)
 
