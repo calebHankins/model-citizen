@@ -516,6 +516,8 @@ sub getSQLCreateTable {
       .= qq{COMMENT ON COLUMN $modelFile->{name}.$commentInRDBMS->{name} IS '$commentInRDBMS->{commentInRDBMS}';\n\n};
   }
 
+  $modelFile->{createTableSQL} = $createTableSQL; # todo, review saving this SQL to the model
+
   return $createTableSQL;
 } ## end sub getSQLCreateTable
 ##---------------------------------------------------------------------------
