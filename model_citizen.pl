@@ -272,7 +272,7 @@ sub loadModel {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
-# load a model file
+# Load a model file
 sub loadModelFile {
   my ($currentFilename) = @_;
   my $subName = (caller(0))[3];
@@ -295,7 +295,9 @@ sub loadModelFile {
   if ($fileType eq 'table')      { $modelFile = loadModelFileTable($XMLObj); }
   if ($fileType eq 'foreignkey') { $modelFile = loadModelFileForeignKey($XMLObj); }
 
-  if ($verbose) { $partnerApps::logger->info("$subName Complete: [$currentFilename]") }
+  # if ($fileType eq 'unknown') { $partnerApps::logger->warn("$subName unknown model type: [$currentFilename]"); }
+
+  if ($verbose) { $partnerApps::logger->info("$subName Complete: [$currentFilename]"); }
 
   return $modelFile;
 } ## end sub loadModelFile
@@ -448,11 +450,15 @@ sub getSQL {
       # Create table SQL
       $sql .= getSQLCreateTable($modelFile, $types, $RDBMS);
 
-      # Create PK SQL
+      # Create index SQL
       for my $index (@{$modelFile->{indexes}}) {
         if ($verbose) { $partnerApps::logger->info("$subName index name:" . $index->{name}); }
-        if (defined $index->{pk}) { $sql .= getSQLPrimaryKey($index, $modelFile, $modelFiles); }
-      }
+        if (defined $index->{indexState}) {
+          if (defined $index->{pk}) { $sql .= getSQLPrimaryKey($index, $modelFile, $modelFiles); }
+          elsif ($index->{indexState} eq 'Unique Plain Index') { $sql .= getSQLUniqueKey($index, $modelFile, $modelFiles); }
+          elsif ($index->{indexState} eq 'Unique Constraint') { $sql .= getSQLUniqueKey($index, $modelFile, $modelFiles); }
+        }
+      } ## end for my $index (@{$modelFile...})
     } ## end if ($modelFile->{type}...)
     elsif ($modelFile->{type} eq "foreignkey") {
       if (defined $modelFile->{containerWithKeyObject}) { $sql .= getSQLForeignKey($modelFile, $modelFiles); }
@@ -597,7 +603,18 @@ sub getSQLPrimaryKey {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
-# Return index based on ID
+sub getSQLUniqueKey {
+  my ($index, $modelFile, $modelFiles) = @_;
+  my $subName = (caller(0))[3];
+
+  if ($verbose) { $partnerApps::logger->info("$subName index:" . $index->{name} . " detected as a unique key"); }
+  my $fieldList = getFieldListFromIndex($index, $modelFile, $modelFiles);
+  return qq{ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} UNIQUE ( $fieldList );\n};
+} ## end sub getSQLPrimaryKey
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Return index based on id
 sub getIndexFromID {
   my ($tables, $indexID) = @_;
   my $subName = (caller(0))[3];
