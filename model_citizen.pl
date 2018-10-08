@@ -361,6 +361,13 @@ sub loadModelFileTable () {
     if (defined $column->first_child('dataTypeSize')) {
       $colInfo->{"dataTypeSize"} = $column->first_child("dataTypeSize")->inner_xml;
     }
+    if (defined $column->first_child('commentInRDBMS')) {
+
+      # These comment might have encoded new lines, replace the encoded version with new line
+      my $comment = $column->first_child("commentInRDBMS")->inner_xml;
+      $comment =~ s/&lt;br\/>/\n/g;
+      $colInfo->{"commentInRDBMS"} = $comment;
+    } ## end if (defined $column->first_child...)
 
     push(@{$tableInfo->{columns}}, $colInfo);
   } ## end for my $column ($columns...)
@@ -464,7 +471,8 @@ sub getSQLCreateTable {
   $createTableSQL .= qq{\nCREATE TABLE $modelFile->{name} ( \n};
 
   # Field list
-  my $fieldList = [];
+  my $fieldList          = [];
+  my $commentInRDBMSList = [];
   for my $column (@{$modelFile->{columns}}) {
 
     # Lookup type info using logical type
@@ -474,13 +482,26 @@ sub getSQLCreateTable {
 
     my $fieldSQL = getFieldSQL($column, $typeInfo, $RDBMS);
 
+    # Save off any comments so we can add the DDL for them later
+    if (defined $column->{commentInRDBMS}) {
+      push(@{$commentInRDBMSList}, {name => $column->{name}, commentInRDBMS => $column->{commentInRDBMS}});
+    }
+
     # $createTableSQL .= qq{ $column->{name}  $typeInfo->{mapping}   \n };
     push(@{$fieldList}, qq{ $fieldSQL });
   } ## end for my $column (@{$modelFile...})
 
+  # Add field list to SQL statement
   $createTableSQL .= join ",\n", @$fieldList;
 
+  # Close field list
   $createTableSQL .= qq{\n); \n\n};
+
+  # Add SQL for column comments
+  for my $commentInRDBMS (@{$commentInRDBMSList}) {
+    $createTableSQL
+      .= qq{COMMENT ON COLUMN $modelFile->{name}.$commentInRDBMS->{name} IS '$commentInRDBMS->{commentInRDBMS}';\n\n};
+  }
 
   return $createTableSQL;
 } ## end sub getSQLCreateTable
