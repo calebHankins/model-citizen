@@ -516,7 +516,7 @@ sub getSQLCreateTable {
       .= qq{COMMENT ON COLUMN $modelFile->{name}.$commentInRDBMS->{name} IS '$commentInRDBMS->{commentInRDBMS}';\n\n};
   }
 
-  $modelFile->{createTableSQL} = $createTableSQL; # todo, review saving this SQL to the model
+  $modelFile->{sql} = $createTableSQL;    # todo, review saving this SQL to the model
 
   return $createTableSQL;
 } ## end sub getSQLCreateTable
@@ -604,10 +604,13 @@ sub getFieldSQL {
 sub getSQLPrimaryKey {
   my ($index, $modelFile, $modelFiles) = @_;
   my $subName = (caller(0))[3];
+  my $sql     = '';
 
   if ($verbose) { $partnerApps::logger->info("$subName index:" . $index->{name} . " detected as a pk"); }
   my $fieldList = getFieldListFromIndex($index, $modelFile, $modelFiles);
-  return qq{ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} PRIMARY KEY ( $fieldList );\n\n};
+  $sql = qq{ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} PRIMARY KEY ( $fieldList );\n\n};
+  $index->{sql} = $sql; # todo, revisit sql storage in model
+  return $sql;
 } ## end sub getSQLPrimaryKey
 ##---------------------------------------------------------------------------
 
@@ -615,10 +618,13 @@ sub getSQLPrimaryKey {
 sub getSQLUniqueKey {
   my ($index, $modelFile, $modelFiles) = @_;
   my $subName = (caller(0))[3];
+  my $sql     = '';
 
   if ($verbose) { $partnerApps::logger->info("$subName index:" . $index->{name} . " detected as a unique key"); }
   my $fieldList = getFieldListFromIndex($index, $modelFile, $modelFiles);
-  return qq{ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} UNIQUE ( $fieldList );\n\n};
+  $sql = qq{ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} UNIQUE ( $fieldList );\n\n};
+  $index->{sql} = $sql; # todo, revisit sql storage in model
+  return $sql;
 } ## end sub getSQLUniqueKey
 ##---------------------------------------------------------------------------
 
@@ -690,7 +696,7 @@ sub getSQLForeignKey {
     ADD CONSTRAINT $modelFile->{name} FOREIGN KEY ( $hostKeyFieldList )
       REFERENCES $referredTableName ( $referredKeyFieldList );\n\n};
 
-  $modelFile->{fkSQL} = $sql;    # todo, review sql storage in model
+  $modelFile->{sql} = $sql;    # todo, review sql storage in model
 
   if ($verbose) { $partnerApps::logger->info("$subName \$sql:\n $sql"); }
 
