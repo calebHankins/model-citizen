@@ -420,6 +420,8 @@ sub loadModelFileForeignKey () {
   $fkInfo->{containerWithKeyObject} = $fkXMLObj->att("containerWithKeyObject");
   $fkInfo->{localFKIndex}           = $fkXMLObj->att("localFKIndex");
   $fkInfo->{keyObject}              = $fkXMLObj->first_child("keyObject")->inner_xml;
+  $fkInfo->{createdTime}            = $fkXMLObj->first_child("createdTime")->inner_xml;
+  $fkInfo->{createdBy}              = $fkXMLObj->first_child("createdBy")->inner_xml;
 
   if (defined $fkXMLObj->first_child("referredTableID")) {
     $fkInfo->{referredTableID} = $fkXMLObj->first_child("referredTableID")->inner_xml;
@@ -581,7 +583,7 @@ sub getFieldSQL {
     }
   } ## end if (defined($column->{...}))
 
-  if (!defined($column->{nullsAllowed})) { $fieldDetailsSQL .= ' NOT NULL'; }
+  if (!defined($column->{nullsAllowed})) { $fieldDetailsSQL .= 'NOT NULL'; }
 
   # Assemble field components into SQL
   my $fieldSQL = qq{$column->{name} $fieldDatatype $fieldDetailsSQL};
