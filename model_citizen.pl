@@ -475,7 +475,7 @@ sub getSQLCreateTable {
   my $subName        = (caller(0))[3];
   my $createTableSQL = '';
 
-  $createTableSQL .= qq{\nCREATE TABLE $modelFile->{name} ( \n};
+  $createTableSQL .= qq{\nCREATE TABLE $modelFile->{name} (\n};
 
   # Field list
   my $fieldList          = [];
@@ -495,14 +495,14 @@ sub getSQLCreateTable {
     }
 
     # $createTableSQL .= qq{ $column->{name}  $typeInfo->{mapping}   \n };
-    push(@{$fieldList}, qq{ $fieldSQL });
+    push(@{$fieldList}, qq{    $fieldSQL});
   } ## end for my $column (@{$modelFile...})
 
   # Add field list to SQL statement
   $createTableSQL .= join ",\n", @$fieldList;
 
   # Close field list
-  $createTableSQL .= qq{\n); \n\n};
+  $createTableSQL .= qq{\n);\n\n};
 
   # Add SQL for column comments
   for my $commentInRDBMS (@{$commentInRDBMSList}) {
