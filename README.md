@@ -50,3 +50,9 @@ perl model_citizen.pl  --outputFileSQL ./scratch/ddl.sql --outputFileJSON ./scra
 
 ```
 
+The json output is an array of documents describing the data model. These can be fed directly into mongoDB using a tool such as mongoimport using the --jsonArray option.
+```powershell
+mongoimport.exe --db join-hero --collection model --file "C:\git\model-citizen\scratch\model.json"
+ --host localhost:27017 -v --stopOnError --jsonArray --mode upsert --upsertFields "name,type";
+```
+
