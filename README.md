@@ -40,14 +40,12 @@ use Log::Log4perl;               # Log4j implementation for Perl
 Print usage info
 ```powershell
 perl model_citizen.pl --help
-
 ```
 
 
 Load up data modeler files and generate a DDL SQL output file and a json output file
 ```powershell
 perl model_citizen.pl  --outputFileSQL ./scratch/ddl.sql --outputFileJSON ./scratch/model.json --modelFilepath C:\git\datamodels\MY_AWESOME_DATA_MODEL\
-
 ```
 
 The json output is an array of documents describing the data model. These can be fed directly into mongoDB using a tool such as mongoimport using the --jsonArray option.
