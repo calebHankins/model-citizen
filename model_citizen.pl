@@ -420,6 +420,8 @@ sub loadModelFileForeignKey () {
   $fkInfo->{containerWithKeyObject} = $fkXMLObj->att("containerWithKeyObject");
   $fkInfo->{localFKIndex}           = $fkXMLObj->att("localFKIndex");
   $fkInfo->{keyObject}              = $fkXMLObj->first_child("keyObject")->inner_xml;
+  $fkInfo->{createdTime}            = $fkXMLObj->first_child("createdTime")->inner_xml;
+  $fkInfo->{createdBy}              = $fkXMLObj->first_child("createdBy")->inner_xml;
 
   if (defined $fkXMLObj->first_child("referredTableID")) {
     $fkInfo->{referredTableID} = $fkXMLObj->first_child("referredTableID")->inner_xml;
@@ -475,7 +477,7 @@ sub getSQLCreateTable {
   my $subName        = (caller(0))[3];
   my $createTableSQL = '';
 
-  $createTableSQL .= qq{\nCREATE TABLE $modelFile->{name} ( \n};
+  $createTableSQL .= qq{\nCREATE TABLE $modelFile->{name} (\n};
 
   # Field list
   my $fieldList          = [];
@@ -495,14 +497,14 @@ sub getSQLCreateTable {
     }
 
     # $createTableSQL .= qq{ $column->{name}  $typeInfo->{mapping}   \n };
-    push(@{$fieldList}, qq{ $fieldSQL });
+    push(@{$fieldList}, qq{    $fieldSQL});
   } ## end for my $column (@{$modelFile...})
 
   # Add field list to SQL statement
   $createTableSQL .= join ",\n", @$fieldList;
 
   # Close field list
-  $createTableSQL .= qq{\n); \n\n};
+  $createTableSQL .= qq{\n);\n\n};
 
   # Add SQL for column comments
   for my $commentInRDBMS (@{$commentInRDBMSList}) {
@@ -581,7 +583,7 @@ sub getFieldSQL {
     }
   } ## end if (defined($column->{...}))
 
-  if (!defined($column->{nullsAllowed})) { $fieldDetailsSQL .= ' NOT NULL'; }
+  if (!defined($column->{nullsAllowed})) { $fieldDetailsSQL .= 'NOT NULL'; }
 
   # Assemble field components into SQL
   my $fieldSQL = qq{$column->{name} $fieldDatatype $fieldDetailsSQL};

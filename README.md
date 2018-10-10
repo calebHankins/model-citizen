@@ -1,6 +1,6 @@
 # MODEL-CITIZEN
 
-_I am the very model of a modern meta generator_
+_I am the very model of modern meta generable_
 
 Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes 
 
@@ -8,7 +8,6 @@ Export Oracle Data Modeler files as json and or SQL DDL for easier consumption b
   - [Installation](#installation)
     - [Example commands to install Log::Log4perl on various platforms](#example-commands-to-install-loglog4perl-on-various-platforms)
   - [Usage](#usage)
-
 
 ## Installation
 
@@ -38,16 +37,20 @@ use Log::Log4perl;               # Log4j implementation for Perl
 
 ## Usage
 
+Print usage info
 ```powershell
-# Print usage info
 perl model_citizen.pl --help
-
 ```
 
 
+Load up data modeler files and generate a DDL SQL output file and a json output file
 ```powershell
-# Load up data modeler files and generate a DDL SQL output file and a json output file
 perl model_citizen.pl  --outputFileSQL ./scratch/ddl.sql --outputFileJSON ./scratch/model.json --modelFilepath C:\git\datamodels\MY_AWESOME_DATA_MODEL\
+```
 
+The json output is an array of documents describing the data model. These can be fed directly into mongoDB using a tool such as mongoimport using the --jsonArray option.
+```powershell
+mongoimport.exe --db join-hero --collection model --file "C:\git\model-citizen\scratch\model.json"
+ --host localhost:27017 -v --stopOnError --jsonArray --mode upsert --upsertFields "name,type";
 ```
 
