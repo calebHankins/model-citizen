@@ -86,6 +86,10 @@ if ($typesFilePath) {
 $partnerApps::logger->info("Parsing data model files loaded from from [$modelFilepath]...");
 my $model = loadModel(\@inputFiles);
 
+# Sort model by name
+$partnerApps::logger->info("Sorting model files by name...");
+@$model = sort { $a->{name} cmp $b->{name} } @$model;
+
 # Export model as SQL (if asked)
 if ($outputFileSQL && $types && $RDBMS) {
   $partnerApps::logger->info("Exporting data model as $RDBMS sql to [$outputFileSQL]...");
