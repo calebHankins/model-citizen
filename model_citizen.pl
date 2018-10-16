@@ -86,6 +86,10 @@ if ($typesFilePath) {
 $partnerApps::logger->info("Parsing data model files loaded from from [$modelFilepath]...");
 my $model = loadModel(\@inputFiles);
 
+# Sort model by name
+$partnerApps::logger->info("Sorting model files by name...");
+@$model = sort { $a->{name} cmp $b->{name} } @$model;
+
 # Export model as SQL (if asked)
 if ($outputFileSQL && $types && $RDBMS) {
   $partnerApps::logger->info("Exporting data model as $RDBMS sql to [$outputFileSQL]...");
@@ -456,8 +460,13 @@ sub getSQL {
 
       # Create index SQL
       for my $index (@{$modelFile->{indexes}}) {
-        $tableSQL .= getSQLIndex($index, $modelFile, $modelFiles);
-      }
+        if (defined $index->{indexState}) {
+          if ($index->{indexState} ne 'Foreign Key') {
+
+            $tableSQL .= getSQLIndex($index, $modelFile, $modelFiles);
+          }
+        } ## end if (defined $index->{indexState...})
+      } ## end for my $index (@{$modelFile...})
     } ## end if ($modelFile->{type}...)
     elsif ($modelFile->{type} eq "foreignkey") {
       if (defined $modelFile->{containerWithKeyObject}) { $fkSQL .= getSQLForeignKey($modelFile, $modelFiles); }
@@ -579,7 +588,7 @@ sub getFieldSQL {
     if (@fieldDetails) {
       $fieldDetailsSQL .= '(';
       $fieldDetailsSQL .= join ',', @fieldDetails;
-      $fieldDetailsSQL .= ')';
+      $fieldDetailsSQL .= ') ';
     }
   } ## end if (defined($column->{...}))
 
@@ -605,7 +614,7 @@ sub getSQLIndex {
 
   if ($verbose) { $partnerApps::logger->info("$subName index name:" . $index->{name}); }
   if (defined $index->{indexState}) {
-    my $keyTypeSQL = '';
+    my $keyTypeSQL = 'UNKNOWN_INDEX_TYPE';
     if (defined $index->{pk}) {
       $keyTypeSQL = 'PRIMARY KEY';
     }
