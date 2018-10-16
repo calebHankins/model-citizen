@@ -7,6 +7,7 @@ Export Oracle Data Modeler files as json and or SQL DDL for easier consumption b
 - [MODEL-CITIZEN](#model-citizen)
   - [Installation](#installation)
     - [Example commands to install Log::Log4perl on various platforms](#example-commands-to-install-loglog4perl-on-various-platforms)
+    - [macOS example](#macos-example)
   - [Usage](#usage)
 
 ## Installation
@@ -34,10 +35,13 @@ use Log::Log4perl;               # Log4j implementation for Perl
 - `ppm install Log-Log4perl (ActivePerl)`
 - `sudo apt install liblog-log4perl-perl (Ubuntu/Debian)`
 - `sudo yum install perl-Log-Log4perl (CentOS/RedHat)`
-- `On MAC`
-    - `sudo cpan install JSON`
-    - `sudo cpan install XML::Twig`
-    - `sudo cpan install Log::Log4perl`
+
+### macOS example
+```bash
+sudo cpan install JSON
+sudo cpan install XML::Twig
+sudo cpan install Log::Log4perl
+```
 
 ## Usage
 
