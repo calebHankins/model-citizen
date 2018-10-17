@@ -3,7 +3,7 @@
 #                               All Rights Reserved.
 ############################################################################################
 #
-# Script: modelCitizen.pm
+# Script: ModelCitizen.pm
 # Author: Caleb Hankins - chanki
 # Date:   2018-10-17
 #
