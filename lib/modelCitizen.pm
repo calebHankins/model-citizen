@@ -17,7 +17,7 @@
 # 2018-10-17  Caleb Hankins - chanki       Initial Copy
 ############################################################################################
 
-package modelCitizen;
+package ModelCitizen;
 
 use warnings;
 use strict;

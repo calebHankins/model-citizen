@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
-   "name" : "modelCitizen",
+   "name" : "ModelCitizen",
    "prereqs" : {
       "runtime" : {
          "requires" : {
@@ -38,13 +38,14 @@
    "provides" : {
       "Logger" : {
          "file" : "lib/Logger.pm"
-      },
-      "modelCitizen" : {
-         "file" : "lib/modelCitizen.pm",
-         "version" : "v0.0.1"
       }
    },
    "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://apache.org/licenses/LICENSE-2.0"
+      ]
+   },
    "version" : "v0.0.1",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }

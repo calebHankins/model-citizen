@@ -28,7 +28,7 @@ use Pod::Usage;                        # Print a usage message from embedded pod
 use Cwd qw( cwd abs_path );            # Get current working directory and absolute file paths
 use File::Basename;                    # Parse file paths into directory, filename and suffix
 use lib dirname(__FILE__) . '/lib';    # Use local libraries
-use modelCitizen;                      # modelCitizen helper code
+use ModelCitizen;                      # Helper code for file processing
 
 # turn on auto-flush / hot pipes
 STDOUT->autoflush(1);
@@ -67,49 +67,49 @@ sanityCheckOptions();
 logScriptConfig();
 
 # Construct a list of files to munge and log file details
-$modelCitizen::logger->info("Opening data model from [$modelFilepath]...");
-my @inputFiles = modelCitizen::buildPackageFileList($modelFilepath, '.xml');
+$ModelCitizen::logger->info("Opening data model from [$modelFilepath]...");
+my @inputFiles = ModelCitizen::buildPackageFileList($modelFilepath, '.xml');
 if ($verbose) { logFileInformation(\@inputFiles, 'Input'); }
 my $inputFileCnt = @inputFiles;
-$modelCitizen::logger->info("[$inputFileCnt] files have been identified for analysis.");
+$ModelCitizen::logger->info("[$inputFileCnt] files have been identified for analysis.");
 
 # Load type lookup info
 my $types;
 if ($typesFilePath) {
-  $modelCitizen::logger->info("Loading type info lookup from [$typesFilePath]...");
+  $ModelCitizen::logger->info("Loading type info lookup from [$typesFilePath]...");
   $types = loadTypes($typesFilePath);
-  modelCitizen::checkRequiredParm($types, 'types', '');
+  ModelCitizen::checkRequiredParm($types, 'types', '');
 }
 
 # Load files to form our model
-$modelCitizen::logger->info("Parsing data model files loaded from from [$modelFilepath]...");
+$ModelCitizen::logger->info("Parsing data model files loaded from from [$modelFilepath]...");
 my $model = loadModel(\@inputFiles);
 
 # Sort model by name
-$modelCitizen::logger->info("Sorting model files by name...");
+$ModelCitizen::logger->info("Sorting model files by name...");
 @$model = sort { $a->{name} cmp $b->{name} } @$model;
 
 # Export model as SQL (if asked)
 if ($outputFileSQL && $types && $RDBMS) {
-  $modelCitizen::logger->info("Exporting data model as $RDBMS sql to [$outputFileSQL]...");
+  $ModelCitizen::logger->info("Exporting data model as $RDBMS sql to [$outputFileSQL]...");
   my $sql = getSQL($model, $types, $RDBMS);
-  modelCitizen::createExportFile($sql, $outputFileSQL);
+  ModelCitizen::createExportFile($sql, $outputFileSQL);
 }
 
 # Export model as json (if asked)
 if ($outputFileJSON) {
-  $modelCitizen::logger->info("Exporting data model as json to [$outputFileJSON]...");
-  modelCitizen::createExportFile($modelCitizen::json->encode($model), $outputFileJSON);
+  $ModelCitizen::logger->info("Exporting data model as json to [$outputFileJSON]...");
+  ModelCitizen::createExportFile($ModelCitizen::json->encode($model), $outputFileJSON);
 }
 
 # Log out warning if we couldn't find any files to load
 if (!@inputFiles > 0) {
-  $modelCitizen::logger->warn("No files were found to work on. You might want to check that out.");
+  $ModelCitizen::logger->warn("No files were found to work on. You might want to check that out.");
 }
 
 ##---------------------------------------------------------------------------
 END {
-  exit(modelCitizen::signOff($?));
+  exit(ModelCitizen::signOff($?));
 }
 ##---------------------------------------------------------------------------
 
@@ -123,24 +123,24 @@ sub sanityCheckOptions {
   $typesFilePath = glob($typesFilePath);
 
   # Make sure we have all our required parms set
-  modelCitizen::checkRequiredParm($modelFilepath, 'modelFilepath');
-  modelCitizen::checkRequiredParm($typesFilePath, 'typesFilePath');
-  modelCitizen::checkRequiredParm($RDBMS,         'RDBMS');
+  ModelCitizen::checkRequiredParm($modelFilepath, 'modelFilepath');
+  ModelCitizen::checkRequiredParm($typesFilePath, 'typesFilePath');
+  ModelCitizen::checkRequiredParm($RDBMS,         'RDBMS');
 
   # Set package level variables
-  $modelCitizen::verbose = $verbose;    # Set modelCitizen' verbose flag to the user supplied option
+  $ModelCitizen::verbose = $verbose;    # Set ModelCitizen' verbose flag to the user supplied option
 
   # Check for errors before starting processing
-  if ($modelCitizen::logger->get_count("ERROR") > 0) {
+  if ($ModelCitizen::logger->get_count("ERROR") > 0) {
 
     # Print informational message to standard output
-    $modelCitizen::logger->info(  "$subName There were ["
-                                . $modelCitizen::logger->get_count("ERROR")
+    $ModelCitizen::logger->info(  "$subName There were ["
+                                . $ModelCitizen::logger->get_count("ERROR")
                                 . "] error messages detected while sanity checking options. Script is halting.");
 
     # Exit with a non-zero code and print usage
     pod2usage(10);
-  } ## end if ($modelCitizen::logger...)
+  } ## end if ($ModelCitizen::logger...)
 
   return;
 } ## end sub sanityCheckOptions
@@ -149,21 +149,21 @@ sub sanityCheckOptions {
 ##---------------------------------------------------------------------------
 # Print [Script Config Information] to log
 sub logScriptConfig {
-  $modelCitizen::logger->info("[Script Config Information]");
-  $modelCitizen::logger->info("  script path:             [$0]");
-  $modelCitizen::logger->info("  modelFilepath:           [$modelFilepath]");
-  $modelCitizen::logger->info("  typesFilePath:           [$typesFilePath]");
-  $modelCitizen::logger->info("  outputFileSQL:           [$outputFileSQL]");
-  $modelCitizen::logger->info("  outputFileJSON:          [$outputFileJSON]");
-  $modelCitizen::logger->info("  RDBMS:                   [$RDBMS]");
+  $ModelCitizen::logger->info("[Script Config Information]");
+  $ModelCitizen::logger->info("  script path:             [$0]");
+  $ModelCitizen::logger->info("  modelFilepath:           [$modelFilepath]");
+  $ModelCitizen::logger->info("  typesFilePath:           [$typesFilePath]");
+  $ModelCitizen::logger->info("  outputFileSQL:           [$outputFileSQL]");
+  $ModelCitizen::logger->info("  outputFileJSON:          [$outputFileJSON]");
+  $ModelCitizen::logger->info("  RDBMS:                   [$RDBMS]");
 
   $testMode
-    ? $modelCitizen::logger->info("  testMode:                [Enabled]")
-    : $modelCitizen::logger->info("  testMode:                [Disabled]");
+    ? $ModelCitizen::logger->info("  testMode:                [Enabled]")
+    : $ModelCitizen::logger->info("  testMode:                [Disabled]");
   $verbose
-    ? $modelCitizen::logger->info("  verbose:                 [Enabled]")
-    : $modelCitizen::logger->info("  verbose:                 [Disabled]");
-  $modelCitizen::logger->info("");
+    ? $ModelCitizen::logger->info("  verbose:                 [Enabled]")
+    : $ModelCitizen::logger->info("  verbose:                 [Disabled]");
+  $ModelCitizen::logger->info("");
 
   return;
 } ## end sub logScriptConfig
@@ -173,13 +173,13 @@ sub logScriptConfig {
 # Print [File Information] to log
 sub logFileInformation {
   my ($files, $fileType) = @_;
-  $modelCitizen::logger->info("[$fileType File Information]");
-  $modelCitizen::logger->info("  filepath: [$modelFilepath]");
+  $ModelCitizen::logger->info("[$fileType File Information]");
+  $ModelCitizen::logger->info("  filepath: [$modelFilepath]");
   for (my $i = 0; $i < @{$files}; $i++) {
     my $formattedIndex = sprintf '%4s', $i;    # Left pad index with spaces for prettier logging
-    $modelCitizen::logger->info("$formattedIndex:  [$files->[$i]]");
+    $ModelCitizen::logger->info("$formattedIndex:  [$files->[$i]]");
   }
-  $modelCitizen::logger->info("");
+  $ModelCitizen::logger->info("");
 
   return;
 } ## end sub logFileInformation
@@ -193,8 +193,8 @@ sub loadTypes {
   my $XMLObj;    # Our XML Twig containing the file contents
 
   # Convert plain XML text to a twig object
-  eval { $XMLObj = $modelCitizen::twig->parsefile($currentFilename); };
-  $modelCitizen::logger->error(modelCitizen::objConversionErrorMsgGenerator($@)) if $@;
+  eval { $XMLObj = $ModelCitizen::twig->parsefile($currentFilename); };
+  $ModelCitizen::logger->error(ModelCitizen::objConversionErrorMsgGenerator($@)) if $@;
 
   my $types       = {};
   my $typesXMLObj = $XMLObj->root;
@@ -221,7 +221,7 @@ sub loadTypes {
   } ## end for my $logicalType ($typesXMLObj...)
 
   # if ($verbose) {
-  # $modelCitizen::logger->info("$subName types:\n" . modelCitizen::Dumper($types));
+  # $ModelCitizen::logger->info("$subName types:\n" . ModelCitizen::Dumper($types));
 
   #  }
 
@@ -280,25 +280,25 @@ sub loadModelFile {
   my $XMLObj;    # Our XML Twig containing the file contents
   my $modelFile;
 
-  if ($verbose) { $modelCitizen::logger->info("$subName Processing: [$currentFilename]") }
+  if ($verbose) { $ModelCitizen::logger->info("$subName Processing: [$currentFilename]") }
 
   # Convert plain XML text to a twig object
-  eval { $XMLObj = $modelCitizen::twig->parsefile($currentFilename); };
-  $modelCitizen::logger->error(modelCitizen::objConversionErrorMsgGenerator($@)) if $@;
+  eval { $XMLObj = $ModelCitizen::twig->parsefile($currentFilename); };
+  $ModelCitizen::logger->error(ModelCitizen::objConversionErrorMsgGenerator($@)) if $@;
 
   # Handle files based on type. Could also do this based on internal metadata in the file instead of the path
   my $fileType = '';
   if    ($currentFilename ~~ /table/)      { $fileType = 'table'; }
   elsif ($currentFilename ~~ /foreignkey/) { $fileType = 'foreignkey'; }
   else                                     { $fileType = 'unknown'; }
-  if ($verbose) { $modelCitizen::logger->info("$subName detected as a $fileType fileType: [$currentFilename]"); }
+  if ($verbose) { $ModelCitizen::logger->info("$subName detected as a $fileType fileType: [$currentFilename]"); }
 
   if ($fileType eq 'table')      { $modelFile = loadModelFileTable($XMLObj); }
   if ($fileType eq 'foreignkey') { $modelFile = loadModelFileForeignKey($XMLObj); }
 
-  # if ($fileType eq 'unknown') { $modelCitizen::logger->warn("$subName unknown model type: [$currentFilename]"); }
+  # if ($fileType eq 'unknown') { $ModelCitizen::logger->warn("$subName unknown model type: [$currentFilename]"); }
 
-  if ($verbose) { $modelCitizen::logger->info("$subName Complete: [$currentFilename]"); }
+  if ($verbose) { $ModelCitizen::logger->info("$subName Complete: [$currentFilename]"); }
 
   return $modelFile;
 } ## end sub loadModelFile
@@ -381,7 +381,7 @@ sub loadModelFileTable () {
 
     $tableInfo->{indexes} = [];
     for my $index ($indexes->children('ind_PK_UK')) {
-      if ($verbose) { $modelCitizen::logger->info("$subName index name:" . $index->att("name")); }
+      if ($verbose) { $ModelCitizen::logger->info("$subName index name:" . $index->att("name")); }
 
       my $indexInfo = {name => $index->att("name"), id => $index->att("id")};
 
@@ -401,7 +401,7 @@ sub loadModelFileTable () {
     } ## end for my $index ($indexes...)
   } ## end if (defined $indexes)
 
-  if ($verbose) { $modelCitizen::logger->info("$subName tableInfo:\n" . modelCitizen::Dumper($tableInfo)); }
+  if ($verbose) { $ModelCitizen::logger->info("$subName tableInfo:\n" . ModelCitizen::Dumper($tableInfo)); }
 
   return $tableInfo;
 } ## end sub loadModelFileTable
@@ -431,7 +431,7 @@ sub loadModelFileForeignKey () {
     $fkInfo->{referredKeyID} = $fkXMLObj->first_child("referredKeyID")->inner_xml;
   }
 
-  if ($verbose) { $modelCitizen::logger->info("$subName fkName\n" . modelCitizen::Dumper($fkInfo)); }
+  if ($verbose) { $ModelCitizen::logger->info("$subName fkName\n" . ModelCitizen::Dumper($fkInfo)); }
 
   return $fkInfo;
 } ## end sub loadModelFileForeignKey
@@ -448,7 +448,7 @@ sub getSQL {
 
   for my $modelFile (@$modelFiles) {
     if ($verbose) {
-      $modelCitizen::logger->info("$subName modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]");
+      $ModelCitizen::logger->info("$subName modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]");
     }
     if ($modelFile->{type} eq 'table') {
 
@@ -609,7 +609,7 @@ sub getSQLIndex {
   my $subName = (caller(0))[3];
   my $sql     = '';
 
-  if ($verbose) { $modelCitizen::logger->info("$subName index name:" . $index->{name}); }
+  if ($verbose) { $ModelCitizen::logger->info("$subName index name:" . $index->{name}); }
   if (defined $index->{indexState}) {
     my $keyTypeSQL = 'UNKNOWN_INDEX_TYPE';
     if (defined $index->{pk}) {
@@ -619,7 +619,7 @@ sub getSQLIndex {
       $keyTypeSQL = 'UNIQUE';
     }
 
-    if ($verbose) { $modelCitizen::logger->info("$subName index:" . $index->{name} . " detected as $keyTypeSQL"); }
+    if ($verbose) { $ModelCitizen::logger->info("$subName index:" . $index->{name} . " detected as $keyTypeSQL"); }
 
     my $fieldList = getFieldListFromIndex($index, $modelFile, $modelFiles);
     $sql = qq{ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} $keyTypeSQL ( $fieldList );\n\n};
@@ -643,7 +643,7 @@ sub getIndexFromID {
   }
 
   my $error = "ERR_COULD_NOT_RESOLVE_INDEX_FOR_ID_${indexID}";
-  $modelCitizen::logger->error("$subName $error");
+  $ModelCitizen::logger->error("$subName $error");
   return "ERR_COULD_NOT_RESOLVE_INDEX_FOR_ID_${indexID}";
 } ## end sub getIndexFromID
 ##---------------------------------------------------------------------------
@@ -700,7 +700,7 @@ sub getSQLForeignKey {
 
   $modelFile->{sql} = $sql;    # todo, review sql storage in model
 
-  if ($verbose) { $modelCitizen::logger->info("$subName \$sql:\n $sql"); }
+  if ($verbose) { $ModelCitizen::logger->info("$subName \$sql:\n $sql"); }
 
   return $sql;
 } ## end sub getSQLForeignKey
@@ -719,7 +719,7 @@ sub getColumnNameFromID {
   }
 
   my $error = "ERR_COULD_NOT_RESOLVE_FIELD_NAME_FOR_ID_${columnID}";
-  $modelCitizen::logger->error("$subName $error");
+  $ModelCitizen::logger->error("$subName $error");
   return "ERR_COULD_NOT_RESOLVE_FIELD_NAME_FOR_ID_${columnID}";
 } ## end sub getColumnNameFromID
 ##---------------------------------------------------------------------------
@@ -735,7 +735,7 @@ sub getTableNameFromID {
   }
 
   my $error = "ERR_COULD_NOT_RESOLVE_TABLE_NAME_FOR_ID_${tableID}";
-  $modelCitizen::logger->error("$subName $error");
+  $ModelCitizen::logger->error("$subName $error");
   return "ERR_COULD_NOT_RESOLVE_TABLE_NAME_FOR_ID_${tableID}";
 } ## end sub getTableNameFromID
 ##---------------------------------------------------------------------------

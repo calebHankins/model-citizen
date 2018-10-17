@@ -9,13 +9,10 @@ license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
-name: modelCitizen
+name: ModelCitizen
 provides:
   Logger:
     file: lib/Logger.pm
-  modelCitizen:
-    file: lib/modelCitizen.pm
-    version: v0.0.1
 requires:
   Cwd: '0'
   Data::Dumper: '0'
@@ -33,5 +30,7 @@ requires:
   XML::Twig: '0'
   experimental: '0'
   perl: v5.10.1
+resources:
+  license: http://apache.org/licenses/LICENSE-2.0
 version: v0.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
