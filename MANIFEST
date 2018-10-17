@@ -1,0 +1,10 @@
+Build.PL
+CONTRIBUTING.md
+lib/model-citizen.pm
+Logger.pm
+MANIFEST			This list of files
+model_citizen.pl
+partnerApps.pm
+perltidy.rc
+README.md
+types/types.xml
