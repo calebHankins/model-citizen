@@ -12,10 +12,10 @@ Export Oracle Data Modeler files as json and or SQL DDL for easier consumption b
 
  ```powershell
 perl Build.PL
-./Build installdeps  # this step may require superuser privs
+./Build installdeps   # this step may require superuser privs
 ./Build
 ./Build test
-./Build install  # this step may require superuser privs
+./Build install       # this step may require superuser privs
 ```
 
 ## Usage

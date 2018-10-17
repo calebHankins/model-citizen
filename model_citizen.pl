@@ -51,7 +51,6 @@ my $rc = GetOptions(
   'o|outputFile|outputFileSQL=s' => \$outputFileSQL,
   'outputFileJSON=s'             => \$outputFileJSON,
   'utfDisabled'                  => \$utfDisabled,
-  'webLogSafeOutput=s'           => \$webLogSafeOutput,
 
   't|testMode' => \$testMode,
   'v|verbose'  => \$verbose,
@@ -156,9 +155,6 @@ sub logScriptConfig {
   $modelCitizen::logger->info("  outputFileJSON:          [$outputFileJSON]");
   $modelCitizen::logger->info("  RDBMS:                   [$RDBMS]");
 
-  $webLogSafeOutput
-    ? $modelCitizen::logger->info("  webLogSafeOutput:        [Enabled]")
-    : $modelCitizen::logger->info("  webLogSafeOutput:        [Disabled]");
   $testMode
     ? $modelCitizen::logger->info("  testMode:                [Enabled]")
     : $modelCitizen::logger->info("  testMode:                [Disabled]");
@@ -753,11 +749,11 @@ Caleb Hankins - chanki
 
 =head1 NAME
 
-model_citizen.pl
+model-citizen
 
 =head1 SYNOPSIS
 
-Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes 
+model-citizen: Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes 
 
  Options:
     f|modelFilepath             String. Directory path where data model lives. Defaults to current working directory.

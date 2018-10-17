@@ -11,6 +11,8 @@ meta-spec:
   version: '1.4'
 name: modelCitizen
 provides:
+  Logger:
+    file: lib/Logger.pm
   modelCitizen:
     file: lib/modelCitizen.pm
     version: v0.0.1
@@ -29,6 +31,7 @@ requires:
   Text::ParseWords: '0'
   URI::Escape: '0'
   XML::Twig: '0'
+  experimental: '0'
   perl: v5.10.1
 version: v0.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

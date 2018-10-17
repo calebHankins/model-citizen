@@ -25,6 +25,7 @@ my $build = Module::Build->new(
                'Getopt::Long'     => '0',
                'Pod::Usage'       => '0',
                'Cwd'              => '0',
+               'experimental'     => '0',
   },
 );
 $build->create_build_script;

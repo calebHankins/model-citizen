@@ -121,7 +121,7 @@ sub get_count {
   my $all_level = shift;
   my $total     = 0;
 
-  @levels = split(/,/, $all_level);
+  my @levels = split(/,/, $all_level);
   foreach my $level (@levels) {
     $level = uc($level);
     chomp $level;
@@ -146,7 +146,9 @@ sub _init {
   # Retrieve Logger
   $logger = Log::Log4perl::get_logger($class);
 
-  my $level = uc($ENV{'LOG_LEVEL'});
+  my $log_level = $ENV{'LOG_LEVEL'};
+  my $level = '';
+  if (defined $log_level) { $level = uc($ENV{'LOG_LEVEL'}); }
 
   if ($level =~ /.conf$/) {
     Log::Log4perl::init_once($level);
