@@ -1,6 +1,6 @@
 Build.PL
 CONTRIBUTING.md
-lib/model-citizen.pm
+lib/modelCitizen.pm
 Logger.pm
 MANIFEST			This list of files
 model_citizen.pl

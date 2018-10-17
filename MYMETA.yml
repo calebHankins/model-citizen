@@ -9,7 +9,7 @@ license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
-name: model-citizen
+name: modelCitizen
 requires:
   Data::Dumper: '0'
   File::Basename: '0'

@@ -5,7 +5,7 @@ use warnings;
 
 use Module::Build;
 my $build = Module::Build->new(
-  module_name   => 'model-citizen',
+  module_name   => 'modelCitizen',
   license       => 'Apache',
   dist_abstract => 'Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes ',
   dist_author   => 'Caleb Hankins (caleb.hankins at acxiom.com)',
