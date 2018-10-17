@@ -79,6 +79,7 @@ if ($typesFilePath) {
   $ModelCitizen::logger->info("Loading type info lookup from [$typesFilePath]...");
   $types = loadTypes($typesFilePath);
   ModelCitizen::checkRequiredParm($types, 'types', '');
+  # todo, also check that RDBMS has valid matching types
 }
 
 # Load files to form our model
