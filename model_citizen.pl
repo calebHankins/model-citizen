@@ -35,12 +35,12 @@ STDOUT->autoflush(1);
 STDERR->autoflush(1);
 
 # User options that we'll set using GetOptions()
-my $typesFilePath = dirname(__FILE__) . '/types/types.xml'; # Default file to use for type lookup info
-my $modelFilepath = cwd();                                  # Default dir to current working dir if no path is specified
-my $RDBMS         = 'Oracle Database 12c';                  # Default RDBMS SQL to generate
-my $outputFileSQL = '';
+my $modelFilepath  = '';
+my $outputFileSQL  = '';
 my $outputFileJSON = '';
-my $utfDisabled    = '';                                    # Default to creating files with encoding(UTF-8)
+my $typesFilePath  = dirname(__FILE__) . '/types/types.xml';    # Default file to use for type lookup info
+my $RDBMS          = 'Oracle Database 12c';                     # Default RDBMS SQL to generate
+my $utfDisabled    = '';                                        # Default to creating files with encoding(UTF-8)
 my $testMode       = '';
 my $verbose        = '';
 
@@ -120,12 +120,14 @@ sub sanityCheckOptions {
 
   # Shell style filename expansions for things in the path like tilde or wildcards
   $modelFilepath = glob($modelFilepath);
-  modelCitizen::checkRequiredParm($modelFilepath, 'modelFilepath');
   $typesFilePath = glob($typesFilePath);
+
+  # Make sure we have all our required parms set
+  modelCitizen::checkRequiredParm($modelFilepath, 'modelFilepath');
   modelCitizen::checkRequiredParm($typesFilePath, 'typesFilePath');
+  modelCitizen::checkRequiredParm($RDBMS,         'RDBMS');
 
-  modelCitizen::checkRequiredParm($RDBMS, 'RDBMS');
-
+  # Set package level variables
   $modelCitizen::verbose = $verbose;    # Set modelCitizen' verbose flag to the user supplied option
 
   # Check for errors before starting processing
@@ -756,12 +758,11 @@ model-citizen
 model-citizen: Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes 
 
  Options:
-    f|modelFilepath             String. Directory path where data model lives. Defaults to current working directory.
+    f|modelFilepath             String. Directory path where data model lives.
     typesFilePath               String. File path of XML file containing type lookup information. This file can be located in your Oracle Data Modeler install directory at ${MODELER_HOME}/datamodeler/datamodeler/types/types.xml
-    RDBMS|rdbms                 String. Target RDBMS system type. Defaults to 'Oracle Database 12c'.
+    RDBMS|rdbms                 String. Target RDBMS system type. Defaults to 'Oracle Database 12c'. Must be defined in the 'types' file.
     o|outputFile|outputFileSQL  String. Output file path for SQL DDL file built off the model.
     outputFileJSON              String. Output file path for json file built off the model.
-    webLogSafeOutput            0 or 1. If 1, encodes HTML entities in logs so they can be displayed in a web log viewer properly. Defaults to 0.
     t|testMode                  Flag. Skip call to create output file(s) but print all of the other information.
     v|verbose                   Flag. Print more verbose output.
     help                        Print brief help information.
@@ -769,7 +770,7 @@ model-citizen: Export Oracle Data Modeler files as json and or SQL DDL for easie
 
 =head1 EXAMPLES
 
-  perl model_citizen.pl  --outputFileSQL ./scratch/ddl.sql --outputFileJSON ./scratch/model.json --modelFilepath C:\git\datamodels\MY_AWESOME_DATA_MODEL\
+  perl model_citizen.pl  --outputFileSQL ./scratch/ddl.sql --outputFileJSON ./scratch/model.json --modelFilepath 'C:\git\datamodels\MY_AWESOME_DATA_MODEL\'
 
 =cut
 ##---------------------------------------------------------------------------
