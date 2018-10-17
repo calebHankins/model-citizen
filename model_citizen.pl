@@ -79,7 +79,6 @@ my $types;
 if ($typesFilePath) {
   $partnerApps::logger->info("Loading type info lookup from [$typesFilePath]...");
   $types = loadTypes($typesFilePath);
-  partnerApps::createExportFile($partnerApps::json->encode($types), './scratch/types.json');    # todo
 }
 
 # Load files to form our model
