@@ -21,6 +21,7 @@
 use strict;
 use warnings;
 use v5.10;
+use experimental 'smartmatch';         # Gimme those ~~ y'all
 use IO::Handle;                        # Supply object methods for I/O handles
 use Getopt::Long;                      # Extended processing of command line options
 use Pod::Usage;                        # Print a usage message from embedded pod documentation
@@ -28,7 +29,6 @@ use Cwd qw( cwd abs_path );            # Get current working directory and absol
 use File::Basename;                    # Parse file paths into directory, filename and suffix
 use lib dirname(__FILE__) . '/lib';    # Use local libraries
 use modelCitizen;                      # modelCitizen helper code
-use experimental 'smartmatch';         # Gimme those ~~ y'all
 
 # turn on auto-flush / hot pipes
 STDOUT->autoflush(1);

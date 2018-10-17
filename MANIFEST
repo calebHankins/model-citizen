@@ -1,10 +1,10 @@
 Build.PL
 CONTRIBUTING.md
+lib/Logger.pm
 lib/modelCitizen.pm
-Logger.pm
+LICENSE
 MANIFEST			This list of files
 model_citizen.pl
-partnerApps.pm
 perltidy.rc
 README.md
 types/types.xml
