@@ -6,7 +6,6 @@ Export Oracle Data Modeler files as json and or SQL DDL for easier consumption b
 
 - [MODEL-CITIZEN](#model-citizen)
     - [Note for Windows Users](#note-for-windows-users)
-- [chocolatey](#chocolatey)
     - [Installation](#installation)
     - [Run without installing](#run-without-installing)
     - [Usage](#usage)
@@ -18,11 +17,10 @@ Export Oracle Data Modeler files as json and or SQL DDL for easier consumption b
 This application requires Perl to be installed and on your path. [Active Perl](https://en.wikipedia.org/wiki/ActivePerl) is one alternative for installing a Perl interpreter. 
 
 If you have *chocolatey* installed, you can use the following command to install Active Perl.
+
 ```powershell
-# chocolatey
 choco install activeperl
 ```
-
 
 ## Installation
 
@@ -55,7 +53,7 @@ model-citizen --help
 ### Export Model as SQL and or JSON array
 Load up data modeler files and generate a DDL SQL output file and a json output file
 ```powershell
-model-citizen  --outputFileSQL ./scratch/ddl.sql --outputFileJSON ./scratch/model.json --modelFilepath C:\git\datamodels\MY_AWESOME_DATA_MODEL\
+model-citizen  --outputFileSQL ./scratch/model.sql --outputFileJSON ./scratch/model.json --modelFilepath C:\git\datamodels\MY_AWESOME_DATA_MODEL\
 ```
 
 ### Load JSON output to MongoDB
