@@ -20,7 +20,7 @@ our %counter;
 ################################################################################
 ################################################################################
 sub new {
-	my @args = @_;
+  my @args  = @_;
   my $class = shift @args;
   my $self  = {@args};
 
@@ -53,7 +53,7 @@ sub info {
   return;
 } ## end sub info
 
-sub warn {  
+sub warn {
   my $class   = shift;
   my $message = shift;
   _count('WARN');
@@ -148,7 +148,7 @@ sub _init {
   $logger = Log::Log4perl::get_logger($class);
 
   my $log_level = $ENV{'LOG_LEVEL'};
-  my $level = '';
+  my $level     = '';
   if (defined $log_level) { $level = uc($ENV{'LOG_LEVEL'}); }
 
   if ($level =~ /.conf$/) {
