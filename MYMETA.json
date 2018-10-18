@@ -35,11 +35,6 @@
          }
       }
    },
-   "provides" : {
-      "Logger" : {
-         "file" : "lib/Logger.pm"
-      }
-   },
    "release_status" : "stable",
    "resources" : {
       "license" : [

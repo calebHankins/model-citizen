@@ -1,15 +1,20 @@
-use 5.0101;
+package ModelCitizen;
 
+use 5.0101;
 use strict;
 use warnings;
 
 use Module::Build;
+
+#todo, need to install types file as well
+
 my $build = Module::Build->new(
   module_name   => 'ModelCitizen',
   license       => 'apache',
   dist_abstract => 'Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes ',
   dist_author   => 'Caleb Hankins (caleb.hankins at acxiom.com)',
-  requires      => {
+  script_files       => 'script/model-citizen',
+  requires           => {
                'perl'             => '5.10.1',
                'JSON'             => '0',
                'XML::Twig'        => '0',
@@ -29,3 +34,5 @@ my $build = Module::Build->new(
   },
 );
 $build->create_build_script;
+
+1;
