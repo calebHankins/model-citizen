@@ -36,10 +36,10 @@ STDERR->autoflush(1);
 
 # User options that we'll set using GetOptions()
 my $modelFilepath  = '';
-my $outputFileSQL  = '';
-my $outputFileJSON = '';
-my $typesFilePath  = dirname(dirname(__FILE__)) . '/lib/ModelCitizen/types/types.xml';   # Default file type lookup file
-my $RDBMS          = 'Oracle Database 12c';                                              # Default RDBMS SQL to generate
+my $outputFileSQL  = './scratch/model.sql';     # Default file to write the SQL results
+my $outputFileJSON = './scratch/model.json';    # Default file to write the json results
+my $typesFilePath = dirname(dirname(__FILE__)) . '/lib/ModelCitizen/types/types.xml';    # Default file type lookup file
+my $RDBMS         = 'Oracle Database 12c';                                               # Default RDBMS SQL to generate
 my $utfDisabled = '';    # Default to creating files with encoding(UTF-8)
 my $testMode    = '';
 my $verbose     = '';
