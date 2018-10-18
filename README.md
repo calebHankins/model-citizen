@@ -8,10 +8,11 @@ Export Oracle Data Modeler files as json and or SQL DDL for easier consumption b
   - [Note for Windows Users](#note-for-windows-users)
 - [chocolatey](#chocolatey)
   - [Installation](#installation)
+  - [Run without installing](#run-without-installing)
   - [Usage](#usage)
     - [Help](#help)
     - [Export Model as SQL and or JSON array](#export-model-as-sql-and-or-json-array)
-    - [Load JSO output to MongoDB](#load-jso-output-to-mongodb)
+    - [Load JSON output to MongoDB](#load-json-output-to-mongodb)
 
 ## Note for Windows Users
 This application requires Perl to be installed and on your path. [Active Perl](https://en.wikipedia.org/wiki/ActivePerl) is one alternative for installing a Perl interpreter. 
@@ -22,6 +23,7 @@ If you have *chocolatey* installed, you can use the following command to install
 choco install activeperl
 ```
 
+
 ## Installation
 
 ```powershell
@@ -30,6 +32,16 @@ perl Build.PL
 ./Build               # After this step, you should have entry point(s) in .\blib\script
 ./Build test          # Run tests for cromulency 
 ./Build install       # Add entry point(s) to your path. May require superuser privs
+```
+
+## Run without installing
+
+You can run the model-citizen app without installing by invoking it in the `./script` directory. 
+
+Note, you will have to install any missing dependencies manually. If you have locally downloaded libraries, you can add them to `@INC` via the `-I` flag when invoking the Perl interpreter. [See the official perlrun documentation for more info](http://perldoc.perl.org/perlrun.html). 
+ 
+```powershell
+perl -I '.\vendor' .\script\model-citizen --help
 ```
 
 ## Usage
@@ -45,10 +57,10 @@ Load up data modeler files and generate a DDL SQL output file and a json output 
 model-citizen  --outputFileSQL ./scratch/ddl.sql --outputFileJSON ./scratch/model.json --modelFilepath C:\git\datamodels\MY_AWESOME_DATA_MODEL\
 ```
 
-### Load JSO output to MongoDB
+### Load JSON output to MongoDB
 The json output is an array of documents describing the data model. These can be fed directly into mongoDB using a tool such as mongoimport using the --jsonArray option.
 ```powershell
-mongoimport.exe --db join-hero --collection model --file "C:\git\model-citizen\scratch\model.json"
- --host localhost:27017 -v --stopOnError --jsonArray --mode upsert --upsertFields "name,type";
+mongoimport.exe --db model-citizen --collection model --file "C:\git\model-citizen\scratch\model.json"
+ --host localhost:27017 -v --stopOnError --jsonArray;
 ```
 

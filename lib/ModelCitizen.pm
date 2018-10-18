@@ -39,8 +39,8 @@ our $VERSION = '0.0.1';           # Todo, pull this from git tag
 
 ##--------------------------------------------------------------------------
 # Create logger object
-use Logger;
-our $logger = Logger->new() or die "Cannot retrieve Logger object\n";
+use ModelCitizen::Logger;
+our $logger = ModelCitizen::Logger->new() or die "Cannot retrieve Logger object\n";
 ##--------------------------------------------------------------------------
 
 ##--------------------------------------------------------------------------

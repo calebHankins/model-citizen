@@ -6,8 +6,6 @@ use warnings;
 
 use Module::Build;
 
-#todo, need to install types file as well
-
 my $build = Module::Build->new(
   module_name   => 'ModelCitizen',
   license       => 'apache',
@@ -33,6 +31,12 @@ my $build = Module::Build->new(
                'experimental'     => '0',
   },
 );
+
+# Install any data files in /lib
+$build->add_build_element('xml');
+$build->add_build_element('json');
+$build->add_build_element('dat');
+
 $build->create_build_script;
 
 1;

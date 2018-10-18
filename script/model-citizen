@@ -21,14 +21,14 @@
 use strict;
 use warnings;
 use v5.10;
-use experimental 'smartmatch';         # Gimme those ~~ y'all
-use IO::Handle;                        # Supply object methods for I/O handles
-use Getopt::Long;                      # Extended processing of command line options
-use Pod::Usage;                        # Print a usage message from embedded pod documentation
-use Cwd qw( cwd abs_path );            # Get current working directory and absolute file paths
-use File::Basename;                    # Parse file paths into directory, filename and suffix
-use lib dirname(__FILE__) . '/lib';    # Use local libraries
-use ModelCitizen;                      # Helper code for file processing
+use experimental 'smartmatch';                  # Gimme those ~~ y'all
+use IO::Handle;                                 # Supply object methods for I/O handles
+use Getopt::Long;                               # Extended processing of command line options
+use Pod::Usage;                                 # Print a usage message from embedded pod documentation
+use Cwd qw( cwd abs_path );                     # Get current working directory and absolute file paths
+use File::Basename;                             # Parse file paths into directory, filename and suffix
+use lib dirname(dirname(__FILE__)) . '/lib';    # Use local libraries if we couldn't find them in @INC
+use ModelCitizen;                               # Helper code for file processing
 
 # turn on auto-flush / hot pipes
 STDOUT->autoflush(1);
@@ -38,11 +38,11 @@ STDERR->autoflush(1);
 my $modelFilepath  = '';
 my $outputFileSQL  = '';
 my $outputFileJSON = '';
-my $typesFilePath  = dirname(__FILE__) . '/types/types.xml';    # Default file to use for type lookup info
-my $RDBMS          = 'Oracle Database 12c';                     # Default RDBMS SQL to generate
-my $utfDisabled    = '';                                        # Default to creating files with encoding(UTF-8)
-my $testMode       = '';
-my $verbose        = '';
+my $typesFilePath  = dirname(dirname(__FILE__)) . '/lib/ModelCitizen/types/types.xml';   # Default file type lookup file
+my $RDBMS          = 'Oracle Database 12c';                                              # Default RDBMS SQL to generate
+my $utfDisabled = '';    # Default to creating files with encoding(UTF-8)
+my $testMode    = '';
+my $verbose     = '';
 
 my $rc = GetOptions(
   'f|modelFilepath=s'            => \$modelFilepath,
@@ -79,8 +79,9 @@ if ($typesFilePath) {
   $ModelCitizen::logger->info("Loading type info lookup from [$typesFilePath]...");
   $types = loadTypes($typesFilePath);
   ModelCitizen::checkRequiredParm($types, 'types', '');
+
   # todo, also check that RDBMS has valid matching types
-}
+} ## end if ($typesFilePath)
 
 # Load files to form our model
 $ModelCitizen::logger->info("Parsing data model files loaded from from [$modelFilepath]...");

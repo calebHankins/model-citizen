@@ -1,4 +1,4 @@
-package Logger;
+package ModelCitizen::Logger;
 
 use strict;
 use warnings;
@@ -53,7 +53,7 @@ sub info {
   return;
 } ## end sub info
 
-sub warn {
+sub warn {  
   my $class   = shift;
   my $message = shift;
   _count('WARN');
