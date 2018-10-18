@@ -277,4 +277,44 @@ sub signOff {
 } ## end sub signOff
 ##--------------------------------------------------------------------------
 
+##---------------------------------------------------------------------------
+# Load type lookup information
+sub loadTypes {
+  my ($currentFilename) = @_;
+  my $subName = (caller(0))[3];
+  $currentFilename //= dirname(__FILE__) . '/ModelCitizen/types/types.xml';    # Use this types info file by default
+  my $XMLObj;    # Our XML Twig containing the file contents
+
+  # Convert plain XML text to a twig object
+  eval { $XMLObj = $twig->parsefile($currentFilename); };
+  $logger->error(objConversionErrorMsgGenerator($@)) if $@;
+
+  my $types       = {};
+  my $typesXMLObj = $XMLObj->root;
+
+  my $logicalTypes = [];
+  $types->{logicalTypes} = $logicalTypes;
+  for my $logicalType ($typesXMLObj->children('logicaltype')) {
+    my $logicalTypeInfo = {};
+    $logicalTypeInfo->{name}     = $logicalType->att('name');
+    $logicalTypeInfo->{objectid} = $logicalType->att('objectid');
+
+    my $mappings = [];
+    $logicalTypeInfo->{mappings} = $mappings;
+    for my $mapping ($logicalType->children('mapping')) {
+      my $mappingInfo = {};
+      $mappingInfo->{rdbms}   = $mapping->att('rdbms');
+      $mappingInfo->{mapping} = $mapping->inner_xml;
+      push(@{$mappings}, $mappingInfo);
+    } ## end for my $mapping ($logicalType...)
+
+    push(@{$logicalTypes}, $logicalTypeInfo);
+
+    # my $colInfo = {name => $column->att('name'), id => $column->att('id')};
+  } ## end for my $logicalType ($typesXMLObj...)
+
+  return $types;
+} ## end sub loadTypes
+##---------------------------------------------------------------------------
+
 1;

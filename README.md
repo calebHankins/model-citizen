@@ -5,14 +5,14 @@ _I am the very model of modern meta generable_
 Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes 
 
 - [MODEL-CITIZEN](#model-citizen)
-  - [Note for Windows Users](#note-for-windows-users)
+    - [Note for Windows Users](#note-for-windows-users)
 - [chocolatey](#chocolatey)
-  - [Installation](#installation)
-  - [Run without installing](#run-without-installing)
-  - [Usage](#usage)
-    - [Help](#help)
-    - [Export Model as SQL and or JSON array](#export-model-as-sql-and-or-json-array)
-    - [Load JSON output to MongoDB](#load-json-output-to-mongodb)
+    - [Installation](#installation)
+    - [Run without installing](#run-without-installing)
+    - [Usage](#usage)
+        - [Help](#help)
+        - [Export Model as SQL and or JSON array](#export-model-as-sql-and-or-json-array)
+        - [Load JSON output to MongoDB](#load-json-output-to-mongodb)
 
 ## Note for Windows Users
 This application requires Perl to be installed and on your path. [Active Perl](https://en.wikipedia.org/wiki/ActivePerl) is one alternative for installing a Perl interpreter. 
@@ -28,6 +28,7 @@ choco install activeperl
 
 ```powershell
 perl Build.PL
+./Build clean         # Clean up build files
 ./Build installdeps   # Install any missing dependencies. May require superuser privs
 ./Build               # After this step, you should have entry point(s) in .\blib\script
 ./Build test          # Run tests for cromulency 

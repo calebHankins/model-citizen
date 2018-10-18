@@ -38,11 +38,12 @@ STDERR->autoflush(1);
 my $modelFilepath  = '';
 my $outputFileSQL  = './scratch/model.sql';     # Default file to write the SQL results
 my $outputFileJSON = './scratch/model.json';    # Default file to write the json results
-my $typesFilePath = dirname(dirname(__FILE__)) . '/lib/ModelCitizen/types/types.xml';    # Default file type lookup file
-my $RDBMS         = 'Oracle Database 12c';                                               # Default RDBMS SQL to generate
-my $utfDisabled = '';    # Default to creating files with encoding(UTF-8)
-my $testMode    = '';
-my $verbose     = '';
+
+my $typesFilePath = '';
+my $RDBMS         = 'Oracle Database 12c';      # Default RDBMS SQL to generate
+my $utfDisabled   = '';                         # Default to creating files with encoding(UTF-8)
+my $testMode      = '';
+my $verbose       = '';
 
 my $rc = GetOptions(
   'f|modelFilepath=s'            => \$modelFilepath,
@@ -77,14 +78,10 @@ my $inputFileCnt = @inputFiles;
 $ModelCitizen::logger->info("[$inputFileCnt] files have been identified for analysis.");
 
 # Load type lookup info
-my $types;
-if ($typesFilePath) {
-  $ModelCitizen::logger->info("Loading type info lookup from [$typesFilePath]...");
-  $types = loadTypes($typesFilePath);
-  ModelCitizen::checkRequiredParm($types, 'types', '');
+my $types = ModelCitizen::loadTypes($typesFilePath);
+ModelCitizen::checkRequiredParm($types, 'types', '');
 
-  # todo, also check that RDBMS has valid matching types
-} ## end if ($typesFilePath)
+# todo, also check that RDBMS has valid matching types
 
 # Load files to form our model
 $ModelCitizen::logger->info("Parsing data model files loaded from from [$modelFilepath]...");
@@ -129,8 +126,9 @@ sub sanityCheckOptions {
 
   # Make sure we have all our required parms set
   ModelCitizen::checkRequiredParm($modelFilepath, 'modelFilepath');
-  ModelCitizen::checkRequiredParm($typesFilePath, 'typesFilePath');
-  ModelCitizen::checkRequiredParm($RDBMS,         'RDBMS');
+
+  # ModelCitizen::checkRequiredParm($typesFilePath, 'typesFilePath');
+  ModelCitizen::checkRequiredParm($RDBMS, 'RDBMS');
 
   # Set package level variables
   $ModelCitizen::verbose = $verbose;    # Set ModelCitizen' verbose flag to the user supplied option
@@ -157,10 +155,13 @@ sub logScriptConfig {
   $ModelCitizen::logger->info("[Script Config Information]");
   $ModelCitizen::logger->info("  script path:             [$0]");
   $ModelCitizen::logger->info("  modelFilepath:           [$modelFilepath]");
-  $ModelCitizen::logger->info("  typesFilePath:           [$typesFilePath]");
   $ModelCitizen::logger->info("  outputFileSQL:           [$outputFileSQL]");
   $ModelCitizen::logger->info("  outputFileJSON:          [$outputFileJSON]");
   $ModelCitizen::logger->info("  RDBMS:                   [$RDBMS]");
+
+  if (defined $typesFilePath) {
+    $ModelCitizen::logger->info("  typesFilePath:           [$typesFilePath]");
+  }
 
   $testMode
     ? $ModelCitizen::logger->info("  testMode:                [Enabled]")
@@ -188,50 +189,6 @@ sub logFileInformation {
 
   return;
 } ## end sub logFileInformation
-##---------------------------------------------------------------------------
-
-##---------------------------------------------------------------------------
-# Load type lookup information
-sub loadTypes {
-  my ($currentFilename) = @_;
-  my $subName = (caller(0))[3];
-  my $XMLObj;    # Our XML Twig containing the file contents
-
-  # Convert plain XML text to a twig object
-  eval { $XMLObj = $ModelCitizen::twig->parsefile($currentFilename); };
-  $ModelCitizen::logger->error(ModelCitizen::objConversionErrorMsgGenerator($@)) if $@;
-
-  my $types       = {};
-  my $typesXMLObj = $XMLObj->root;
-
-  my $logicalTypes = [];
-  $types->{logicalTypes} = $logicalTypes;
-  for my $logicalType ($typesXMLObj->children('logicaltype')) {
-    my $logicalTypeInfo = {};
-    $logicalTypeInfo->{name}     = $logicalType->att('name');
-    $logicalTypeInfo->{objectid} = $logicalType->att('objectid');
-
-    my $mappings = [];
-    $logicalTypeInfo->{mappings} = $mappings;
-    for my $mapping ($logicalType->children('mapping')) {
-      my $mappingInfo = {};
-      $mappingInfo->{rdbms}   = $mapping->att('rdbms');
-      $mappingInfo->{mapping} = $mapping->inner_xml;
-      push(@{$mappings}, $mappingInfo);
-    } ## end for my $mapping ($logicalType...)
-
-    push(@{$logicalTypes}, $logicalTypeInfo);
-
-    # my $colInfo = {name => $column->att('name'), id => $column->att('id')};
-  } ## end for my $logicalType ($typesXMLObj...)
-
-  # if ($verbose) {
-  # $ModelCitizen::logger->info("$subName types:\n" . ModelCitizen::Dumper($types));
-
-  #  }
-
-  return $types;
-} ## end sub loadTypes
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
