@@ -4,7 +4,7 @@
 #                               All Rights Reserved.
 ############################################################################################
 #
-# Script: model_citizen.pl
+# Script: model-citizen
 # Author: Caleb Hankins - chanki
 # Date:   2018-09-13
 #
@@ -54,6 +54,9 @@ my $rc = GetOptions(
 
   't|testMode' => \$testMode,
   'v|verbose'  => \$verbose,
+
+  # Version info
+  'version' => sub { print("model-citizen Version: $ModelCitizen::VERSION\n"); exit; },
 
   #pod2usage variables
   'help' => sub { pod2usage(1); },
@@ -772,7 +775,7 @@ model-citizen: Export Oracle Data Modeler files as json and or SQL DDL for easie
 
 =head1 EXAMPLES
 
-  perl model_citizen.pl  --outputFileSQL ./scratch/ddl.sql --outputFileJSON ./scratch/model.json --modelFilepath 'C:\git\datamodels\MY_AWESOME_DATA_MODEL\'
+  model-citizen  --outputFileSQL ./scratch/ddl.sql --outputFileJSON ./scratch/model.json --modelFilepath 'C:\git\datamodels\MY_AWESOME_DATA_MODEL\'
 
 =cut
 ##---------------------------------------------------------------------------
