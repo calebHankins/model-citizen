@@ -10,6 +10,12 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: ModelCitizen
+provides:
+  ModelCitizen:
+    file: lib/ModelCitizen.pm
+    version: v0.0.1
+  ModelCitizen::Logger:
+    file: lib/ModelCitizen/Logger.pm
 requires:
   Cwd: '0'
   Data::Dumper: '0'

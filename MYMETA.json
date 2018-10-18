@@ -35,6 +35,15 @@
          }
       }
    },
+   "provides" : {
+      "ModelCitizen" : {
+         "file" : "lib/ModelCitizen.pm",
+         "version" : "v0.0.1"
+      },
+      "ModelCitizen::Logger" : {
+         "file" : "lib/ModelCitizen/Logger.pm"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "license" : [
