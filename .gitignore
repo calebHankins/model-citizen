@@ -39,3 +39,10 @@ tags
 node_modules
 
 lorem_ipsum_copy.txt
+_build/
+Build
+Build.bat
+
+MANIFEST.bak
+MANIFEST.SKIP.bak
+blib/

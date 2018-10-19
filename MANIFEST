@@ -1,0 +1,11 @@
+.perlcriticrc
+.perltidyrc
+Build.PL
+CONTRIBUTING.md
+lib/ModelCitizen.pm
+lib/ModelCitizen/Logger.pm
+lib/ModelCitizen/types/types.xml
+LICENSE
+MANIFEST			This list of files
+README.md
+script/model-citizen

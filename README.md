@@ -5,60 +5,61 @@ _I am the very model of modern meta generable_
 Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes 
 
 - [MODEL-CITIZEN](#model-citizen)
-  - [Installation](#installation)
-    - [Example commands to install Log::Log4perl on various platforms](#example-commands-to-install-loglog4perl-on-various-platforms)
-    - [macOS example](#macos-example)
-  - [Usage](#usage)
+    - [Note for Windows Users](#note-for-windows-users)
+    - [Installation](#installation)
+    - [Run without installing](#run-without-installing)
+    - [Usage](#usage)
+        - [Help](#help)
+        - [Export Model as SQL and or JSON array](#export-model-as-sql-and-or-json-array)
+        - [Load JSON output to MongoDB](#load-json-output-to-mongodb)
+
+## Note for Windows Users
+This application requires Perl to be installed and on your path. [Active Perl](https://en.wikipedia.org/wiki/ActivePerl) is one alternative for installing a Perl interpreter. 
+
+If you have *chocolatey* installed, you can use the following command to install Active Perl.
+
+```powershell
+choco install activeperl
+```
 
 ## Installation
 
-Install dependent perl libraries via your favorite management system
-
-Requires the following perl modules and their dependencies:
-
-```perl
-use JSON;                        # JSON (JavaScript Object Notation) encoder/decoder
-use XML::Simple;                 # An API for simple XML files
-use XML::Twig;                   # A perl module for processing huge XML documents in tree mode
-use LWP::UserAgent;              # Web user agent class
-use Data::Dumper;                # Stringified perl data structures, suitable for both printing and eval
-use HTML::Entities;              # Encode or decode strings with HTML entities
-use URI::Escape;                 # Percent-encode and percent-decode unsafe characters
-use File::Path qw(make_path);    # Create directory trees
-use File::Basename;              # Parse file paths into directory, filename and suffix
-use Text::ParseWords;            # Parse text into an array of tokens or array of arrays
-use Log::Log4perl;               # Log4j implementation for Perl
+```powershell
+perl Build.PL
+./Build clean         # Clean up build files
+./Build installdeps   # Install any missing dependencies. May require superuser privs
+./Build               # After this step, you should have entry point(s) in .\blib\script
+./Build test          # Run tests for cromulency 
+./Build install       # Add entry point(s) to your path. May require superuser privs
 ```
 
-### Example commands to install Log::Log4perl on various platforms
-- `cpan install Log::Log4perl (cpan)`
-- `ppm install Log-Log4perl (ActivePerl)`
-- `sudo apt install liblog-log4perl-perl (Ubuntu/Debian)`
-- `sudo yum install perl-Log-Log4perl (CentOS/RedHat)`
+## Run without installing
 
-### macOS example
-```bash
-sudo cpan install JSON
-sudo cpan install XML::Twig
-sudo cpan install Log::Log4perl
+You can run the model-citizen app without installing by invoking it in the `./script` directory. 
+
+Note, you will have to install any missing dependencies manually. If you have locally downloaded libraries, you can add them to `@INC` via the `-I` flag when invoking the Perl interpreter. [See the official perlrun documentation for more info](http://perldoc.perl.org/perlrun.html). 
+ 
+```powershell
+perl -I '.\vendor' .\script\model-citizen --help
 ```
 
 ## Usage
 
+### Help
 Print usage info
 ```powershell
-perl model_citizen.pl --help
+model-citizen --help
 ```
-
-
+### Export Model as SQL and or JSON array
 Load up data modeler files and generate a DDL SQL output file and a json output file
 ```powershell
-perl model_citizen.pl  --outputFileSQL ./scratch/ddl.sql --outputFileJSON ./scratch/model.json --modelFilepath C:\git\datamodels\MY_AWESOME_DATA_MODEL\
+model-citizen  --outputFileSQL ./scratch/model.sql --outputFileJSON ./scratch/model.json --modelFilepath C:\git\datamodels\MY_AWESOME_DATA_MODEL\
 ```
 
+### Load JSON output to MongoDB
 The json output is an array of documents describing the data model. These can be fed directly into mongoDB using a tool such as mongoimport using the --jsonArray option.
 ```powershell
-mongoimport.exe --db join-hero --collection model --file "C:\git\model-citizen\scratch\model.json"
- --host localhost:27017 -v --stopOnError --jsonArray --mode upsert --upsertFields "name,type";
+mongoimport.exe --db model-citizen --collection model --file "C:\git\model-citizen\scratch\model.json"
+ --host localhost:27017 -v --stopOnError --jsonArray;
 ```
 

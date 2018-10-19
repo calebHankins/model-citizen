@@ -1,79 +1,46 @@
 ############################################################################################
-#                       (C) Copyright Acxiom Corporation 2017
+#                       (C) Copyright Acxiom Corporation 2018
 #                               All Rights Reserved.
 ############################################################################################
 #
-# Script: partnerApps.pm
+# Script: ModelCitizen.pm
 # Author: Caleb Hankins - chanki
-# Date:   2017-07-24
+# Date:   2018-10-17
 #
-# Purpose: partnerApps helper code for acxiom integration
+# Purpose: Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes
 #
 ############################################################################################
 # MODIFICATION HISTORY
 ##----------------------------------------------------------------------------------------
 # DATE        PROGRAMMER                   DESCRIPTION
 ##----------------------------------------------------------------------------------------
-# 2017-07-24  Caleb Hankins - chanki       Initial Copy
+# 2018-10-17  Caleb Hankins - chanki       Initial Copy
 ############################################################################################
 
-package partnerApps;
+package ModelCitizen;
 
 use warnings;
 use strict;
-use JSON;                        # JSON (JavaScript Object Notation) encoder/decoder
-use XML::Simple;                 # An API for simple XML files
-use XML::Twig;                   # A perl module for processing huge XML documents in tree mode
-use LWP::UserAgent;              # Web user agent class
-use Data::Dumper;                # Stringified perl data structures, suitable for both printing and eval
-use HTML::Entities;              # Encode or decode strings with HTML entities
-use URI::Escape;                 # Percent-encode and percent-decode unsafe characters
-use File::Path qw(make_path);    # Create directory trees
-use File::Basename;              # Parse file paths into directory, filename and suffix
-use Text::ParseWords;            # Parse text into an array of tokens or array of arrays
-use Exporter qw(import);         # Implements default import method for modules
+use JSON;                         # JSON (JavaScript Object Notation) encoder/decoder
+use XML::Twig;                    # A perl module for processing huge XML documents in tree mode
+use Data::Dumper;                 # Stringified perl data structures, suitable for both printing and eval
+use HTML::Entities;               # Encode or decode strings with HTML entities
+use URI::Escape;                  # Percent-encode and percent-decode unsafe characters
+use File::Path qw(make_path);     # Create directory trees
+use File::Basename;               # Parse file paths into directory, filename and suffix
+use Text::ParseWords;             # Parse text into an array of tokens or array of arrays
+use Exporter qw(import);          # Implements default import method for modules
+use experimental 'smartmatch';    # Gimme those ~~ y'all
 
-our @EXPORT_OK = qw(
-  Dumper import
-  $logger
-  $ua $xml $twig $json $verbose $fuseLogSafeOutput
-  getFuseLogSafeOutput apiRespErrorMsgGenerator objConversionErrorMsgGenerator
-  checkRequiredParm setLoginCredentials signOff
-  openAndLoadFile pushPackageFile buildPackageFileList createExportFile getFilepathParts
-  getUniqArray runSQL deriveWithDBConnect
-);
-
-# ##--------------------------------------------------------------------------
-# # Access the ASC standard library
-# eval { require ASC::ASC; ASC::ASC->import(); 1; }
-#   or die "$0 [FATAL] Could not access the ASC perl modules.\n"
-#   . "This script was designed to be ran from fuse or after the fuse client env has been sourced.\n"
-#   . "Please check this out:\n$@";
-# ##--------------------------------------------------------------------------
+##--------------------------------------------------------------------------
+# Version info
+our $VERSION = '0.0.1';           # Todo, pull this from git tag
+##--------------------------------------------------------------------------
 
 ##--------------------------------------------------------------------------
 # Create logger object
-# our $logger = ASC::Logger->new() or die "Cannot retrieve Logger object\n";
-use Logger;
-our $logger = Logger->new() or die "Cannot retrieve Logger object\n";
-##--------------------------------------------------------------------------
-
-##--------------------------------------------------------------------------
-# Create ASC object
-# our $asc = ASC::ASC->new() or $logger->error_die("Cannot retrieve ASC object.");
-##--------------------------------------------------------------------------
-
-##--------------------------------------------------------------------------
-# Setup user agent object
-our $ua = LWP::UserAgent->new;
-if (LWP::UserAgent->VERSION >= 6.00) {
-  $ua->ssl_opts(verify_hostname => 0);
-}   # Workaround for Error: Can't connect to <host>:443 (certificate verify failed). LWP < 6.0 does not support ssl_opts
-##--------------------------------------------------------------------------
-
-##--------------------------------------------------------------------------
-# Setup xml simple object
-our $xml = XML::Simple->new;
+use ModelCitizen::Logger;
+our $logger = ModelCitizen::Logger->new() or die "Cannot retrieve Logger object\n";
 ##--------------------------------------------------------------------------
 
 ##--------------------------------------------------------------------------
@@ -92,47 +59,10 @@ our $verbose = 0;    # Default to not verbose
 ##--------------------------------------------------------------------------
 
 ##--------------------------------------------------------------------------
-# Log output in a way that it will be viewable in fuse web logs
-our $fuseLogSafeOutput = 1;    # Default to make logs 'fuse safe'
-##--------------------------------------------------------------------------
-
-##--------------------------------------------------------------------------
-# Generate a fuseLogSafeOutput string if the fuseLogSafeOutput variable is set. Else return the original string
-sub getFuseLogSafeOutput {
-  my ($input) = @_;
-  return (($fuseLogSafeOutput) ? HTML::Entities::encode_entities($input) : $input);
-}
-##--------------------------------------------------------------------------
-
-##--------------------------------------------------------------------------
-# Generate an error string using a LWP::UserAgent request response
-sub apiRespErrorMsgGenerator {
-  my ($APIResp) = @_;
-  my $parentName = (caller(1))[3];
-
-  # If fuseLogSafeOutput option is set, sanitize strings so they can be viewed in fuse web logs
-  my $respStrFull        = getFuseLogSafeOutput($json->encode($APIResp));
-  my $respDecodedContent = getFuseLogSafeOutput($APIResp->decoded_content);
-  my $APIResponseCode    = $APIResp->code;
-  my $APIResponseMessage = $APIResp->message;
-
-  my $errMsg = "An error has been detected in $parentName!\n";
-  if ($verbose) { $errMsg .= "$parentName full request response: [" . $respStrFull . "]\n"; }
-  $errMsg .= "$parentName error code:            [$APIResponseCode]\n";
-  $errMsg .= "$parentName error message:         [$APIResponseMessage]\n";
-  $errMsg .= "$parentName decoded_content:       [$respDecodedContent]\n";
-  return $errMsg;
-} ## end sub apiRespErrorMsgGenerator
-##--------------------------------------------------------------------------
-
-##--------------------------------------------------------------------------
 # Generate an error string for failed object conversions
 sub objConversionErrorMsgGenerator {
   my ($errorInformation) = @_;
   my $parentName = (caller(1))[3];
-
-  # If fuseLogSafeOutput option is set, sanitize strings so they can be viewed in fuse web logs
-  $errorInformation = getFuseLogSafeOutput($errorInformation);
 
   my $errMsg = "$parentName Could not create the expected obj from input. Error information: $errorInformation";
 
@@ -154,57 +84,6 @@ sub checkRequiredParm {
   return;
 } ## end sub checkRequiredParm
 ##--------------------------------------------------------------------------
-
-##--------------------------------------------------------------------------
-# Check and munge login credentials. If fuseConnect is specified, glean login details from fuse and ship back to caller by reference
-# sub setLoginCredentials {
-#   my ($baseURL, $username, $password, $clientName, $fuseConnect)
-#     = @_;    # These should all be passed by ref so we can update them if we need to.
-#   my $credNotPopulatedErrorMsg = "is a required parameter.";
-#   my $subName                  = (caller(0))[3];
-
-#   # If we got a fuse style connect string as an input option, try to retrieve login info from fuse
-#   if (defined($$fuseConnect) and length($$fuseConnect) > 0) {
-#     $credNotPopulatedErrorMsg = "was not populated after resolving fuseConnect. Please check fuseConnect config.";
-#     my $schemaASC;
-#     eval { $schemaASC = $asc->schema($$fuseConnect); };
-#     $logger->error(
-#       "$subName Could not create ASC Schema object for fuseConnect Alias '$$fuseConnect' due to the following error:\n$@\n"
-#     ) if $@;
-
-#     # If we were able to create an ASC schema object, try to glean login details from it
-#     if ($schemaASC) {
-#       my $db_user = $schemaASC->{db_user};
-#       my $db_pw   = ASC::Fuse::DecryptPw($schemaASC->{db_pw});
-#       my $db_name = $schemaASC->{db_name};
-#       my $db_host = $schemaASC->{db_host};
-#       my $db_port = $schemaASC->{db_port};
-
-#       # If the fuse db connect specified a port, append that to the URL
-#       if ((defined($db_port) and length($db_port) > 0)) { $db_host .= ":" . $db_port; }
-
-#       # Use fuseConnect values unless they were overridden by another command line option
-#       $$username   = (defined $$username   and length($$username))   ? $$username   : $db_user;
-#       $$password   = (defined $$password   and length($$password))   ? $$password   : $db_pw;
-#       $$clientName = (defined $$clientName and length($$clientName)) ? $$clientName : $db_name;
-#       $$baseURL    = (defined $$baseURL    and length($$baseURL))    ? $$baseURL    : $db_host;
-#     } ## end if ($schemaASC)
-#   } ## end if (defined($$fuseConnect...))
-
-#   # Sanity check login details after munging
-#   checkRequiredParm($$username,   'username',   'username ' . $credNotPopulatedErrorMsg);
-#   checkRequiredParm($$password,   'password',   'password ' . $credNotPopulatedErrorMsg);
-#   checkRequiredParm($$clientName, 'clientName', 'clientName ' . $credNotPopulatedErrorMsg);
-#   checkRequiredParm($$baseURL,    'baseURL',    'baseURL ' . $credNotPopulatedErrorMsg);
-
-#   # Munge the baseURL and prepend transport protocol if missing
-#   if (index($$baseURL, 'http') == -1) {
-#     $$baseURL = "https://" . $$baseURL;
-#   }    # Check for transport protocol and default to https if not specified
-
-#   return;
-# } ## end sub setLoginCredentials
-# ##--------------------------------------------------------------------------
 
 ##--------------------------------------------------------------------------
 sub openAndLoadFile {
@@ -398,24 +277,44 @@ sub signOff {
 } ## end sub signOff
 ##--------------------------------------------------------------------------
 
-# ##--------------------------------------------------------------------------
-# # Run sql for a specified fuse connect and return the results in an array ref
-# sub runSQL {
-#   my ($fuseConnect, $inputSQL) = @_;
-#   my $dbh = $asc->dbh($fuseConnect)
-#     or $logger->confess("Unable to generate dbh from asc object targeting $fuseConnect");
-#   return $dbh->selectall_arrayref($inputSQL);
-# } ## end sub runSQL
-# ##--------------------------------------------------------------------------
+##---------------------------------------------------------------------------
+# Load type lookup information
+sub loadTypes {
+  my ($currentFilename) = @_;
+  my $subName = (caller(0))[3];
+  $currentFilename //= dirname(__FILE__) . '/ModelCitizen/types/types.xml';    # Use this types info file by default
+  my $XMLObj;    # Our XML Twig containing the file contents
 
-# ##--------------------------------------------------------------------------
-# # Run sql for a specified fuse connect and return the first result in the first row
-# # This should be like fuse's derive with db connect but you can specifiy the connect at runtime
-# sub deriveWithDBConnect {
-#   my ($fuseConnect, $inputSQL) = @_;
-#   my @results = @{runSQL($fuseConnect, $inputSQL)};
-#   return scalar(${$results[0]}[0]);
-# }
-# ##--------------------------------------------------------------------------
+  # Convert plain XML text to a twig object
+  eval { $XMLObj = $twig->parsefile($currentFilename); };
+  $logger->error(objConversionErrorMsgGenerator($@)) if $@;
+
+  my $types       = {};
+  my $typesXMLObj = $XMLObj->root;
+
+  my $logicalTypes = [];
+  $types->{logicalTypes} = $logicalTypes;
+  for my $logicalType ($typesXMLObj->children('logicaltype')) {
+    my $logicalTypeInfo = {};
+    $logicalTypeInfo->{name}     = $logicalType->att('name');
+    $logicalTypeInfo->{objectid} = $logicalType->att('objectid');
+
+    my $mappings = [];
+    $logicalTypeInfo->{mappings} = $mappings;
+    for my $mapping ($logicalType->children('mapping')) {
+      my $mappingInfo = {};
+      $mappingInfo->{rdbms}   = $mapping->att('rdbms');
+      $mappingInfo->{mapping} = $mapping->inner_xml;
+      push(@{$mappings}, $mappingInfo);
+    } ## end for my $mapping ($logicalType...)
+
+    push(@{$logicalTypes}, $logicalTypeInfo);
+
+    # my $colInfo = {name => $column->att('name'), id => $column->att('id')};
+  } ## end for my $logicalType ($typesXMLObj...)
+
+  return $types;
+} ## end sub loadTypes
+##---------------------------------------------------------------------------
 
 1;
