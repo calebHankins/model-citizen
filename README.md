@@ -7,6 +7,9 @@ Export Oracle Data Modeler files as json and or SQL DDL for easier consumption b
 - [MODEL-CITIZEN](#model-citizen)
     - [Note for Windows Users](#note-for-windows-users)
     - [Installation](#installation)
+        - [Manual Dependency install](#manual-dependency-install)
+            - [Example commands to install Log::Log4perl on various platforms](#example-commands-to-install-loglog4perl-on-various-platforms)
+        - [Troubleshooting](#troubleshooting)
     - [Run without installing](#run-without-installing)
     - [Usage](#usage)
         - [Help](#help)
@@ -33,11 +36,27 @@ perl Build.PL
 ./Build install       # Add entry point(s) to your path. May require superuser privs
 ```
 
+### Manual Dependency install
+If you don't want to or can't install dependencies via `Build installdeps`, you can install them manually via your favorite management system.
+
+[The dependency list can be reviewed here](MYMETA.json).
+
+#### Example commands to install Log::Log4perl on various platforms
+- `cpan install Log::Log4perl (cpan)`
+- `ppm install Log-Log4perl (ActivePerl)`
+- `sudo apt install liblog-log4perl-perl (Ubuntu/Debian)`
+- `sudo yum install perl-Log-Log4perl (CentOS/RedHat)`
+
+### Troubleshooting
+Users have reporting issues installing certain modules on Windows platforms. If one or more libraries fail to load due to failing tests on Windows, consider installing with the force flag turned on:
+```powershell
+cpan install Log::Log4perl -f
+```
 ## Run without installing
 
 You can run the model-citizen app without installing by invoking it in the `./script` directory. 
 
-Note, you will have to install any missing dependencies manually. If you have locally downloaded libraries, you can add them to `@INC` via the `-I` flag when invoking the Perl interpreter. [See the official perlrun documentation for more info](http://perldoc.perl.org/perlrun.html). 
+Note, you will have to [install any missing dependencies manually](#manual-dependency-install). If you have locally downloaded libraries, you can add them to `@INC` via the `-I` flag when invoking the Perl interpreter. [See the official perlrun documentation for more info](http://perldoc.perl.org/perlrun.html). 
  
 ```powershell
 perl -I '.\vendor' .\script\model-citizen --help
