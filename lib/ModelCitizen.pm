@@ -21,20 +21,19 @@ package ModelCitizen;
 
 use warnings;
 use strict;
-use JSON;                         # JSON (JavaScript Object Notation) encoder/decoder
-use XML::Twig;                    # A perl module for processing huge XML documents in tree mode
-use Data::Dumper;                 # Stringified perl data structures, suitable for both printing and eval
-use HTML::Entities;               # Encode or decode strings with HTML entities
-use URI::Escape;                  # Percent-encode and percent-decode unsafe characters
-use File::Path qw(make_path);     # Create directory trees
-use File::Basename;               # Parse file paths into directory, filename and suffix
-use Text::ParseWords;             # Parse text into an array of tokens or array of arrays
-use Exporter qw(import);          # Implements default import method for modules
-use experimental 'smartmatch';    # Gimme those ~~ y'all
+use JSON;                        # JSON (JavaScript Object Notation) encoder/decoder
+use XML::Twig;                   # A perl module for processing huge XML documents in tree mode
+use Data::Dumper;                # Stringified perl data structures, suitable for both printing and eval
+use HTML::Entities;              # Encode or decode strings with HTML entities
+use URI::Escape;                 # Percent-encode and percent-decode unsafe characters
+use File::Path qw(make_path);    # Create directory trees
+use File::Basename;              # Parse file paths into directory, filename and suffix
+use Text::ParseWords;            # Parse text into an array of tokens or array of arrays
+use Exporter qw(import);         # Implements default import method for modules
 
 ##--------------------------------------------------------------------------
 # Version info
-our $VERSION = '0.0.1';           # Todo, pull this from git tag
+our $VERSION = '0.0.1';          # Todo, pull this from git tag
 ##--------------------------------------------------------------------------
 
 ##--------------------------------------------------------------------------
@@ -282,12 +281,14 @@ sub signOff {
 sub loadTypes {
   my ($currentFilename) = @_;
   my $subName = (caller(0))[3];
-  $currentFilename //= dirname(__FILE__) . '/ModelCitizen/types/types.xml';    # Use this types info file by default
-  my $XMLObj;    # Our XML Twig containing the file contents
+
+  # Sanity test and default types file path
+  $currentFilename = $currentFilename ? $currentFilename : dirname(__FILE__) . '/ModelCitizen/types/types.xml';
 
   # Convert plain XML text to a twig object
+  my $XMLObj;    # Our XML Twig containing the file contents
   eval { $XMLObj = $twig->parsefile($currentFilename); };
-  $logger->error(objConversionErrorMsgGenerator($@)) if $@;
+  $logger->confess(objConversionErrorMsgGenerator($@)) if $@;
 
   my $types       = {};
   my $typesXMLObj = $XMLObj->root;
