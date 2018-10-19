@@ -31,7 +31,6 @@ requires:
   Text::ParseWords: '0'
   URI::Escape: '0'
   XML::Twig: '0'
-  experimental: '0'
   perl: v5.10.1
 resources:
   license: http://apache.org/licenses/LICENSE-2.0
