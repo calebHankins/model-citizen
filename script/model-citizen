@@ -327,9 +327,9 @@ sub loadModelFileTable () {
     }
     if (defined $column->first_child('commentInRDBMS')) {
 
-      # These comments might have encoded new lines, replace the encoded version with new line
+      # These comments might have encoded new lines, replace the encoded version with \n
       my $comment = $column->first_child("commentInRDBMS")->inner_xml;
-      $comment =~ s/&lt;br\/>/\n/g;    # todo, review this substitution. might need to further escape newlines
+      $comment =~ s/&lt;br\/>/\n/g;
       $colInfo->{"commentInRDBMS"} = $comment;
     } ## end if (defined $column->first_child...)
 
@@ -475,8 +475,9 @@ sub getSQLCreateTable {
 
   # Add SQL for column comments
   for my $commentInRDBMS (@{$commentInRDBMSList}) {
-    $createTableSQL
-      .= qq{COMMENT ON COLUMN $modelFile->{name}.$commentInRDBMS->{name} IS '$commentInRDBMS->{commentInRDBMS}';\n\n};
+    my $commentText = $commentInRDBMS->{commentInRDBMS};
+    $commentText =~ s/'/''/g;    # Escape single quotes inside the text
+    $createTableSQL .= qq{COMMENT ON COLUMN $modelFile->{name}.$commentInRDBMS->{name} IS '$commentText';\n\n};
   }
 
   $modelFile->{sql} = $createTableSQL;    # todo, review saving this SQL to the model
