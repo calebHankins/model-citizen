@@ -28,7 +28,7 @@ join_us.sql
 *temp*
 
 
-vendor/pkg
+vendor/
 
 .gopath
 .godeps

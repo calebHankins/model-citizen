@@ -21,7 +21,6 @@
 use strict;
 use warnings;
 use v5.10;
-use experimental 'smartmatch';                  # Gimme those ~~ y'all
 use IO::Handle;                                 # Supply object methods for I/O handles
 use Getopt::Long;                               # Extended processing of command line options
 use Pod::Usage;                                 # Print a usage message from embedded pod documentation
@@ -30,7 +29,7 @@ use File::Basename;                             # Parse file paths into director
 use lib dirname(dirname(__FILE__)) . '/lib';    # Use local libraries if we couldn't find them in @INC
 use ModelCitizen;                               # Helper code for file processing
 
-# turn on auto-flush / hot pipes
+# Turn on auto-flush / hot pipes
 STDOUT->autoflush(1);
 STDERR->autoflush(1);
 
@@ -59,7 +58,7 @@ my $rc = GetOptions(
   # Version info
   'version' => sub { print("model-citizen Version: $ModelCitizen::VERSION\n"); exit; },
 
-  #pod2usage variables
+  # pod2usage variables
   'help' => sub { pod2usage(1); },
   'man'  => sub { pod2usage(-exitstatus => 0, -verbose => 2); }
 );
@@ -89,7 +88,7 @@ my $model = loadModel(\@inputFiles);
 
 # Sort model by name
 $ModelCitizen::logger->info("Sorting model files by name...");
-@$model = sort { $a->{name} cmp $b->{name} } @$model;
+@$model = sort { uc(stripQuotes($a->{name})) cmp uc(stripQuotes($b->{name})) } @$model;
 
 # Export model as SQL (if asked)
 if ($outputFileSQL && $types && $RDBMS) {
@@ -276,7 +275,7 @@ sub loadModelFileTable () {
   my $tableInfo   = {};
   my $tableXMLObj = $XMLObj->root;
   $tableInfo->{type}        = 'table';
-  $tableInfo->{name}        = $tableXMLObj->att("name");
+  $tableInfo->{name}        = getSanitizedObjectName($tableXMLObj->att("name"));
   $tableInfo->{id}          = $tableXMLObj->att("id");
   $tableInfo->{createdBy}   = $tableXMLObj->first_child("createdBy")->inner_xml;
   $tableInfo->{createdTime} = $tableXMLObj->first_child("createdTime")->inner_xml;
@@ -286,7 +285,7 @@ sub loadModelFileTable () {
   $tableInfo->{columns} = [];
   for my $column ($columns->children('Column')) {
 
-    my $colInfo = {name => $column->att('name'), id => $column->att('id')};
+    my $colInfo = {name => getSanitizedObjectName($column->att('name')), id => $column->att('id')};
 
     if (defined $column->first_child('associations')) {
       my $colAssociations = [];
@@ -345,7 +344,7 @@ sub loadModelFileTable () {
     for my $index ($indexes->children('ind_PK_UK')) {
       if ($verbose) { $ModelCitizen::logger->info("$subName index name:" . $index->att("name")); }
 
-      my $indexInfo = {name => $index->att("name"), id => $index->att("id")};
+      my $indexInfo = {name => getSanitizedObjectName($index->att("name")), id => $index->att("id")};
 
       # looks like FKs don't have indexColumnUsage
       if (defined $index->first_child("indexState")) {
@@ -377,9 +376,9 @@ sub loadModelFileForeignKey () {
 
   my $fkInfo   = {};
   my $fkXMLObj = $XMLObj->root;
-  $fkInfo->{type}                   = 'foreignkey';
-  $fkInfo->{name}                   = $fkXMLObj->att("name");
-  $fkInfo->{id}                     = $fkXMLObj->att("id");
+  $fkInfo->{type} = 'foreignkey';
+  $fkInfo->{name} = getSanitizedObjectName($fkXMLObj->att("name"));    # todo, if name invalid, wrap in quotes
+  $fkInfo->{id}   = $fkXMLObj->att("id");
   $fkInfo->{containerWithKeyObject} = $fkXMLObj->att("containerWithKeyObject");
   $fkInfo->{localFKIndex}           = $fkXMLObj->att("localFKIndex");
   $fkInfo->{keyObject}              = $fkXMLObj->first_child("keyObject")->inner_xml;
@@ -701,6 +700,36 @@ sub getTableNameFromID {
   return "ERR_COULD_NOT_RESOLVE_TABLE_NAME_FOR_ID_${tableID}";
 } ## end sub getTableNameFromID
 ##---------------------------------------------------------------------------
+
+##--------------------------------------------------------------------------
+# Derive and return a valid object name
+sub getSanitizedObjectName {
+  my ($objectName)        = @_;
+  my $subName             = (caller(0))[3];
+  my $sanitizedObjectName = $objectName;
+
+  # Check if this object name matches a valid object pattern, if not wrap it in double quotes
+  my $validObjectNameRegEx = '^[a-z?A-Z0-9_#\$@]+$';
+  unless ($sanitizedObjectName =~ /$validObjectNameRegEx/gm) {    # Unless a valid object named without wrapping
+    $sanitizedObjectName = stripQuotes($sanitizedObjectName);     # Strip any existing quotes
+    $sanitizedObjectName = qq{"$sanitizedObjectName"};            # Wrap in double quotes
+    $ModelCitizen::logger->warn(
+                         "$subName $objectName detected as an invalid name, wrapping in quotes: $sanitizedObjectName.");
+  } ## end unless ($sanitizedObjectName...)
+
+  return $sanitizedObjectName;
+} ## end sub getSanitizedObjectName
+##--------------------------------------------------------------------------
+
+##--------------------------------------------------------------------------
+# Return a version of the supplied string, but without any double quote characters
+sub stripQuotes {
+  my ($string) = @_;
+  my $stripped = $string;
+  $stripped =~ s/"//gm;
+  return $stripped;
+} ## end sub stripQuotes
+##-------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
 # Podusage

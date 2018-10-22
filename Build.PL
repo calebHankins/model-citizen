@@ -1,6 +1,6 @@
 package ModelCitizen;
 
-use 5.0101;
+use 5.0100;
 use strict;
 use warnings;
 
@@ -28,7 +28,6 @@ my $build = Module::Build->new(
                'Getopt::Long'     => '0',
                'Pod::Usage'       => '0',
                'Cwd'              => '0',
-               'experimental'     => '0',
   },
 );
 
