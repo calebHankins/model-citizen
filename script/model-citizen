@@ -493,7 +493,7 @@ sub getFieldSQL {
   my $subName         = (caller(0))[3];
   my $fieldDetailsSQL = '';
   my @mapping;
-  my $fieldDatatype = 'unknown'; # Default value for known values
+  my $fieldDatatype = 'unknown'; # Default value for unknown values
 
   # Split ownDataTypeParameters, then need to know what datatype we're working with to apply the rules (?)
   if (defined($typeInfo->{mapping})) {
