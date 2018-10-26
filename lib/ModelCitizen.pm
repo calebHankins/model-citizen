@@ -571,8 +571,6 @@ sub getSQLCreateTable {
     if (defined $column->{commentInRDBMS}) {
       push(@{$commentInRDBMSList}, {name => $column->{name}, commentInRDBMS => $column->{commentInRDBMS}});
     }
-
-    # $createTableSQL .= qq{ $column->{name}  $typeInfo->{mapping}   \n };
     push(@{$fieldList}, qq{    $fieldSQL});
   } ## end for my $column (@{$modelFile...})
 
