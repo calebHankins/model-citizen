@@ -40,7 +40,6 @@ my $outputFileJSON = './scratch/model.json';    # Default file to write the json
 
 my $typesFilePath = '';
 my $RDBMS         = 'Oracle Database 12c';      # Default RDBMS SQL to generate
-my $utfDisabled   = '';                         # Default to creating files with encoding(UTF-8)
 my $testMode      = '';
 my $verbose       = '';
 
@@ -50,7 +49,6 @@ my $rc = GetOptions(
   'typesFilePath=s'              => \$typesFilePath,
   'o|outputFile|outputFileSQL=s' => \$outputFileSQL,
   'outputFileJSON=s'             => \$outputFileJSON,
-  'utfDisabled'                  => \$utfDisabled,
 
   't|testMode' => \$testMode,
   'v|verbose'  => \$verbose,
