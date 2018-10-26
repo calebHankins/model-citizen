@@ -191,6 +191,7 @@ model-citizen: Export Oracle Data Modeler files as json and or SQL DDL for easie
     outputFileJSON              String. Output file path for json file built off the model.
     t|testMode                  Flag. Skip call to create output file(s) but print all of the other information.
     v|verbose                   Flag. Print more verbose output.
+    version                     Flag. Print version information.
     help                        Print brief help information.
     man                         Read the manual, includes examples.
 
