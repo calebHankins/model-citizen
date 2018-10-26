@@ -571,8 +571,6 @@ sub getSQLCreateTable {
     if (defined $column->{commentInRDBMS}) {
       push(@{$commentInRDBMSList}, {name => $column->{name}, commentInRDBMS => $column->{commentInRDBMS}});
     }
-
-    # $createTableSQL .= qq{ $column->{name}  $typeInfo->{mapping}   \n };
     push(@{$fieldList}, qq{    $fieldSQL});
   } ## end for my $column (@{$modelFile...})
 
@@ -662,43 +660,49 @@ sub getFieldSQL {
     # 0 == size (might also include the datatype in the case of strings)
     # 1 == precision
     # 2 == scale
-    my @fieldDetails;
     for my $map (@mapping) {
       $map =~ s/^\s+|\s+$//g;    # Trim whitespace
       if ($map eq 'size') {
+
+        # Populate size with the dedicated size attribute if it exists and is populated
+        if (defined($column->{dataTypeSize})) {
+          $column->{size} = $column->{dataTypeSize};
+        }
+
+        # This version of size is more specific than dataTypeSize sometimes, so use it if we have it
         if ($ownDataTypeParameters[0]) {
           my $size = $ownDataTypeParameters[0];
           $size =~ s/^\s+|\s+$//g;    # Trim whitespace
-          push(@fieldDetails, $size);
-          $column->{size} = $size;    # Save in model
-        } ## end if ($ownDataTypeParameters...)
+          if (defined($size)) { $column->{size} = $size; }    # Only overwrite if we got something here
+        }
       } ## end if ($map eq 'size')
       if ($map eq 'precision') {
         if ($ownDataTypeParameters[1]) {
           my $precision = $ownDataTypeParameters[1];
-          $precision =~ s/^\s+|\s+$//g;    # Trim whitespace
-          push(@fieldDetails, $precision);
-          $column->{precision} = $precision;    # Save in model
-        } ## end if ($ownDataTypeParameters...)
+          $precision =~ s/^\s+|\s+$//g;                       # Trim whitespace
+          $column->{precision} = $precision;                  # Save in model
+        }
       } ## end if ($map eq 'precision')
       if ($map eq 'scale') {
         if ($ownDataTypeParameters[2]) {
           my $scale = $ownDataTypeParameters[2];
-          $scale =~ s/^\s+|\s+$//g;             # Trim whitespace
-          push(@fieldDetails, $scale);
-          $column->{scale} = $scale;            # Save in model
-        } ## end if ($ownDataTypeParameters...)
+          $scale =~ s/^\s+|\s+$//g;                           # Trim whitespace
+          $column->{scale} = $scale;                          # Save in model
+        }
       } ## end if ($map eq 'scale')
     } ## end for my $map (@mapping)
-
-    # Add size/precision/scale information if we have any
-
-    if (@fieldDetails) {
-      $fieldDetailsSQL .= '(';
-      $fieldDetailsSQL .= join ',', @fieldDetails;
-      $fieldDetailsSQL .= ') ';
-    }
   } ## end if (defined($column->{...}))
+
+  # Add size/precision/scale information if we have any
+  my $fieldDetails = [];
+  if (defined($column->{size}))      { push(@$fieldDetails, $column->{size}); }
+  if (defined($column->{precision})) { push(@$fieldDetails, $column->{precision}); }
+  if (defined($column->{scale}))     { push(@$fieldDetails, $column->{scale}); }
+  if (@$fieldDetails) {
+    $fieldDetailsSQL .= '(';
+    $fieldDetailsSQL .= join ',', @$fieldDetails;
+    $fieldDetailsSQL .= ') ';
+  }
 
   if (!defined($column->{nullsAllowed})) { $fieldDetailsSQL .= 'NOT NULL'; }
 
