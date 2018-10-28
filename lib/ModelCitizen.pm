@@ -337,8 +337,6 @@ sub loadModelFile {
   if ($fileType eq 'table')      { $modelFile = loadModelFileTable($XMLObj); }
   if ($fileType eq 'foreignkey') { $modelFile = loadModelFileForeignKey($XMLObj); }
 
-  # if ($fileType eq 'unknown') { $logger->warn("$subName unknown model type: [$currentFilename]"); }
-
   if ($verbose) { $logger->info("$subName Complete: [$currentFilename]"); }
 
   return $modelFile;
@@ -756,24 +754,25 @@ sub getIndexFromID {
       if ($index->{id} eq $indexID) { return $index; }
     }
   }
-
   my $error = "ERR_COULD_NOT_RESOLVE_INDEX_FOR_ID_${indexID}";
-  $logger->error("$subName $error");
-  return "ERR_COULD_NOT_RESOLVE_INDEX_FOR_ID_${indexID}";
+  $logger->warn("$subName $error");
+  return {error => $error};
 } ## end sub getIndexFromID
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
+# Generate a field list from an index
 sub getFieldListFromIndex {
   my ($index, $modelFile, $modelFiles) = @_;
-  my $columnNames = getColumnNamesFromIndex($index, $modelFile, $modelFiles);
+  my $columnNames = getColumnNamesFromIndex($index, $modelFiles);
   return join ',', @$columnNames;
 }
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
+# Generate a field names for an index
 sub getColumnNamesFromIndex {
-  my ($index, $modelFile, $modelFiles) = @_;
+  my ($index, $modelFiles) = @_;
   my $subName     = (caller(0))[3];
   my $columnNames = [];
   for my $columnID (@{$index->{indexColumnUsage}}) { push(@$columnNames, getColumnNameFromID($modelFiles, $columnID)); }
@@ -782,14 +781,14 @@ sub getColumnNamesFromIndex {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
+# Generate DDL SQL for foreign keys
 sub getSQLForeignKey {
   my ($modelFile, $modelFiles) = @_;
-  my $subName     = (caller(0))[3];
-  my $sql         = '';
-  my $columnNames = [];
+  my $subName = (caller(0))[3];
+  my $sql     = '';               # Default
 
   my $hostTableID     = $modelFile->{containerWithKeyObject};
-  my $hostKeyID       = $modelFile->{keyObject};
+  my $hostKeyID       = $modelFile->{localFKIndex};
   my $referredTableID = $modelFile->{referredTableID};
   my $referredKeyID   = $modelFile->{referredKeyID};
 
@@ -809,14 +808,25 @@ sub getSQLForeignKey {
   # Convert referred key to human key field list
   my $referredKeyFieldList = getFieldListFromIndex($referredKeyIndex, $modelFile, $modelFiles);
 
-  $sql = qq{ALTER TABLE $hostTableName
+  # If we could find all the objects we needed, construct the SQL
+  if (defined($hostKeyIndex->{error}) || defined($referredKeyIndex->{error})) {
+    $logger->warn("$subName Foreign Key $modelFile->{name} has no columns.");
+    $sql = "-- Error - Foreign Key $modelFile->{name} has no columns\n\n";
+  }
+  else {
+    $sql = qq{ALTER TABLE $hostTableName
     ADD CONSTRAINT $modelFile->{name} FOREIGN KEY ( $hostKeyFieldList )
       REFERENCES $referredTableName ( $referredKeyFieldList );\n\n};
+  }
 
-  $modelFile->{sql} = $sql;    # todo, review sql storage in model
+  # Update the model file with our findings # todo, review mutating the model
+  $modelFile->{hostTableName}        = $hostTableName;
+  $modelFile->{referredTableName}    = $referredTableName;
+  $modelFile->{hostKeyFieldList}     = $hostKeyFieldList;
+  $modelFile->{referredKeyFieldList} = $referredKeyFieldList;
+  $modelFile->{sql}                  = $sql;
 
   if ($verbose) { $logger->info("$subName \$sql:\n $sql"); }
-
   return $sql;
 } ## end sub getSQLForeignKey
 ##---------------------------------------------------------------------------
@@ -834,8 +844,8 @@ sub getColumnNameFromID {
   }
 
   my $error = "ERR_COULD_NOT_RESOLVE_FIELD_NAME_FOR_ID_${columnID}";
-  $logger->error("$subName $error");
-  return "ERR_COULD_NOT_RESOLVE_FIELD_NAME_FOR_ID_${columnID}";
+  $logger->warn("$subName $error");
+  return $error;
 } ## end sub getColumnNameFromID
 ##---------------------------------------------------------------------------
 
@@ -850,8 +860,8 @@ sub getTableNameFromID {
   }
 
   my $error = "ERR_COULD_NOT_RESOLVE_TABLE_NAME_FOR_ID_${tableID}";
-  $logger->error("$subName $error");
-  return "ERR_COULD_NOT_RESOLVE_TABLE_NAME_FOR_ID_${tableID}";
+  $logger->warn("$subName $error");
+  return $error;
 } ## end sub getTableNameFromID
 ##---------------------------------------------------------------------------
 
