@@ -382,6 +382,9 @@ sub loadModelFileTable () {
     if (defined $column->first_child('logicalDatatype')) {
       $colInfo->{"logicalDatatype"} = $column->first_child("logicalDatatype")->inner_xml;
     }
+    if (defined $column->first_child('domain')) {
+      $colInfo->{"domain"} = $column->first_child("domain")->inner_xml;
+    }
     if (defined $column->first_child('ownDataTypeParameters')) {
       $colInfo->{"ownDataTypeParameters"} = $column->first_child("ownDataTypeParameters")->inner_xml;
     }
