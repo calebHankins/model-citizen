@@ -457,14 +457,24 @@ sub loadModelFileForeignKey () {
 
   my $fkInfo   = {};
   my $fkXMLObj = $XMLObj->root;
-  $fkInfo->{type} = 'foreignkey';
-  $fkInfo->{name} = getSanitizedObjectName($fkXMLObj->att("name"));    # todo, if name invalid, wrap in quotes
-  $fkInfo->{id}   = $fkXMLObj->att("id");
+  $fkInfo->{type}                   = 'foreignkey';
+  $fkInfo->{name}                   = getSanitizedObjectName($fkXMLObj->att("name"));
+  $fkInfo->{id}                     = $fkXMLObj->att("id");
   $fkInfo->{containerWithKeyObject} = $fkXMLObj->att("containerWithKeyObject");
   $fkInfo->{localFKIndex}           = $fkXMLObj->att("localFKIndex");
   $fkInfo->{keyObject}              = $fkXMLObj->first_child("keyObject")->inner_xml;
   $fkInfo->{createdTime}            = $fkXMLObj->first_child("createdTime")->inner_xml;
   $fkInfo->{createdBy}              = $fkXMLObj->first_child("createdBy")->inner_xml;
+
+  # Sometimes localFKIndex is down here instead
+  if (defined $fkXMLObj->first_child("localFKIndex")) {
+    $fkInfo->{localFKIndex} = $fkXMLObj->first_child("localFKIndex")->inner_xml;
+  }
+
+  # Sometimes containerWithKeyObject is down here instead
+  if (defined $fkXMLObj->first_child("containerWithKeyObject")) {
+    $fkInfo->{containerWithKeyObject} = $fkXMLObj->first_child("containerWithKeyObject")->inner_xml;
+  }
 
   if (defined $fkXMLObj->first_child("referredTableID")) {
     $fkInfo->{referredTableID} = $fkXMLObj->first_child("referredTableID")->inner_xml;
@@ -623,8 +633,14 @@ sub getSQL {
       } ## end for my $index (@{$modelFile...})
     } ## end if ($modelFile->{type}...)
     elsif ($modelFile->{type} eq "foreignkey") {
-      if (defined $modelFile->{containerWithKeyObject}) { $fkSQL .= getSQLForeignKey($modelFile, $modelFiles); }
-    }
+      if (   defined $modelFile->{containerWithKeyObject}
+          && defined $modelFile->{localFKIndex}
+          && defined $modelFile->{referredTableID}
+          && defined $modelFile->{referredKeyID})
+      {    # If we're a foreignkey and we have all the required data to process
+        $fkSQL .= getSQLForeignKey($modelFile, $modelFiles);
+      } ## end if (defined $modelFile...)
+    } ## end elsif ($modelFile->{type}...)
   } ## end for my $modelFile (@$modelFiles)
 
   # Write fk after all table objects to avoid dependency issues
@@ -757,6 +773,7 @@ sub getIndexFromID {
       if ($index->{id} eq $indexID) { return $index; }
     }
   }
+
   my $error = "ERR_COULD_NOT_RESOLVE_INDEX_FOR_ID_${indexID}";
   $logger->warn("$subName $error");
   return {error => $error};
@@ -812,10 +829,18 @@ sub getSQLForeignKey {
   my $referredKeyFieldList = getFieldListFromIndex($referredKeyIndex, $modelFile, $modelFiles);
 
   # If we could find all the objects we needed, construct the SQL
-  if (defined($hostKeyIndex->{error}) || defined($referredKeyIndex->{error})) {
+  if (defined($hostKeyIndex->{error})) {
     $logger->warn("$subName Foreign Key $modelFile->{name} has no columns.");
     $sql = "-- Error - Foreign Key $modelFile->{name} has no columns\n\n";
-  }
+    if ($verbose) {
+      if (defined($hostKeyIndex->{error})) {
+        $logger->warn("$subName Foreign Key $modelFile->{name} host has no columns: $hostKeyIndex->{error}");
+      }
+      if (defined($referredKeyIndex->{error})) {
+        $logger->warn("$subName Foreign Key $modelFile->{name} host has no columns: $referredKeyIndex->{error}");
+      }
+    } ## end if ($verbose)
+  } ## end if (defined($hostKeyIndex...))
   else {
     $sql = qq{ALTER TABLE $hostTableName
     ADD CONSTRAINT $modelFile->{name} FOREIGN KEY ( $hostKeyFieldList )
