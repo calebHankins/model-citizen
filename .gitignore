@@ -46,3 +46,4 @@ Build.bat
 MANIFEST.bak
 MANIFEST.SKIP.bak
 blib/
+pod2htmd.tmp
