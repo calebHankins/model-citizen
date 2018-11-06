@@ -492,15 +492,51 @@ sub loadModelFileForeignKey () {
 ##---------------------------------------------------------------------------
 # Load type lookup information
 sub loadTypes {
-  my ($currentFilename) = @_;
+  my ($typeFilepath) = @_;
+  my $subName = (caller(0))[3];
+  my $types;
+
+  # Sanity test and default types file path, then load the types information
+  $typeFilepath = $typeFilepath ? $typeFilepath : dirname(__FILE__) . '/ModelCitizen/types/types.json';
+  my $typeFilepathParts = getFilepathParts($typeFilepath, ('.json', '.xml'));
+  if ($typeFilepathParts->{ext} eq '.json') {
+    $types = loadJSONTypes($typeFilepath);
+  }
+  elsif ($typeFilepathParts->{ext} eq '.xml') {
+    $types = loadXMLTypes($typeFilepath);
+  }
+
+  if (!defined($types)) {
+    $logger->confess("$subName Unable to load types information from $typeFilepath");
+  }
+
+  return $types;
+} ## end sub loadTypes
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Load type lookup information from a json file and return as a hash ref
+sub loadJSONTypes {
+  my ($typeFilepath) = @_;
   my $subName = (caller(0))[3];
 
-  # Sanity test and default types file path
-  $currentFilename = $currentFilename ? $currentFilename : dirname(__FILE__) . '/ModelCitizen/types/types.xml';
+  my $types = {};
+  eval { $types = $json->decode(openAndLoadFile($typeFilepath)) };
+  $logger->confess(objConversionErrorMsgGenerator($@)) if $@;
+
+  return $types;
+} ## end sub loadJSONTypes
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Load type lookup information from an XML file and return as a hash ref
+sub loadXMLTypes {
+  my ($typeFilepath) = @_;
+  my $subName = (caller(0))[3];
 
   # Convert plain XML text to a twig object
   my $XMLObj;    # Our XML Twig containing the file contents
-  eval { $XMLObj = $twig->parsefile($currentFilename); };
+  eval { $XMLObj = $twig->parsefile($typeFilepath); };
   $logger->confess(objConversionErrorMsgGenerator($@)) if $@;
 
   my $types       = {};
@@ -528,7 +564,7 @@ sub loadTypes {
   } ## end for my $logicalType ($typesXMLObj...)
 
   return $types;
-} ## end sub loadTypes
+} ## end sub loadXMLTypes
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------

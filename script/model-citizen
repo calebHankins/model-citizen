@@ -67,16 +67,15 @@ sanityCheckOptions();
 # Print script config info to log
 logScriptConfig();
 
+# Load type lookup info
+my $types = ModelCitizen::loadTypes($typesFilePath);
+
 # Construct a list of files to munge and log file details
 $ModelCitizen::logger->info("Opening data model from [$modelFilepath]...");
 my @inputFiles = ModelCitizen::buildPackageFileList($modelFilepath, '.xml');
 if ($verbose) { ModelCitizen::logFileInformation(\@inputFiles, 'Input', $modelFilepath); }
 my $inputFileCnt = @inputFiles;
 $ModelCitizen::logger->info("[$inputFileCnt] files have been identified for analysis.");
-
-# Load type lookup info
-my $types = ModelCitizen::loadTypes($typesFilePath);
-ModelCitizen::checkRequiredParm($types, 'types');
 
 # Load files to form our model
 $ModelCitizen::logger->info("Parsing data model files loaded from from [$modelFilepath]...");
@@ -87,7 +86,8 @@ if ($outputFileSQL && $types && $RDBMS) {
   $ModelCitizen::logger->info("Exporting data model as $RDBMS sql to [$outputFileSQL]...");
   my $sql = ModelCitizen::getSQL($model, $types, $RDBMS);
   ModelCitizen::createExportFile($sql, $outputFileSQL);
-}
+
+} ## end if ($outputFileSQL && ...)
 
 # Export model as json
 if ($outputFileJSON) {
