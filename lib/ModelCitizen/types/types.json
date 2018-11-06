@@ -1,0 +1,3890 @@
+{
+   "logicalTypes" : [
+      {
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "unknown",
+         "objectid" : "LOGDT017"
+      },
+      {
+         "mappings" : [
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "BLOB"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "BLOB"
+            },
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "BINARY, size"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "BINARY, size"
+            },
+            {
+               "mapping" : "BINARY, size",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "BINARY, size"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "BLOB, size"
+            },
+            {
+               "mapping" : "BLOB, size",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "BLOB, size",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "mapping" : "BLOB, size",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "BLOB, size"
+            }
+         ],
+         "name" : "Audio",
+         "objectid" : "LOGDT005"
+      },
+      {
+         "name" : "BFile",
+         "mappings" : [
+            {
+               "mapping" : "BFILE",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "BFILE"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "BFILE"
+            },
+            {
+               "mapping" : "BFILE",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "DATALINK",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "DATALINK"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "DATALINK"
+            }
+         ],
+         "objectid" : "LogDes-7DD553FD-11E8-61FA-399D-2E531FB621D0@LOGDT10034"
+      },
+      {
+         "objectid" : "LOGDT027",
+         "name" : "BIGINT",
+         "mappings" : [
+            {
+               "mapping" : "INTEGER",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "INTEGER"
+            },
+            {
+               "mapping" : "INTEGER",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "INTEGER"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "BIGINT"
+            },
+            {
+               "mapping" : "BIGINT",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "BIGINT"
+            },
+            {
+               "mapping" : "BIGINT",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "mapping" : "INTEGER",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "mapping" : "INTEGER",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "BIGINT"
+            },
+            {
+               "mapping" : "INTEGER",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "INTEGER"
+            }
+         ]
+      },
+      {
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "RAW, size"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "BLOB"
+            },
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "BLOB"
+            },
+            {
+               "mapping" : "BINARY, size",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "mapping" : "BINARY, size",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "BINARY, size"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "BINARY, size"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "BLOB, size"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "BLOB, size"
+            },
+            {
+               "mapping" : "BLOB, size",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "mapping" : "BLOB, size",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "BLOB, size",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "BINARY",
+         "objectid" : "LOGDT033"
+      },
+      {
+         "objectid" : "LOGDT056",
+         "name" : "BINARY DOUBLE",
+         "mappings" : [
+            {
+               "mapping" : "BINARY_DOUBLE",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "mapping" : "BINARY_DOUBLE",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "BINARY_DOUBLE"
+            },
+            {
+               "mapping" : "NUMBER",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "FLOAT"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "FLOAT"
+            },
+            {
+               "mapping" : "FLOAT",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "FLOAT"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "DOUBLE"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "DOUBLE"
+            },
+            {
+               "mapping" : "DOUBLE",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "DOUBLE"
+            },
+            {
+               "mapping" : "DOUBLE",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ]
+      },
+      {
+         "name" : "BINARY FLOAT",
+         "mappings" : [
+            {
+               "mapping" : "BINARY_FLOAT",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "mapping" : "BINARY_FLOAT",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "BINARY_FLOAT"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "NUMBER"
+            },
+            {
+               "mapping" : "REAL",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "REAL"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "REAL"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "REAL"
+            },
+            {
+               "mapping" : "REAL",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "REAL"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "REAL"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "REAL"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "REAL"
+            }
+         ],
+         "objectid" : "LOGDT055"
+      },
+      {
+         "objectid" : "LOGDT034",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "CHAR"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "CHAR"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "CHAR"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "CHAR"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "BIT"
+            },
+            {
+               "mapping" : "BIT",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "BIT"
+            },
+            {
+               "mapping" : "BIT",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "BIT"
+      },
+      {
+         "name" : "BLOB",
+         "mappings" : [
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "BLOB"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "BLOB"
+            },
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "IMAGE",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "mapping" : "IMAGE",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "IMAGE",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "mapping" : "IMAGE",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "BLOB, size"
+            },
+            {
+               "mapping" : "BLOB, size",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "BLOB, size",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "BLOB, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "BLOB, size"
+            }
+         ],
+         "objectid" : "LOGDT029"
+      },
+      {
+         "name" : "Boolean",
+         "mappings" : [
+            {
+               "mapping" : "NUMBER",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "mapping" : "CHAR",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "CHAR",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "CHAR"
+            },
+            {
+               "mapping" : "BIT",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "BIT"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "BIT"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "BIT"
+            },
+            {
+               "mapping" : "CHAR",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "mapping" : "CHAR",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "CHAR",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "CHAR"
+            },
+            {
+               "mapping" : "CHAR",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "objectid" : "LOGDT006"
+      },
+      {
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "CHAR",
+         "objectid" : "LOGDT025"
+      },
+      {
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "CLOB"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "CLOB"
+            },
+            {
+               "mapping" : "CLOB",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "CLOB"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "TEXT"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "CLOB, size"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "CLOB, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "CLOB, size"
+            },
+            {
+               "mapping" : "CLOB, size",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "CLOB, size",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "CLOB",
+         "objectid" : "LOGDT028"
+      },
+      {
+         "objectid" : "LOGDT030",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "BLOB"
+            },
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "BLOB"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "BINARY"
+            },
+            {
+               "mapping" : "BINARY",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "BINARY",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "BINARY"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "DATALINK"
+            },
+            {
+               "mapping" : "DATALINK",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "DATALINK",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "DATALINK"
+      },
+      {
+         "objectid" : "LOGDT007",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "DATE"
+            },
+            {
+               "mapping" : "DATE",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "DATE",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "DATE",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "DATE",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "mapping" : "DATE",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "DATETIME"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "DATETIME"
+            },
+            {
+               "mapping" : "DATE",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "DATE"
+            },
+            {
+               "mapping" : "DATE",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "mapping" : "DATE",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "DATE"
+            }
+         ],
+         "name" : "Date"
+      },
+      {
+         "objectid" : "LOGDT008",
+         "mappings" : [
+            {
+               "mapping" : "DATE",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "DATE"
+            },
+            {
+               "mapping" : "DATE",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "DATE"
+            },
+            {
+               "mapping" : "DATETIME",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "mapping" : "DATETIME",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "DATETIME"
+            },
+            {
+               "mapping" : "DATETIME",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "TIMESTAMP"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "TIMESTAMP"
+            },
+            {
+               "mapping" : "TIMESTAMP",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "TIMESTAMP"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "TIMESTAMP"
+            }
+         ],
+         "name" : "Datetime"
+      },
+      {
+         "objectid" : "91229484-D19C-D458-8647-333C7FFE7B60",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "TIMESTAMP"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "TIMESTAMP"
+            },
+            {
+               "mapping" : "TIMESTAMP",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "TIMESTAMP"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "DATETIME2"
+            },
+            {
+               "mapping" : "DATETIME2",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "DATETIME",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "DATETIME"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "TIMESTAMP"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "TIMESTAMP"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "TIMESTAMP"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "TIMESTAMP"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "TIMESTAMP"
+            }
+         ],
+         "name" : "DATETIME2"
+      },
+      {
+         "objectid" : "LOGDT054",
+         "name" : "DBURIType",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "DBURITYPE"
+            },
+            {
+               "mapping" : "DBURITYPE",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "DBURITYPE",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "DBURITYPE",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "DATALINK",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "mapping" : "DATALINK",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "DATALINK",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ]
+      },
+      {
+         "objectid" : "LOGDT026",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "NUMBER, precision, scale"
+            },
+            {
+               "mapping" : "NUMBER, precision, scale",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "NUMBER, precision, scale"
+            },
+            {
+               "mapping" : "NUMBER, precision, scale",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "DECIMAL, precision, scale",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "mapping" : "DECIMAL, precision, scale",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "DECIMAL, precision, scale",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "mapping" : "DECIMAL, precision, scale",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "mapping" : "DECIMAL, precision, scale",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "mapping" : "DECIMAL, precision, scale",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "DECIMAL, precision, scale",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "DECIMAL, precision, scale"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "DECIMAL, precision, scale"
+            }
+         ],
+         "name" : "DECIMAL"
+      },
+      {
+         "mappings" : [
+            {
+               "mapping" : "NUMBER",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "NUMBER"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "NUMBER"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "NUMBER"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "NUMERIC"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "NUMERIC"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "NUMERIC"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "NUMERIC"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "NUMERIC"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "NUMERIC"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "DECFLOAT"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "NUMERIC"
+            },
+            {
+               "mapping" : "NUMERIC",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "DECFLOAT",
+         "objectid" : "69230305-AB6A-99EB-35A1-CC306D543604"
+      },
+      {
+         "name" : "DOUBLE",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "NUMBER"
+            },
+            {
+               "mapping" : "NUMBER",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "NUMBER"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "NUMBER"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "BIGINT"
+            },
+            {
+               "mapping" : "BIGINT",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "BIGINT",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "mapping" : "BIGINT",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "mapping" : "DOUBLE",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "DOUBLE"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "DOUBLE"
+            },
+            {
+               "mapping" : "DOUBLE",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "DOUBLE"
+            }
+         ],
+         "objectid" : "LOGDT020"
+      },
+      {
+         "objectid" : "LOGDT021",
+         "name" : "FLOAT",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "FLOAT, precision"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "FLOAT, precision"
+            },
+            {
+               "mapping" : "FLOAT, precision",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "FLOAT, precision",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "FLOAT, precision"
+            },
+            {
+               "mapping" : "FLOAT, precision",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "FLOAT, precision",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "FLOAT, precision"
+            },
+            {
+               "mapping" : "FLOAT, precision",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "mapping" : "FLOAT, precision",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "FLOAT, precision",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "FLOAT, precision"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "FLOAT, precision"
+            }
+         ]
+      },
+      {
+         "objectid" : "LOGDT031",
+         "mappings" : [
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "BLOB"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "BLOB"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "BINARY"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "BINARY"
+            },
+            {
+               "mapping" : "BINARY",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "BINARY"
+            },
+            {
+               "mapping" : "GRAPHIC, size",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "GRAPHIC, size"
+            },
+            {
+               "mapping" : "GRAPHIC, size",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "mapping" : "GRAPHIC, size",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "GRAPHIC, size",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "GRAPHIC"
+      },
+      {
+         "objectid" : "LOGDT052",
+         "name" : "HTTPURIType",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "HTTPURITYPE"
+            },
+            {
+               "mapping" : "HTTPURITYPE",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "HTTPURITYPE",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "HTTPURITYPE",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ]
+      },
+      {
+         "name" : "INTERVAL DAY TO SECOND",
+         "mappings" : [
+            {
+               "mapping" : "INTERVAL DAY TO SECOND, precision, scale",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "mapping" : "INTERVAL DAY TO SECOND, precision, scale",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "INTERVAL DAY TO SECOND, precision, scale",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "INTERVAL DAY TO SECOND, precision, scale"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "CHAR, size"
+            }
+         ],
+         "objectid" : "LOGDT049"
+      },
+      {
+         "objectid" : "LOGDT048",
+         "mappings" : [
+            {
+               "mapping" : "INTERVAL YEAR TO MONTH, precision",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "mapping" : "INTERVAL YEAR TO MONTH, precision",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "INTERVAL YEAR TO MONTH, precision"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "INTERVAL YEAR TO MONTH, precision"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "CHAR, size"
+            }
+         ],
+         "name" : "INTERVAL YEAR TO MONTH"
+      },
+      {
+         "objectid" : "LOGDT010",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "BLOB"
+            },
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "BLOB"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "IMAGE"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "IMAGE"
+            },
+            {
+               "mapping" : "IMAGE",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "IMAGE"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "BLOB, size"
+            },
+            {
+               "mapping" : "BLOB, size",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "BLOB, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "BLOB, size"
+            },
+            {
+               "mapping" : "BLOB, size",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "Image"
+      },
+      {
+         "objectid" : "LOGDT011",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "INTEGER"
+            },
+            {
+               "mapping" : "INTEGER",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "INTEGER"
+            },
+            {
+               "mapping" : "INTEGER",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "INTEGER",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "INTEGER"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "INTEGER"
+            },
+            {
+               "mapping" : "INTEGER",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "INTEGER"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "INTEGER"
+            },
+            {
+               "mapping" : "INTEGER",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "mapping" : "INTEGER",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "INTEGER",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "Integer"
+      },
+      {
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "LONG"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "LONG"
+            },
+            {
+               "mapping" : "LONG",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "LONG"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "mapping" : "CLOB, size",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "mapping" : "CLOB, size",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "CLOB, size"
+            },
+            {
+               "mapping" : "CLOB, size",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "CLOB, size"
+            }
+         ],
+         "name" : "Long Char",
+         "objectid" : "LogDes-1768A872-F385-FDBA-D95E-0CB63F5908E2@LOGDT10045"
+      },
+      {
+         "objectid" : "LogDes-7DD553FD-11E8-61FA-399D-2E531FB621D0@LOGDT10036",
+         "name" : "Long_Raw",
+         "mappings" : [
+            {
+               "mapping" : "LONG RAW",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "mapping" : "LONG RAW",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "LONG RAW",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "LONG RAW"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "VARBINARY, size"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "VARBINARY, size"
+            },
+            {
+               "mapping" : "VARBINARY, size",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "VARBINARY, size"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "BLOB, size"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "BLOB, size"
+            },
+            {
+               "mapping" : "BLOB, size",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "BLOB, size"
+            },
+            {
+               "mapping" : "BLOB, size",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ]
+      },
+      {
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "NUMBER, precision, scale"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "NUMBER, precision, scale"
+            },
+            {
+               "mapping" : "NUMBER, precision, scale",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "NUMBER, precision, scale",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "MONEY",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "mapping" : "MONEY",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "MONEY",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "MONEY"
+            },
+            {
+               "mapping" : "DOUBLE",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "DOUBLE"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "DOUBLE"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "DOUBLE"
+            },
+            {
+               "mapping" : "DOUBLE",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "MONEY",
+         "objectid" : "LOGDT043"
+      },
+      {
+         "objectid" : "LOGDT035",
+         "name" : "NCHAR",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "NCHAR, size"
+            },
+            {
+               "mapping" : "NCHAR, size",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "NCHAR, size",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "NCHAR, size",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "NCHAR, size",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "mapping" : "NCHAR, size",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "NCHAR, size"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "NCHAR, size"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ]
+      },
+      {
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "NCLOB"
+            },
+            {
+               "mapping" : "NCLOB",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "NCLOB"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "NCLOB"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "NTEXT"
+            },
+            {
+               "mapping" : "NTEXT",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "NTEXT",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "NTEXT"
+            },
+            {
+               "mapping" : "CLOB, size",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "CLOB, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "CLOB, size"
+            },
+            {
+               "mapping" : "CLOB, size",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "CLOB, size",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "NClob",
+         "objectid" : "LogDes-7DD553FD-11E8-61FA-399D-2E531FB621D0@LOGDT10035"
+      },
+      {
+         "objectid" : "LOGDT036",
+         "name" : "NTEXT",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "NCLOB"
+            },
+            {
+               "mapping" : "NCLOB",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "NCLOB"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "NCLOB"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "NTEXT"
+            },
+            {
+               "mapping" : "NTEXT",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "NTEXT"
+            },
+            {
+               "mapping" : "NTEXT",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "mapping" : "CLOB, size",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "CLOB, size"
+            },
+            {
+               "mapping" : "CLOB, size",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "CLOB, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "CLOB, size"
+            }
+         ]
+      },
+      {
+         "objectid" : "LOGDT019",
+         "name" : "NUMERIC",
+         "mappings" : [
+            {
+               "mapping" : "NUMBER, precision, scale",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "NUMBER, precision, scale"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "NUMBER, precision, scale"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "NUMBER, precision, scale"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "NUMERIC, precision, scale"
+            },
+            {
+               "mapping" : "NUMERIC, precision, scale",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "NUMERIC, precision, scale",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "mapping" : "NUMERIC, precision, scale",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "mapping" : "NUMERIC, precision, scale",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "NUMERIC, precision, scale"
+            },
+            {
+               "mapping" : "NUMERIC, precision, scale",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "mapping" : "NUMERIC, precision, scale",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "NUMERIC, precision, scale",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ]
+      },
+      {
+         "mappings" : [
+            {
+               "mapping" : "NVARCHAR2, size",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "NVARCHAR2, size"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "NVARCHAR2, size"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "NVARCHAR2, size"
+            },
+            {
+               "mapping" : "NVARCHAR, size",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "NVARCHAR, size"
+            },
+            {
+               "mapping" : "NVARCHAR, size",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "mapping" : "NVARCHAR, size",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "VARCHAR, size"
+            }
+         ],
+         "name" : "NVARCHAR",
+         "objectid" : "LOGDT037"
+      },
+      {
+         "name" : "ORDAUDIO",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "ORDSYS.ORDAudio"
+            },
+            {
+               "mapping" : "ORDSYS.ORDAudio",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "ORDSYS.ORDAudio",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "ORDSYS.ORDAudio",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "objectid" : "LogDes-4972B6D2-6F93-8AE5-6E24-3599E65A7CFE@LOGDT10005"
+      },
+      {
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "ORDSYS.ORDDoc"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "ORDSYS.ORDDoc"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "ORDSYS.ORDDoc"
+            },
+            {
+               "mapping" : "ORDSYS.ORDDoc",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "ORDDOC",
+         "objectid" : "LogDes-4972B6D2-6F93-8AE5-6E24-3599E65A7CFE@LOGDT10009"
+      },
+      {
+         "name" : "ORDIMAGE",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "ORDSYS.ORDImage"
+            },
+            {
+               "mapping" : "ORDSYS.ORDImage",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "ORDSYS.ORDImage"
+            },
+            {
+               "mapping" : "ORDSYS.ORDImage",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "objectid" : "LogDes-4972B6D2-6F93-8AE5-6E24-3599E65A7CFE@LOGDT10006"
+      },
+      {
+         "name" : "ORDIMAGE_SIGNATURE",
+         "mappings" : [
+            {
+               "mapping" : "ORDSYS.ORDImageSignature",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "mapping" : "ORDSYS.ORDImageSignature",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "ORDSYS.ORDImageSignature",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "ORDSYS.ORDImageSignature",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "objectid" : "LogDes-4972B6D2-6F93-8AE5-6E24-3599E65A7CFE@LOGDT10007"
+      },
+      {
+         "objectid" : "LogDes-4972B6D2-6F93-8AE5-6E24-3599E65A7CFE@LOGDT10008",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "ORDSYS.ORDVideo"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "ORDSYS.ORDVideo"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "ORDSYS.ORDVideo"
+            },
+            {
+               "mapping" : "ORDSYS.ORDVideo",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "ORDVIDEO"
+      },
+      {
+         "objectid" : "LOGDT022",
+         "mappings" : [
+            {
+               "mapping" : "REAL",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "REAL"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "REAL"
+            },
+            {
+               "mapping" : "REAL",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "REAL, precision",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "REAL, precision"
+            },
+            {
+               "mapping" : "REAL, precision",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "mapping" : "REAL, precision",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "REAL"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "REAL"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "REAL"
+            },
+            {
+               "mapping" : "REAL",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "REAL"
+            }
+         ],
+         "name" : "REAL"
+      },
+      {
+         "objectid" : "LOGDT032",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "ROWID"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "ROWID"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "ROWID"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "ROWID"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "mapping" : "ROWID",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "ROWID"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "ROWID"
+      },
+      {
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "RAW, size"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "RAW, size"
+            },
+            {
+               "mapping" : "RAW, size",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "RAW, size"
+            },
+            {
+               "mapping" : "VARBINARY, size",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "VARBINARY, size"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "VARBINARY, size"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "VARBINARY, size"
+            },
+            {
+               "mapping" : "VARGRAPHIC, size",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "VARGRAPHIC, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "VARGRAPHIC, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "VARGRAPHIC, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "VARGRAPHIC, size"
+            }
+         ],
+         "name" : "Raw",
+         "objectid" : "LogDes-4BABEC65-108B-2A3C-F7C4-84AC47D292B0@LOGDT10040"
+      },
+      {
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "DATE"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "DATE"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "DATE"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "DATE"
+            },
+            {
+               "mapping" : "SMALLDATETIME",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "mapping" : "SMALLDATETIME",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "SMALLDATETIME",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "mapping" : "SMALLDATETIME",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "mapping" : "TIMESTAMP",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "TIMESTAMP"
+            },
+            {
+               "mapping" : "TIMESTAMP",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "TIMESTAMP"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "TIMESTAMP"
+            }
+         ],
+         "name" : "SMALLDATETIME",
+         "objectid" : "LOGDT038"
+      },
+      {
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "SMALLINT"
+            },
+            {
+               "mapping" : "SMALLINT",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "SMALLINT"
+            },
+            {
+               "mapping" : "SMALLINT",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "SMALLINT"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "SMALLINT"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "SMALLINT"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "SMALLINT"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "SMALLINT"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "SMALLINT"
+            },
+            {
+               "mapping" : "SMALLINT",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "SMALLINT"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "SMALLINT"
+            }
+         ],
+         "name" : "SMALLINT",
+         "objectid" : "LOGDT018"
+      },
+      {
+         "objectid" : "LOGDT044",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "NUMBER, precision, scale"
+            },
+            {
+               "mapping" : "NUMBER, precision, scale",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "NUMBER, precision, scale",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "NUMBER, precision, scale",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "SMALLMONEY",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "mapping" : "SMALLMONEY",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "SMALLMONEY"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "SMALLMONEY"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "REAL"
+            },
+            {
+               "mapping" : "REAL",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "REAL",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "mapping" : "REAL",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "REAL",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "SMALLMONEY"
+      },
+      {
+         "name" : "SQL_VARIANT",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "SYS.ANYDATA"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "SYS.ANYDATA"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "SYS.ANYDATA"
+            },
+            {
+               "mapping" : "SYS.ANYDATA",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "SQL_VARIANT",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "SQL_VARIANT"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "SQL_VARIANT"
+            },
+            {
+               "mapping" : "SQL_VARIANT",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "objectid" : "LOGDT045"
+      },
+      {
+         "mappings" : [
+            {
+               "mapping" : "VARCHAR2, size",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "VARCHAR2, size"
+            },
+            {
+               "mapping" : "VARCHAR2, size",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "VARCHAR2, size"
+            },
+            {
+               "mapping" : "SYSNAME",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "SYSNAME"
+            },
+            {
+               "mapping" : "SYSNAME",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "SYSNAME"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "VARCHAR, size"
+            }
+         ],
+         "name" : "SYSNAME",
+         "objectid" : "LOGDT039"
+      },
+      {
+         "name" : "SYS_ANYDATA",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "SYS.ANYDATA"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "SYS.ANYDATA"
+            },
+            {
+               "mapping" : "SYS.ANYDATA",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "SYS.ANYDATA",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "SQL_VARIANT",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "mapping" : "SQL_VARIANT",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "SQL_VARIANT",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "SQL_VARIANT"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "objectid" : "LogDes-F046B719-7D91-3873-3302-38C441683842@LOGDT10010"
+      },
+      {
+         "name" : "SYS_ANYDATASET",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "SYS.ANYDATASET"
+            },
+            {
+               "mapping" : "SYS.ANYDATASET",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "SYS.ANYDATASET"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "SYS.ANYDATASET"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "objectid" : "LogDes-22E251EB-9F6C-8137-56B2-DD4B87DC1E33@LOGDT10030"
+      },
+      {
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "SYS.ANYTYPE"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "SYS.ANYTYPE"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "SYS.ANYTYPE"
+            },
+            {
+               "mapping" : "SYS.ANYTYPE",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "UNKNOWN"
+            },
+            {
+               "mapping" : "UNKNOWN",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "SYS_ANYTYPE",
+         "objectid" : "LogDes-F046B719-7D91-3873-3302-38C441683842@LOGDT10011"
+      },
+      {
+         "objectid" : "LOGDT040",
+         "mappings" : [
+            {
+               "mapping" : "CLOB",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "CLOB"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "CLOB"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "CLOB"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "TEXT"
+            },
+            {
+               "mapping" : "TEXT",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "TEXT",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "mapping" : "TEXT",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "TEXT"
+      },
+      {
+         "objectid" : "LOGDT047",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "TIMESTAMP WITH LOCAL TIME ZONE, precision"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "TIMESTAMP WITH LOCAL TIME ZONE, precision"
+            },
+            {
+               "mapping" : "TIMESTAMP WITH LOCAL TIME ZONE, precision",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "TIMESTAMP WITH LOCAL TIME ZONE, precision",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "DATETIME"
+            },
+            {
+               "mapping" : "DATETIME",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "DATETIME",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "mapping" : "DATETIME",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "TIMESTAMP"
+            },
+            {
+               "mapping" : "TIMESTAMP",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "TIMESTAMP"
+            },
+            {
+               "mapping" : "TIMESTAMP",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "TIMESTAMP"
+            }
+         ],
+         "name" : "TIMESTAMP WITH LOCAL TIME ZONE"
+      },
+      {
+         "objectid" : "LOGDT046",
+         "name" : "TIMESTAMP WITH TIME ZONE",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "TIMESTAMP WITH TIME ZONE, precision"
+            },
+            {
+               "mapping" : "TIMESTAMP WITH TIME ZONE, precision",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "TIMESTAMP WITH TIME ZONE, precision",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "TIMESTAMP WITH TIME ZONE, precision",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "DATETIME"
+            },
+            {
+               "mapping" : "DATETIME",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "DATETIME",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "mapping" : "DATETIME",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "mapping" : "TIMESTAMP",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "TIMESTAMP"
+            },
+            {
+               "mapping" : "TIMESTAMP",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "mapping" : "TIMESTAMP",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "TIMESTAMP"
+            }
+         ]
+      },
+      {
+         "objectid" : "LOGDT042",
+         "name" : "TINYINT",
+         "mappings" : [
+            {
+               "mapping" : "SMALLINT",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "mapping" : "SMALLINT",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "SMALLINT",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "SMALLINT",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "TINYINT",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "mapping" : "TINYINT",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "TINYINT"
+            },
+            {
+               "mapping" : "TINYINT",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "mapping" : "SMALLINT",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "mapping" : "SMALLINT",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "SMALLINT"
+            },
+            {
+               "mapping" : "SMALLINT",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "SMALLINT"
+            }
+         ]
+      },
+      {
+         "objectid" : "LOGDT014",
+         "name" : "Time",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "DATE"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "DATE"
+            },
+            {
+               "mapping" : "DATE",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "DATE",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "TIME"
+            },
+            {
+               "mapping" : "TIME",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "DATETIME"
+            },
+            {
+               "mapping" : "DATETIME",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "TIME"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "TIME"
+            },
+            {
+               "mapping" : "TIME",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "TIME"
+            },
+            {
+               "mapping" : "TIME",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ]
+      },
+      {
+         "mappings" : [
+            {
+               "mapping" : "TIMESTAMP, precision",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "TIMESTAMP, precision"
+            },
+            {
+               "mapping" : "TIMESTAMP, precision",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "TIMESTAMP, precision"
+            },
+            {
+               "mapping" : "DATETIME",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "DATETIME"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "DATETIME"
+            },
+            {
+               "mapping" : "DATETIME",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "mapping" : "TIMESTAMP",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "TIMESTAMP"
+            },
+            {
+               "mapping" : "TIMESTAMP",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "TIMESTAMP"
+            },
+            {
+               "mapping" : "TIMESTAMP",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "Timestamp",
+         "objectid" : "LOGDT015"
+      },
+      {
+         "name" : "UNIQUEIDENTIFIER",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "UNIQUEIDENTIFIER",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "UNIQUEIDENTIFIER"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "UNIQUEIDENTIFIER"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "UNIQUEIDENTIFIER"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "CHAR, size"
+            }
+         ],
+         "objectid" : "LOGDT057"
+      },
+      {
+         "mappings" : [
+            {
+               "mapping" : "URITYPE",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "mapping" : "URITYPE",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "URITYPE"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "URITYPE"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "URIType",
+         "objectid" : "LOGDT051"
+      },
+      {
+         "objectid" : "LogDes-4BABEC65-108B-2A3C-F7C4-84AC47D292B0@LOGDT10041",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "UROWID, size"
+            },
+            {
+               "mapping" : "UROWID, size",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "UROWID, size",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "UROWID, size",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "VARCHAR, size"
+            }
+         ],
+         "name" : "URowID"
+      },
+      {
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "BLOB"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "BLOB"
+            },
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "BLOB"
+            },
+            {
+               "mapping" : "VARBINARY, size",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "mapping" : "VARBINARY, size",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "VARBINARY, size"
+            },
+            {
+               "mapping" : "VARBINARY, size",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "BLOB, size"
+            },
+            {
+               "mapping" : "BLOB, size",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "BLOB, size",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "BLOB, size"
+            },
+            {
+               "mapping" : "BLOB, size",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "VARBINARY",
+         "objectid" : "LOGDT041"
+      },
+      {
+         "objectid" : "LOGDT024",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "VARCHAR2, size"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "VARCHAR2, size"
+            },
+            {
+               "mapping" : "VARCHAR2, size",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "VARCHAR2, size"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "VARCHAR, size"
+            }
+         ],
+         "name" : "VARCHAR"
+      },
+      {
+         "objectid" : "LOGDT023",
+         "mappings" : [
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "VARBINARY, size",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "VARBINARY, size"
+            },
+            {
+               "mapping" : "VARBINARY, size",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "VARBINARY, size"
+            },
+            {
+               "mapping" : "VARGRAPHIC, size",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "mapping" : "VARGRAPHIC, size",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "VARGRAPHIC, size"
+            },
+            {
+               "mapping" : "VARGRAPHIC, size",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "VARGRAPHIC, size",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "VARGRAPHIC"
+      },
+      {
+         "name" : "Video",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "BLOB"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "BLOB"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "BLOB"
+            },
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "IMAGE",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "IMAGE"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "IMAGE"
+            },
+            {
+               "mapping" : "IMAGE",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "VARGRAPHIC, size"
+            },
+            {
+               "mapping" : "VARGRAPHIC, size",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "mapping" : "BLOB",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "BLOB"
+            }
+         ],
+         "objectid" : "LOGDT016"
+      },
+      {
+         "objectid" : "LOGDT053",
+         "mappings" : [
+            {
+               "rdbms" : "Oracle Database 12c",
+               "mapping" : "XDBURITYPE"
+            },
+            {
+               "mapping" : "XDBURITYPE",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "rdbms" : "Oracle Database 10g",
+               "mapping" : "XDBURITYPE"
+            },
+            {
+               "rdbms" : "Oracle9i",
+               "mapping" : "XDBURITYPE"
+            },
+            {
+               "rdbms" : "SQL Server 2012",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "SQL Server 2008"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/390 7"
+            },
+            {
+               "mapping" : "CHAR, size",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "rdbms" : "DB2/UDB 8.1",
+               "mapping" : "CHAR, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "CHAR, size"
+            }
+         ],
+         "name" : "XDBURIType"
+      },
+      {
+         "objectid" : "LOGDT050",
+         "mappings" : [
+            {
+               "mapping" : "XMLTYPE",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "mapping" : "XMLTYPE",
+               "rdbms" : "Oracle Database 11g"
+            },
+            {
+               "mapping" : "XMLTYPE",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "XMLTYPE",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "XML",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "XML"
+            },
+            {
+               "rdbms" : "SQL Server 2005",
+               "mapping" : "XML"
+            },
+            {
+               "mapping" : "TEXT",
+               "rdbms" : "SQL Server 2000"
+            },
+            {
+               "rdbms" : "DB2/390 8",
+               "mapping" : "CLOB, size"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "CLOB, size"
+            },
+            {
+               "rdbms" : "DB2/UDB 9",
+               "mapping" : "XML"
+            },
+            {
+               "mapping" : "XML",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "rdbms" : "DB2/UDB 7.1",
+               "mapping" : "CLOB, size"
+            }
+         ],
+         "name" : "XMLType"
+      },
+      {
+         "objectid" : "A3A3C77D-0366-9768-FF89-1C25E56881C8",
+         "mappings" : [
+            {
+               "mapping" : "VARCHAR2, size",
+               "rdbms" : "Oracle Database 12c"
+            },
+            {
+               "rdbms" : "Oracle Database 11g",
+               "mapping" : "VARCHAR2, size"
+            },
+            {
+               "mapping" : "VARCHAR2, size",
+               "rdbms" : "Oracle Database 10g"
+            },
+            {
+               "mapping" : "VARCHAR2, size",
+               "rdbms" : "Oracle9i"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "SQL Server 2012"
+            },
+            {
+               "rdbms" : "SQL Server 2008",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "SQL Server 2005"
+            },
+            {
+               "rdbms" : "SQL Server 2000",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/390 8"
+            },
+            {
+               "rdbms" : "DB2/390 7",
+               "mapping" : "VARCHAR, size"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/UDB 9"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/UDB 8.1"
+            },
+            {
+               "mapping" : "VARCHAR, size",
+               "rdbms" : "DB2/UDB 7.1"
+            }
+         ],
+         "name" : "String"
+      }
+   ]
+}

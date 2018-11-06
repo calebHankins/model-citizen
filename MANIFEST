@@ -4,7 +4,7 @@ Build.PL
 CONTRIBUTING.md
 lib/ModelCitizen.pm
 lib/ModelCitizen/Logger.pm
-lib/ModelCitizen/types/types.xml
+lib/ModelCitizen/types/types.json
 LICENSE
 MANIFEST			This list of files
 README.md
