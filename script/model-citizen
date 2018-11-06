@@ -86,8 +86,7 @@ if ($outputFileSQL && $types && $RDBMS) {
   $ModelCitizen::logger->info("Exporting data model as $RDBMS sql to [$outputFileSQL]...");
   my $sql = ModelCitizen::getSQL($model, $types, $RDBMS);
   ModelCitizen::createExportFile($sql, $outputFileSQL);
-
-} ## end if ($outputFileSQL && ...)
+}
 
 # Export model as json
 if ($outputFileJSON) {
