@@ -43,7 +43,7 @@
          "file" : "lib/ModelCitizen/Logger.pm"
       }
    },
-   "release_status" : "stable",
+   "release_status" : "unstable",
    "resources" : {
       "license" : [
          "http://apache.org/licenses/LICENSE-2.0"
