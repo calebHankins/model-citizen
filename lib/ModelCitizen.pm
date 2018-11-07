@@ -305,8 +305,11 @@ sub loadModel {
     if ($modelFile) { push(@$tablesInfo, $modelFile); }
   }
 
+  # If we loaded Objects.local info, enrich our other model files with it
+  enrichModelFiles($tablesInfo);
+
   # Sort model by name
-  $logger->info("Sorting model files by name...");
+  $logger->info("$subName Sorting model files by name...");
   @$tablesInfo = sort { uc(stripQuotes($a->{name})) cmp uc(stripQuotes($b->{name})) } @$tablesInfo;
 
   return $tablesInfo;
@@ -329,13 +332,15 @@ sub loadModelFile {
 
   # Handle files based on type. Could also do this based on internal metadata in the file instead of the path
   my $fileType = '';
-  if    ($currentFilename ~~ /table/)      { $fileType = 'table'; }
-  elsif ($currentFilename ~~ /foreignkey/) { $fileType = 'foreignkey'; }
-  else                                     { $fileType = 'unknown'; }
+  if    ($currentFilename ~~ /table/)          { $fileType = 'table'; }
+  elsif ($currentFilename ~~ /foreignkey/)     { $fileType = 'foreignkey'; }
+  elsif ($currentFilename ~~ /Objects\.local/) { $fileType = 'Objects.local'; }
+  else                                         { $fileType = 'unknown'; }
   if ($verbose) { $logger->info("$subName detected as a $fileType fileType: [$currentFilename]"); }
 
-  if ($fileType eq 'table')      { $modelFile = loadModelFileTable($XMLObj); }
-  if ($fileType eq 'foreignkey') { $modelFile = loadModelFileForeignKey($XMLObj); }
+  if ($fileType eq 'table')         { $modelFile = loadModelFileTable($XMLObj); }
+  if ($fileType eq 'foreignkey')    { $modelFile = loadModelFileForeignKey($XMLObj); }
+  if ($fileType eq 'Objects.local') { $modelFile = loadModelFileObjectsLocal($XMLObj); }
 
   if ($verbose) { $logger->info("$subName Complete: [$currentFilename]"); }
 
@@ -451,7 +456,7 @@ sub loadModelFileTable () {
 
 ##---------------------------------------------------------------------------
 # Load Foreign Key info from an XML object and return a hash ref of handy info
-sub loadModelFileForeignKey () {
+sub loadModelFileForeignKey {
   my ($XMLObj) = @_;
   my $subName = (caller(0))[3];
 
@@ -487,6 +492,52 @@ sub loadModelFileForeignKey () {
 
   return $fkInfo;
 } ## end sub loadModelFileForeignKey
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Load Foreign Key info from an XML object and return a hash ref of handy info
+sub loadModelFileObjectsLocal {
+  my ($XMLObj) = @_;
+  my $subName = (caller(0))[3];
+
+  my $objectsInfoXMLObj = $XMLObj->root;
+  my $objects           = [];
+
+  # Object info
+  for my $object ($objectsInfoXMLObj->children('object')) {
+    my $objectInfo = {};
+
+    if (defined $object->att('objectType')) {
+      if ($object->att('objectType') eq 'FKIndexAssociation') {    # Store FKIndexAssociation metadata
+        $objectInfo->{objectType}        = $object->att('objectType');
+        $objectInfo->{objectID}          = $object->att('objectID');
+        $objectInfo->{name}              = $object->att('name');
+        $objectInfo->{seqName}           = $object->att('seqName');
+        $objectInfo->{propertyClassName} = $object->att('propertyClassName');
+        $objectInfo->{propertyParentId}  = $object->att('propertyParentId');
+        $objectInfo->{propertySourceId}  = $object->att('propertySourceId');
+        $objectInfo->{containerID}       = $object->att('containerID');
+        $objectInfo->{refContainerID}    = $object->att('refContainerID');
+        $objectInfo->{propertyTargetId}  = $object->att('propertyTargetId');
+
+        push(@{$objects}, $objectInfo);
+      } ## end if ($object->att('objectType'...))
+    } ## end if (defined $object->att...)
+  } ## end for my $object ($objectsInfoXMLObj...)
+
+  my $objectsInfo;
+  if (@{$objects} > 0) {    # If we found info, construct a populated object to return
+    $objectsInfo->{type}    = 'Objects.local';
+    $objectsInfo->{name}    = 'Objects.local';
+    $objectsInfo->{objects} = $objects;
+
+    if ($verbose) {
+      $logger->info("$subName objectsInfo:\n" . Dumper($objectsInfo));
+    }
+  } ## end if (@{$objects} > 0)
+
+  return $objectsInfo;
+} ## end sub loadModelFileObjectsLocal
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
@@ -595,6 +646,40 @@ sub getTypeInfo {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
+# Enrich Model Files using supplemental metadata
+sub enrichModelFiles {
+  my ($modelFiles) = @_;
+  my $subName = (caller(0))[3];
+
+  # If we have loaded Objects.local types, use them to enrich the other model files
+  for my $modelFile (@{$modelFiles}) {
+    if ($modelFile->{type} eq 'Objects.local') {
+      $logger->info("$subName Objects.local detected, enriching relevant model files...");
+
+      # Foreign Key enrichment
+      for my $object (@{$modelFile->{objects}}) {
+        if (defined $object->{objectType}) {
+          if ($object->{objectType} eq "FKIndexAssociation") {
+            for my $enrichTarget (@{$modelFiles}) {
+              if (defined $enrichTarget->{type} && defined $enrichTarget->{id} && defined $object->{objectID}) {
+                if ($enrichTarget->{type} eq 'foreignkey' && $enrichTarget->{id} eq $object->{objectID}) {
+                  if ($verbose) { $logger->info("$subName enriching $enrichTarget->{name}."); }
+                  $enrichTarget->{enrichment} = $object;    # Save our enriched fields into this matched object
+                }
+              } ## end if (defined $enrichTarget...)
+            } ## end for my $enrichTarget (@...)
+          } ## end if ($object->{objectType...})
+        } ## end if (defined $object->{...})
+      } ## end for my $object (@{$modelFile...})
+    } ## end if ($modelFile->{type}...)
+  } ## end for my $modelFile (@{$modelFiles...})
+
+  return;
+} ## end sub enrichModelFiles
+
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
 sub getSQLCreateTable {
   my ($modelFile, $types, $RDBMS) = @_;
   my $subName        = (caller(0))[3];
@@ -669,14 +754,8 @@ sub getSQL {
       } ## end for my $index (@{$modelFile...})
     } ## end if ($modelFile->{type}...)
     elsif ($modelFile->{type} eq "foreignkey") {
-      if (   defined $modelFile->{containerWithKeyObject}
-          && defined $modelFile->{localFKIndex}
-          && defined $modelFile->{referredTableID}
-          && defined $modelFile->{referredKeyID})
-      {    # If we're a foreignkey and we have all the required data to process
-        $fkSQL .= getSQLForeignKey($modelFile, $modelFiles);
-      } ## end if (defined $modelFile...)
-    } ## end elsif ($modelFile->{type}...)
+      $fkSQL .= getSQLForeignKey($modelFile, $modelFiles);
+    }
   } ## end for my $modelFile (@$modelFiles)
 
   # Write fk after all table objects to avoid dependency issues
@@ -841,56 +920,79 @@ sub getColumnNamesFromIndex {
 sub getSQLForeignKey {
   my ($modelFile, $modelFiles) = @_;
   my $subName = (caller(0))[3];
-  my $sql     = '';               # Default
+  my $sql     = '';
 
+  # Set out first guesses for IDs. Some of these will not be populated and we'll have to fall back
   my $hostTableID     = $modelFile->{containerWithKeyObject};
   my $hostKeyID       = $modelFile->{localFKIndex};
   my $referredTableID = $modelFile->{referredTableID};
   my $referredKeyID   = $modelFile->{referredKeyID};
 
-  # Need to convert these index IDs to index objects
-  my $hostKeyIndex     = getIndexFromID($modelFiles, $hostKeyID);
-  my $referredKeyIndex = getIndexFromID($modelFiles, $referredKeyID);
+  # Sometimes these refereed fields aren't set, try to look them up in the enrichment object
+  if (!defined $referredTableID) {
+    if (defined $modelFile->{enrichment}->{refContainerID}) {
+      $referredTableID = $modelFile->{enrichment}->{refContainerID};
+      if ($verbose) { $logger->info("$subName referredTableID set using enrichment data: $referredTableID"); }
+    }
+  } ## end if (!defined $referredTableID)
+  if (!defined $referredKeyID) {
+    if (defined $modelFile->{keyObject}) {
+      $referredKeyID = $modelFile->{keyObject};
+      if ($verbose) { $logger->info("$subName referredKeyID set using keyObject: $referredKeyID"); }
+    }
+    elsif (defined $modelFile->{enrichment}->{propertyTargetId}) {
+      $referredKeyID = $modelFile->{enrichment}->{propertyTargetId};
+      if ($verbose) { $logger->info("$subName referredKeyID set using enrichment data: $referredKeyID"); }
+    }
+  } ## end if (!defined $referredKeyID)
 
-  # Convert host table id to human name
-  my $hostTableName = getTableNameFromID($modelFiles, $hostTableID);
+  # Proceed if we have the minimum required info to continue
+  if (defined $hostTableID && defined $hostKeyID && defined $referredTableID && defined $referredKeyID) {
 
-  # Convert host key to human key field list
-  my $hostKeyFieldList = getFieldListFromIndex($hostKeyIndex, $modelFile, $modelFiles);
+    # Need to convert these index IDs to index objects
+    my $hostKeyIndex     = getIndexFromID($modelFiles, $hostKeyID);
+    my $referredKeyIndex = getIndexFromID($modelFiles, $referredKeyID);
 
-  # Convert referred table id to human name
-  my $referredTableName = getTableNameFromID($modelFiles, $referredTableID);
+    # Convert host table id to human name
+    my $hostTableName = getTableNameFromID($modelFiles, $hostTableID);
 
-  # Convert referred key to human key field list
-  my $referredKeyFieldList = getFieldListFromIndex($referredKeyIndex, $modelFile, $modelFiles);
+    # Convert host key to human key field list
+    my $hostKeyFieldList = getFieldListFromIndex($hostKeyIndex, $modelFile, $modelFiles);
 
-  # If we could find all the objects we needed, construct the SQL
-  if (defined($hostKeyIndex->{error})) {
-    $logger->warn("$subName Foreign Key $modelFile->{name} has no columns.");
-    $sql = "-- Error - Foreign Key $modelFile->{name} has no columns\n\n";
-    if ($verbose) {
-      if (defined($hostKeyIndex->{error})) {
-        $logger->warn("$subName Foreign Key $modelFile->{name} host has no columns: $hostKeyIndex->{error}");
-      }
-      if (defined($referredKeyIndex->{error})) {
-        $logger->warn("$subName Foreign Key $modelFile->{name} host has no columns: $referredKeyIndex->{error}");
-      }
-    } ## end if ($verbose)
-  } ## end if (defined($hostKeyIndex...))
-  else {
-    $sql = qq{ALTER TABLE $hostTableName
+    # Convert referred table id to human name
+    my $referredTableName = getTableNameFromID($modelFiles, $referredTableID);
+
+    # Convert referred key to human key field list
+    my $referredKeyFieldList = getFieldListFromIndex($referredKeyIndex, $modelFile, $modelFiles);
+
+    # If we could find all the objects we needed, construct the SQL
+    if (defined($hostKeyIndex->{error})) {
+      $logger->warn("$subName Foreign Key $modelFile->{name} has no columns.");
+      $sql = "-- Error - Foreign Key $modelFile->{name} has no columns\n\n";
+      if ($verbose) {
+        if (defined($hostKeyIndex->{error})) {
+          $logger->warn("$subName Foreign Key $modelFile->{name} host has no columns: $hostKeyIndex->{error}");
+        }
+        if (defined($referredKeyIndex->{error})) {
+          $logger->warn("$subName Foreign Key $modelFile->{name} host has no columns: $referredKeyIndex->{error}");
+        }
+      } ## end if ($verbose)
+    } ## end if (defined($hostKeyIndex...))
+    else {
+      $sql = qq{ALTER TABLE $hostTableName
     ADD CONSTRAINT $modelFile->{name} FOREIGN KEY ( $hostKeyFieldList )
       REFERENCES $referredTableName ( $referredKeyFieldList );\n\n};
-  }
+    }
 
-  # Update the model file with our findings # todo, review mutating the model
-  $modelFile->{hostTableName}        = $hostTableName;
-  $modelFile->{referredTableName}    = $referredTableName;
-  $modelFile->{hostKeyFieldList}     = $hostKeyFieldList;
-  $modelFile->{referredKeyFieldList} = $referredKeyFieldList;
-  $modelFile->{sql}                  = $sql;
+    # Update the model file with our findings # todo, review mutating the model
+    $modelFile->{hostTableName}        = $hostTableName;
+    $modelFile->{referredTableName}    = $referredTableName;
+    $modelFile->{hostKeyFieldList}     = $hostKeyFieldList;
+    $modelFile->{referredKeyFieldList} = $referredKeyFieldList;
+    $modelFile->{sql}                  = $sql;
 
-  if ($verbose) { $logger->info("$subName \$sql:\n $sql"); }
+    if ($verbose) { $logger->info("$subName \$sql:\n $sql"); }
+  } ## end if (defined $hostTableID...)
   return $sql;
 } ## end sub getSQLForeignKey
 ##---------------------------------------------------------------------------
