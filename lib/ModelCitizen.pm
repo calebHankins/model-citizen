@@ -295,24 +295,31 @@ sub signOff {
 ##---------------------------------------------------------------------------
 # Loop over list of model files and load model info
 sub loadModel {
-  my ($fileList) = @_;
-  my $subName = (caller(0))[3];
+  my ($fileList)  = @_;
+  my $subName     = (caller(0))[3];
+  my $modelFiles  = [];
+  my $objectsInfo = [];
 
   # Process the list of model files, one file at a time
-  my $tablesInfo = [];
   for my $currentFilename (@$fileList) {
     my $modelFile = loadModelFile($currentFilename);
-    if ($modelFile) { push(@$tablesInfo, $modelFile); }
-  }
+    if (defined $modelFile->{type}) {
+      if   ($modelFile->{type} eq 'Objects.local') { push(@$objectsInfo, $modelFile); }
+      else                                         { push(@$modelFiles,  $modelFile); }
+    }
+  } ## end for my $currentFilename...
 
   # If we loaded Objects.local info, enrich our other model files with it
-  enrichModelFiles($tablesInfo);
+  if (@{$objectsInfo} > 0) {
+    $logger->info("$subName Found additional object info, enriching model...");
+    enrichModelFiles($modelFiles, $objectsInfo);
+  }
 
   # Sort model by name
   $logger->info("$subName Sorting model files by name...");
-  @$tablesInfo = sort { uc(stripQuotes($a->{name})) cmp uc(stripQuotes($b->{name})) } @$tablesInfo;
+  @$modelFiles = sort { uc(stripQuotes($a->{name})) cmp uc(stripQuotes($b->{name})) } @$modelFiles;
 
-  return $tablesInfo;
+  return $modelFiles;
 } ## end sub loadModel
 ##---------------------------------------------------------------------------
 
@@ -648,35 +655,29 @@ sub getTypeInfo {
 ##---------------------------------------------------------------------------
 # Enrich Model Files using supplemental metadata
 sub enrichModelFiles {
-  my ($modelFiles) = @_;
+  my ($modelFiles, $objectsInfo) = @_;
   my $subName = (caller(0))[3];
 
   # If we have loaded Objects.local types, use them to enrich the other model files
-  for my $modelFile (@{$modelFiles}) {
-    if ($modelFile->{type} eq 'Objects.local') {
-      $logger->info("$subName Objects.local detected, enriching relevant model files...");
-
-      # Foreign Key enrichment
-      for my $object (@{$modelFile->{objects}}) {
-        if (defined $object->{objectType}) {
-          if ($object->{objectType} eq "FKIndexAssociation") {
-            for my $enrichTarget (@{$modelFiles}) {
-              if (defined $enrichTarget->{type} && defined $enrichTarget->{id} && defined $object->{objectID}) {
-                if ($enrichTarget->{type} eq 'foreignkey' && $enrichTarget->{id} eq $object->{objectID}) {
-                  if ($verbose) { $logger->info("$subName enriching $enrichTarget->{name}."); }
-                  $enrichTarget->{enrichment} = $object;    # Save our enriched fields into this matched object
-                }
-              } ## end if (defined $enrichTarget...)
-            } ## end for my $enrichTarget (@...)
-          } ## end if ($object->{objectType...})
-        } ## end if (defined $object->{...})
-      } ## end for my $object (@{$modelFile...})
-    } ## end if ($modelFile->{type}...)
-  } ## end for my $modelFile (@{$modelFiles...})
+  for my $objectInfo (@{$objectsInfo}) {
+    for my $object (@{$objectInfo->{objects}}) {
+      if ($object->{objectType} eq "FKIndexAssociation") {    # Foreign Key enrichment
+        for my $enrichTarget (@{$modelFiles}) {
+          if (defined $enrichTarget->{type} && defined $enrichTarget->{id} && defined $object->{objectID}) {
+            if ($enrichTarget->{type} eq 'foreignkey' && $enrichTarget->{id} eq $object->{objectID}) {
+              if ($verbose) {
+                $logger->info("$subName enriching $enrichTarget->{name} using $object->{objectType} $object->{name} .");
+              }
+              $enrichTarget->{enrichment} = $object;          # Save our enriched fields into this matched object
+            } ## end if ($enrichTarget->{type...})
+          } ## end if (defined $enrichTarget...)
+        } ## end for my $enrichTarget (@...)
+      } ## end if ($object->{objectType...})
+    } ## end for my $object (@{$objectInfo...})
+  } ## end for my $objectInfo (@{$objectsInfo...})
 
   return;
 } ## end sub enrichModelFiles
-
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
@@ -929,6 +930,12 @@ sub getSQLForeignKey {
   my $referredKeyID   = $modelFile->{referredKeyID};
 
   # Sometimes these refereed fields aren't set, try to look them up in the enrichment object
+  if (!defined $hostTableID) {
+    if (defined $modelFile->{enrichment}->{containerID}) {
+      $hostTableID = $modelFile->{enrichment}->{containerID};
+      if ($verbose) { $logger->info("$subName hostTableID set using enrichment data: $hostTableID"); }
+    }
+  } ## end if (!defined $hostTableID)
   if (!defined $referredTableID) {
     if (defined $modelFile->{enrichment}->{refContainerID}) {
       $referredTableID = $modelFile->{enrichment}->{refContainerID};
@@ -974,7 +981,7 @@ sub getSQLForeignKey {
           $logger->warn("$subName Foreign Key $modelFile->{name} host has no columns: $hostKeyIndex->{error}");
         }
         if (defined($referredKeyIndex->{error})) {
-          $logger->warn("$subName Foreign Key $modelFile->{name} host has no columns: $referredKeyIndex->{error}");
+          $logger->warn("$subName Foreign Key $modelFile->{name} target has no columns: $referredKeyIndex->{error}");
         }
       } ## end if ($verbose)
     } ## end if (defined($hostKeyIndex...))
@@ -987,6 +994,8 @@ sub getSQLForeignKey {
     # Update the model file with our findings # todo, review mutating the model
     $modelFile->{hostTableName}        = $hostTableName;
     $modelFile->{referredTableName}    = $referredTableName;
+    $modelFile->{hostKeyID}            = $hostKeyID;
+    $modelFile->{referredKeyID}        = $referredKeyID;
     $modelFile->{hostKeyFieldList}     = $hostKeyFieldList;
     $modelFile->{referredKeyFieldList} = $referredKeyFieldList;
     $modelFile->{sql}                  = $sql;
