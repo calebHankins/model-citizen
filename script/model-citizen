@@ -38,11 +38,10 @@ STDERR->autoflush(1);
 my $modelFilepath  = '';
 my $outputFileSQL  = './scratch/model.sql';     # Default file to write the SQL results
 my $outputFileJSON = './scratch/model.json';    # Default file to write the json results
-
-my $typesFilePath = '';
-my $RDBMS         = 'Oracle Database 12c';      # Default RDBMS SQL to generate
-my $testMode      = '';
-my $verbose       = '';
+my $typesFilePath  = '';
+my $RDBMS          = 'Oracle Database 12c';     # Default RDBMS SQL to generate
+my $testMode       = '';
+my $verbose        = '';
 
 my $rc = GetOptions(
   'f|modelFilepath=s'            => \$modelFilepath,
@@ -112,15 +111,17 @@ sub sanityCheckOptions {
   my $subName = (caller(0))[3];
 
   # Shell style filename expansions for things in the path like tilde or wildcards
-  $modelFilepath = bsd_glob($modelFilepath);
-  $typesFilePath = bsd_glob($typesFilePath);
+  $modelFilepath  = bsd_glob($modelFilepath);
+  $typesFilePath  = bsd_glob($typesFilePath);
+  $outputFileJSON = bsd_glob($outputFileJSON);
+  $outputFileSQL  = bsd_glob($outputFileSQL);
 
   # Make sure we have all our required parms set
   ModelCitizen::checkRequiredParm($modelFilepath, 'modelFilepath');
   ModelCitizen::checkRequiredParm($RDBMS,         'RDBMS');
 
   # Set package level variables
-  $ModelCitizen::verbose = $verbose;    # Set ModelCitizen' verbose flag to the user supplied option
+  $ModelCitizen::verbose = $verbose;
 
   # Check for errors before starting processing
   if ($ModelCitizen::logger->get_count("ERROR") > 0) {
@@ -148,7 +149,7 @@ sub logScriptConfig {
   $ModelCitizen::logger->info("  outputFileJSON:          [$outputFileJSON]");
   $ModelCitizen::logger->info("  RDBMS:                   [$RDBMS]");
 
-  if (defined $typesFilePath) {
+  if (defined $typesFilePath and length($typesFilePath) > 0) {
     $ModelCitizen::logger->info("  typesFilePath:           [$typesFilePath]");
   }
 
