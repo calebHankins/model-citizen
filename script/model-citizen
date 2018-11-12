@@ -26,7 +26,8 @@ use Getopt::Long;                               # Extended processing of command
 use Pod::Usage;                                 # Print a usage message from embedded pod documentation
 use Cwd qw( cwd abs_path );                     # Get current working directory and absolute file paths
 use File::Basename;                             # Parse file paths into directory, filename and suffix
-use lib dirname(dirname(__FILE__)) . '/lib';    # Use local libraries if we couldn't find them in @INC
+use File::Glob ':glob';                         # Perl extension for BSD glob routine
+use lib dirname(dirname(__FILE__)) . '/lib';    # Use local libraries if we have them
 use ModelCitizen;                               # Helper code for file processing
 
 # Turn on auto-flush / hot pipes
@@ -111,8 +112,8 @@ sub sanityCheckOptions {
   my $subName = (caller(0))[3];
 
   # Shell style filename expansions for things in the path like tilde or wildcards
-  $modelFilepath = glob($modelFilepath);
-  $typesFilePath = glob($typesFilePath);
+  $modelFilepath = bsd_glob($modelFilepath);
+  $typesFilePath = bsd_glob($typesFilePath);
 
   # Make sure we have all our required parms set
   ModelCitizen::checkRequiredParm($modelFilepath, 'modelFilepath');
