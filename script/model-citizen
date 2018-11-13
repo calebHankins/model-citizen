@@ -29,6 +29,7 @@ use File::Basename;                             # Parse file paths into director
 use File::Glob ':glob';                         # Perl extension for BSD glob routine
 use lib dirname(dirname(__FILE__)) . '/lib';    # Use local libraries if we have them
 use ModelCitizen;                               # Helper code for file processing
+no if $] >= 5.017011, warnings => 'experimental::smartmatch';    # Suppress smartmatch warnings
 
 # Turn on auto-flush / hot pipes
 STDOUT->autoflush(1);
@@ -36,10 +37,10 @@ STDERR->autoflush(1);
 
 # User options that we'll set using GetOptions()
 my $modelFilepath  = '';
-my $outputFileSQL  = './scratch/model.sql';     # Default file to write the SQL results
-my $outputFileJSON = './scratch/model.json';    # Default file to write the json results
+my $outputFileSQL  = './scratch/model.sql';                      # Default file to write the SQL results
+my $outputFileJSON = './scratch/model.json';                     # Default file to write the json results
 my $typesFilePath  = '';
-my $RDBMS          = 'Oracle Database 12c';     # Default RDBMS SQL to generate
+my $RDBMS          = 'Oracle Database 12c';                      # Default RDBMS SQL to generate
 my $testMode       = '';
 my $verbose        = '';
 

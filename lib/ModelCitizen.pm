@@ -30,10 +30,11 @@ use File::Path qw(make_path);    # Create directory trees
 use File::Basename;              # Parse file paths into directory, filename and suffix
 use Text::ParseWords;            # Parse text into an array of tokens or array of arrays
 use Exporter qw(import);         # Implements default import method for modules
+no if $] >= 5.017011, warnings => 'experimental::smartmatch';    # Suppress smartmatch warnings
 
 ##--------------------------------------------------------------------------
 # Version info
-our $VERSION = '0.0.1';          # Todo, pull this from git tag
+our $VERSION = '0.0.1';                                          # Todo, pull this from git tag
 ##--------------------------------------------------------------------------
 
 ##--------------------------------------------------------------------------
