@@ -33,6 +33,11 @@
             "XML::Twig" : "0",
             "perl" : "v5.10.1"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Perl::Critic" : "0"
+         }
       }
    },
    "provides" : {

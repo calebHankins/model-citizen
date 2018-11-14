@@ -31,6 +31,7 @@ my $build = Module::Build->new(
                'Pod::Usage'       => '0',
                'Cwd'              => '0',
   },
+  test_requires => {'Test::Perl::Critic' => '0',},
 );
 
 # Install any data files in /lib
