@@ -36,6 +36,9 @@
       },
       "test" : {
          "requires" : {
+            "English" : "0",
+            "Perl::Tidy" : "0",
+            "Test::Code::TidyAll" : "0",
             "Test::Perl::Critic" : "0"
          }
       }
