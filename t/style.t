@@ -8,7 +8,7 @@ use English qw(-no_match_vars);
 # Make sure we adhere to the supplied style guidelines
 eval { require Test::Code::TidyAll; };
 if ($EVAL_ERROR) {
-  my $msg = 'Test::Code::TidyAll required to criticize code';
+  my $msg = 'Test::Code::TidyAll required to check code against style guide';
   plan(skip_all => $msg);
 }
 
