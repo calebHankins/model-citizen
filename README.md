@@ -17,7 +17,7 @@ Export Oracle Data Modeler files as json and or SQL DDL for easier consumption b
         - [Load JSON output to MongoDB](#load-json-output-to-mongodb)
 
 ## Note for Windows Users
-This application requires Perl to be installed and on your path. [Active Perl](https://en.wikipedia.org/wiki/ActivePerl) is one alternative for installing a Perl interpreter. 
+This application requires Perl to be installed and on your path. [Active Perl](https://en.wikipedia.org/wiki/ActivePerl) is one alternative for installing a Perl interpreter.
 
 If you have *chocolatey* installed, you can use the following command to install Active Perl.
 
