@@ -346,7 +346,7 @@ sub loadModelFile {
 
 ##---------------------------------------------------------------------------
 # Load table info from an XML object and return a hash ref of handy info
-sub loadModelFileTable () {
+sub loadModelFileTable {
   my ($XMLObj) = @_;
   my $subName = (caller(0))[3];
 
@@ -452,7 +452,7 @@ sub loadModelFileTable () {
 
 ##---------------------------------------------------------------------------
 # Load Foreign Key info from an XML object and return a hash ref of handy info
-sub loadModelFileForeignKey () {
+sub loadModelFileForeignKey {
   my ($XMLObj) = @_;
   my $subName = (caller(0))[3];
 
