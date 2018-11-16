@@ -2,7 +2,11 @@
 abstract: 'Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes '
 author:
   - 'Caleb Hankins (caleb.hankins at acxiom.com)'
-build_requires: {}
+build_requires:
+  English: '0'
+  Perl::Tidy: '0'
+  Test::Code::TidyAll: '0'
+  Test::Perl::Critic: '0'
 dynamic_config: 0
 generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
 license: apache
@@ -20,6 +24,7 @@ requires:
   Cwd: '0'
   Data::Dumper: '0'
   File::Basename: '0'
+  File::Glob: '0'
   File::Path: '0'
   Getopt::Long: '0'
   HTML::Entities: '0'

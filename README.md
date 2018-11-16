@@ -15,9 +15,10 @@ Export Oracle Data Modeler files as json and or SQL DDL for easier consumption b
         - [Help](#help)
         - [Export Model as SQL and or JSON array](#export-model-as-sql-and-or-json-array)
         - [Load JSON output to MongoDB](#load-json-output-to-mongodb)
+    - [Contributing](#contributing)
 
 ## Note for Windows Users
-This application requires Perl to be installed and on your path. [Active Perl](https://en.wikipedia.org/wiki/ActivePerl) is one alternative for installing a Perl interpreter. 
+This application requires Perl to be installed and on your path. [Active Perl](https://en.wikipedia.org/wiki/ActivePerl) is one alternative for installing a Perl interpreter.
 
 If you have *chocolatey* installed, you can use the following command to install Active Perl.
 
@@ -82,3 +83,5 @@ mongoimport.exe --db model-citizen --collection model --file "C:\git\model-citiz
  --host localhost:27017 -v --stopOnError --jsonArray;
 ```
 
+## Contributing
+If you are interested in contributing to the project, please check out our [Contributor's Guide](CONTRIBUTING.md).

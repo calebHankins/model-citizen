@@ -19,6 +19,7 @@
             "Cwd" : "0",
             "Data::Dumper" : "0",
             "File::Basename" : "0",
+            "File::Glob" : "0",
             "File::Path" : "0",
             "Getopt::Long" : "0",
             "HTML::Entities" : "0",
@@ -31,6 +32,14 @@
             "URI::Escape" : "0",
             "XML::Twig" : "0",
             "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : "0",
+            "Perl::Tidy" : "0",
+            "Test::Code::TidyAll" : "0",
+            "Test::Perl::Critic" : "0"
          }
       }
    },

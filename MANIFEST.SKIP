@@ -86,3 +86,6 @@ scratch
 
 # Avoid vscode files
 .vscode
+
+# Avoid tidayall files
+.tidyall.d
