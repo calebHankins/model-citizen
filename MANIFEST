@@ -1,5 +1,6 @@
 .perlcriticrc
 .perltidyrc
+.tidyallrc
 Build.PL
 CONTRIBUTING.md
 lib/ModelCitizen.pm
@@ -9,3 +10,6 @@ LICENSE
 MANIFEST			This list of files
 README.md
 script/model-citizen
+t/00-load.t
+t/lint.t
+t/style.t

@@ -1,0 +1,4 @@
+[PerlTidy]
+select = {lib,t,script}/**/*.{pl,pm,t}
+select = Build.PL
+argv = --profile=$ROOT/.perltidyrc
