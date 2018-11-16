@@ -46,7 +46,7 @@
    "provides" : {
       "ModelCitizen" : {
          "file" : "lib/ModelCitizen.pm",
-         "version" : "v0.1.0"
+         "version" : "v0.1.1"
       },
       "ModelCitizen::Logger" : {
          "file" : "lib/ModelCitizen/Logger.pm"
@@ -58,6 +58,6 @@
          "http://apache.org/licenses/LICENSE-2.0"
       ]
    },
-   "version" : "v0.1.0",
+   "version" : "v0.1.1",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }
