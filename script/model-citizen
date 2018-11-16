@@ -37,10 +37,10 @@ STDERR->autoflush(1);
 
 # User options that we'll set using GetOptions()
 my $modelFilepath  = '';
-my $outputFileSQL  = './scratch/model.sql';                      # Default file to write the SQL results
-my $outputFileJSON = './scratch/model.json';                     # Default file to write the json results
+my $outputFileSQL  = '';
+my $outputFileJSON = '';
 my $typesFilePath  = '';
-my $RDBMS          = 'Oracle Database 12c';                      # Default RDBMS SQL to generate
+my $RDBMS          = 'Oracle Database 12c';                      # Default target RDBMS SQL to generate
 my $testMode       = '';
 my $verbose        = '';
 
@@ -184,11 +184,11 @@ model-citizen
 model-citizen: Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes 
 
  Options:
-    f|modelFilepath             String. Directory path where data model lives.
+    i|f|modelFilepath           String. Directory path where data model lives.
     typesFilePath               String. File path of XML file containing type lookup information. This file can be located in your Oracle Data Modeler install directory at ${MODELER_HOME}/datamodeler/datamodeler/types/types.xml
     RDBMS|rdbms                 String. Target RDBMS system type. Defaults to 'Oracle Database 12c'. Must be defined in the 'types' file.
     o|outputFile|outputFileSQL  String. Output file path for SQL DDL file built off the model.
-    outputFileJSON              String. Output file path for json file built off the model.
+    outputFileJSON              String. Output file path for json file built off the model. This will be an array of json documents.
     t|testMode                  Flag. Skip call to create output file(s) but print all of the other information.
     v|verbose                   Flag. Print more verbose output.
     version                     Flag. Print version information.
