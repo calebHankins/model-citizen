@@ -51,7 +51,7 @@ If you don't want to or can't install dependencies via `Build installdeps`, you 
 ### Troubleshooting
 Users have reporting issues installing certain modules on Windows platforms. If one or more libraries fail to load due to failing tests on Windows, consider installing with the force flag turned on:
 ```powershell
-cpan -f install Log::Log4perl
+cpan install -f Log::Log4perl
 ```
 ## Run without installing
 
