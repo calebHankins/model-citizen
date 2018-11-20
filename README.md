@@ -19,6 +19,7 @@ Export Oracle Data Modeler files as json and or SQL DDL for easier consumption b
         - [Help](#help)
         - [Export Model as SQL and or JSON array](#export-model-as-sql-and-or-json-array)
         - [Load JSON output to MongoDB](#load-json-output-to-mongodb)
+    - [Sample Models](#sample-models)
     - [Contributing](#contributing)
 
 ## Note for Windows Users
@@ -123,6 +124,9 @@ The json output is an array of documents describing the data model. These can be
 mongoimport.exe --db model-citizen --collection model --file "C:\git\model-citizen\scratch\model.json"
  --host localhost:27017 -v --stopOnError --jsonArray;
 ```
+
+## Sample Models
+Sample data models can be [found here](https://www.oracle.com/technetwork/developer-tools/datamodeler/sample-models-scripts-224531.html).
 
 ## Contributing
 If you are interested in contributing to the project, please check out our [Contributor's Guide](CONTRIBUTING.md).
