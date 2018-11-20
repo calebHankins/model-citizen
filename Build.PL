@@ -32,7 +32,7 @@ my $build = Module::Build->new(
                'Cwd'              => '0',
   },
   test_requires => {'English' => '0', 'Test::Perl::Critic' => '0', 'Test::Code::TidyAll' => '0', 'Perl::Tidy' => '0',},
-  configure_requires => {'Module::Build' => 0.42},
+  configure_requires => {'Module::Build' => '0'},
   create_makefile_pl => 'traditional',
 );
 
