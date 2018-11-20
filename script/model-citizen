@@ -45,7 +45,7 @@ my $testMode       = '';
 my $verbose        = '';
 
 my $rc = GetOptions(
-  'f|modelFilepath=s'            => \$modelFilepath,
+  'i|f|modelFilepath=s'          => \$modelFilepath,
   'RDBMS|rdbms=s'                => \$RDBMS,
   'typesFilePath=s'              => \$typesFilePath,
   'o|outputFile|outputFileSQL=s' => \$outputFileSQL,

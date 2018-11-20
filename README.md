@@ -7,8 +7,13 @@ Export Oracle Data Modeler files as json and or SQL DDL for easier consumption b
 - [MODEL-CITIZEN](#model-citizen)
     - [Note for Windows Users](#note-for-windows-users)
     - [Installation](#installation)
-        - [Install using cpan](#install-using-cpan)
         - [Install using cpanm](#install-using-cpanm)
+            - [Using git repository directly](#using-git-repository-directly)
+                - [Github](#github)
+                - [Generic Repository](#generic-repository)
+            - [Using local files](#using-local-files)
+            - [Installing cpanm (App::cpanminus)](#installing-cpanm-appcpanminus)
+        - [Install using cpan](#install-using-cpan)
         - [Install using Module::Build](#install-using-modulebuild)
         - [Install using Make](#install-using-make)
         - [Manual Dependency Install](#manual-dependency-install)
@@ -32,18 +37,50 @@ choco install activeperl
 ```
 
 ## Installation
-**Installing may require elevated privileges.** If you want to run without installing, see [Run Without Installing](#run-without-installing)
+**Installing may require elevated privileges.** If you want to run without installing, see [Run Without Installing](#run-without-installing). The following commands that reference '.' should be executed from the same folder in which this README file can be found.
+
+### Install using cpanm
+cpanm is the easiest and most modern way to install. If you don't have cpanm on your path, check out [Installing cpanm](#installing-cpanm-appcpanminus)
+
+#### Using git repository directly
+
+##### Github
+Install directly from a github repository.
+```powershell
+cpanm git://github.com/Acxiom/model-citizen.git
+```
+
+By default it will install the Master branch version. If you want another version, you can specify with the `@` symbol after the URL.
+
+```powershell
+# Install the current development build
+cpanm git://github.com/Acxiom/model-citizen.git@develop
+```
+
+[Video showing cpanm github install example](https://www.youtube.com/watch?feature=player_embedded&v=6Vglyf7X2S8#t=5m).
+
+##### Generic Repository
+If this code repo is in BitBucket / Stash / Gitlab etc, you can use the checkout url that you would normally use for git.
+```powershell
+cpanm https://<YOUR_USER_HERE>@<REPO_HOST_HERE>/<PATH_TO_GIT_HERE>.git@<BRANCH_HERE / COMMIT_HASH_HERE>
+```
+#### Using local files
+If you've checkout out the repository or unpacked the release tarball, you can run the following from the folder containing this README:
+```powershell
+# Install from the directory the README file is in after unpacking the tar.gz
+cpanm install .
+```
+
+
+#### Installing cpanm (App::cpanminus)
+https://metacpan.org/pod/App::cpanminus#INSTALLATION
+
+
 
 ### Install using cpan
 
 ```powershell
 cpan install .
-```
-
-### Install using cpanm
-
-```powershell
-cpanm install .
 ```
 
 ### Install using Module::Build

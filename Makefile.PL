@@ -3,29 +3,29 @@ require 5.010001;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
+  'VERSION_FROM' => 'lib/ModelCitizen.pm',
+  'PREREQ_PM' => {
+                   'Getopt::Long' => '0',
+                   'HTML::Entities' => '0',
+                   'Data::Dumper' => '0',
+                   'Pod::Usage' => '0',
+                   'File::Glob' => '0',
+                   'File::Path' => '0',
+                   'LWP::UserAgent' => '0',
+                   'Cwd' => '0',
+                   'XML::Twig' => '0',
+                   'Text::ParseWords' => '0',
+                   'URI::Escape' => '0',
+                   'JSON' => '0',
+                   'IO::Handle' => '0',
+                   'File::Basename' => '0',
+                   'Log::Log4perl' => '0'
+                 },
+  'INSTALLDIRS' => 'site',
+  'PL_FILES' => {},
   'NAME' => 'ModelCitizen',
   'EXE_FILES' => [
                    'script/model-citizen'
-                 ],
-  'INSTALLDIRS' => 'site',
-  'PREREQ_PM' => {
-                   'Text::ParseWords' => '0',
-                   'IO::Handle' => '0',
-                   'Data::Dumper' => '0',
-                   'LWP::UserAgent' => '0',
-                   'JSON' => '0',
-                   'XML::Twig' => '0',
-                   'File::Glob' => '0',
-                   'Log::Log4perl' => '0',
-                   'URI::Escape' => '0',
-                   'Getopt::Long' => '0',
-                   'Cwd' => '0',
-                   'File::Basename' => '0',
-                   'HTML::Entities' => '0',
-                   'Pod::Usage' => '0',
-                   'File::Path' => '0'
-                 },
-  'VERSION_FROM' => 'lib/ModelCitizen.pm',
-  'PL_FILES' => {}
+                 ]
 )
 ;

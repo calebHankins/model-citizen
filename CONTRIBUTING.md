@@ -19,11 +19,14 @@ All commits to the project must pass linting and style guidelines.
 - Please Build the project and make sure all meta files are up to date
 	- See https://metacpan.org/pod/Module::Build for more info on Module::Build 
 ```powershell
-perl ./Build.PL 
-./Build
-./Build manifest
-./Build test
-./Build dist
+perl ./Build.PL   # Build new Build file
+./Build clean     # Clean up build files
+./Build           # Build code and docs
+./Build manifest  # Rebuild manifest
+./Build test      # Run test suite
+./Build distmeta  # Update metadata
+
+./Build dist      # If you would also like to create a tar.gz
 
 ```
 
