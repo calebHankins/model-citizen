@@ -5,6 +5,7 @@ _I am the very model of modern meta generable_
 Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes 
 
 - [MODEL-CITIZEN](#model-citizen)
+    - [Description](#description)
     - [Note for Windows Users](#note-for-windows-users)
     - [Installation](#installation)
         - [Install using cpanm](#install-using-cpanm)
@@ -26,6 +27,9 @@ Export Oracle Data Modeler files as json and or SQL DDL for easier consumption b
         - [Load JSON output to MongoDB](#load-json-output-to-mongodb)
     - [Sample Models](#sample-models)
     - [Contributing](#contributing)
+
+## Description
+This tool was developed to feed downstream continuous integration processes (like [join-hero](https://github.com/Acxiom/join-hero)) using objects modeled by the graphical tool [Oracle SQL Developer Data Modeler](https://www.oracle.com/database/technologies/appdev/datamodeler.html). It was created to support version 18.2 of Oracle SQL Developer Data Modeler and Oracle Database 12c export type, primarily focused on tables, indexes and foreign keys. Your milage may vary for other targets and Data Modeler versions.
 
 ## Note for Windows Users
 This application requires Perl to be installed and on your path. [Active Perl](https://en.wikipedia.org/wiki/ActivePerl) is one alternative for installing a Perl interpreter.
@@ -163,7 +167,9 @@ mongoimport.exe --db model-citizen --collection model --file "C:\git\model-citiz
 ```
 
 ## Sample Models
-Sample data models can be [found here](https://www.oracle.com/technetwork/developer-tools/datamodeler/sample-models-scripts-224531.html).
+Sample data models can be [found here](https://www.oracle.com/technetwork/developer-tools/datamodeler/sample-models-scripts-224531.html). 
+
+*Note: These models may be an older format (v2.x or v3.x) and will yield better results if upgraded using a more recent version of the Data Modeler utility.*
 
 ## Contributing
 If you are interested in contributing to the project, please check out our [Contributor's Guide](CONTRIBUTING.md).
