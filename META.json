@@ -1,0 +1,68 @@
+{
+   "abstract" : "Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes ",
+   "author" : [
+      "Caleb Hankins (caleb.hankins at acxiom.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4224",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ModelCitizen",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "File::Basename" : "0",
+            "File::Glob" : "0",
+            "File::Path" : "0",
+            "Getopt::Long" : "0",
+            "HTML::Entities" : "0",
+            "IO::Handle" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Log::Log4perl" : "0",
+            "Pod::Usage" : "0",
+            "Text::ParseWords" : "0",
+            "URI::Escape" : "0",
+            "XML::Twig" : "0",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : "0",
+            "Perl::Tidy" : "0",
+            "Test::Code::TidyAll" : "0",
+            "Test::Perl::Critic" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "ModelCitizen" : {
+         "file" : "lib/ModelCitizen.pm",
+         "version" : "v0.1.2"
+      },
+      "ModelCitizen::Logger" : {
+         "file" : "lib/ModelCitizen/Logger.pm"
+      }
+   },
+   "release_status" : "unstable",
+   "resources" : {
+      "license" : [
+         "http://apache.org/licenses/LICENSE-2.0"
+      ]
+   },
+   "version" : "v0.1.2",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}
