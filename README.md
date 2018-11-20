@@ -7,10 +7,14 @@ Export Oracle Data Modeler files as json and or SQL DDL for easier consumption b
 - [MODEL-CITIZEN](#model-citizen)
     - [Note for Windows Users](#note-for-windows-users)
     - [Installation](#installation)
-        - [Manual Dependency install](#manual-dependency-install)
-            - [Example commands to install Log::Log4perl on various platforms](#example-commands-to-install-loglog4perl-on-various-platforms)
+        - [Install using cpan](#install-using-cpan)
+        - [Install using cpanm](#install-using-cpanm)
+        - [Install using Module::Build](#install-using-modulebuild)
+        - [Install using Make](#install-using-make)
+        - [Manual Dependency Install](#manual-dependency-install)
+            - [Example Commands To Install Log Log4perl On Various Platforms](#example-commands-to-install-log-log4perl-on-various-platforms)
         - [Troubleshooting](#troubleshooting)
-    - [Run without installing](#run-without-installing)
+    - [Run Without Installing](#run-without-installing)
     - [Usage](#usage)
         - [Help](#help)
         - [Export Model as SQL and or JSON array](#export-model-as-sql-and-or-json-array)
@@ -27,6 +31,21 @@ choco install activeperl
 ```
 
 ## Installation
+**Installing may require elevated privileges.** If you want to run without installing, see [Run Without Installing](#run-without-installing)
+
+### Install using cpan
+
+```powershell
+cpan install .
+```
+
+### Install using cpanm
+
+```powershell
+cpanm install .
+```
+
+### Install using Module::Build
 
 ```powershell
 perl Build.PL
@@ -37,12 +56,34 @@ perl Build.PL
 ./Build install       # Add entry point(s) to your path. May require superuser privs
 ```
 
-### Manual Dependency install
+See https://metacpan.org/pod/Module::Build for more info on Module::Build
+
+### Install using Make
+
+```bash
+# *nix
+perl Makefile.PL
+make
+make test
+make install
+
+```
+
+```powershell
+# Activeperl
+perl Makefile.PL
+dmake.exe
+dmake.exe test
+dmake.exe install
+
+```
+
+### Manual Dependency Install
 If you don't want to or can't install dependencies via `Build installdeps`, you can install them manually via your favorite management system.
 
 [The dependency list can be reviewed here](MYMETA.json).
 
-#### Example commands to install Log::Log4perl on various platforms
+#### Example Commands To Install Log Log4perl On Various Platforms
 - `cpan install Log::Log4perl (cpan)`
 - `ppm install Log-Log4perl (ActivePerl)`
 - `sudo apt install liblog-log4perl-perl (Ubuntu/Debian)`
@@ -53,7 +94,7 @@ Users have reporting issues installing certain modules on Windows platforms. If 
 ```powershell
 cpan install -f Log::Log4perl
 ```
-## Run without installing
+## Run Without Installing
 
 You can run the model-citizen app without installing by invoking it in the `./script` directory. 
 

@@ -3,7 +3,7 @@
    "author" : [
       "Caleb Hankins (caleb.hankins at acxiom.com)"
    ],
-   "dynamic_config" : 0,
+   "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4224",
    "license" : [
       "apache_2_0"
@@ -14,6 +14,11 @@
    },
    "name" : "ModelCitizen",
    "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
       "runtime" : {
          "requires" : {
             "Cwd" : "0",
@@ -46,7 +51,7 @@
    "provides" : {
       "ModelCitizen" : {
          "file" : "lib/ModelCitizen.pm",
-         "version" : "v0.1.1"
+         "version" : "v0.1.2"
       },
       "ModelCitizen::Logger" : {
          "file" : "lib/ModelCitizen/Logger.pm"
@@ -58,6 +63,6 @@
          "http://apache.org/licenses/LICENSE-2.0"
       ]
    },
-   "version" : "v0.1.1",
+   "version" : "v0.1.2",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }
