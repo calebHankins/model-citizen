@@ -77,9 +77,12 @@
 \bbuild.com$
 ^MANIFEST\.SKIP
 \bscrath
+\bvendor
 
 # Avoid archives of this distribution
 \bmodel-citizen-[\d\.\_]+
+\bModelCitizen-[\d\.\_]+
+\bModelCitizen-.*.gz$
 
 # Avoid scratch dirs
 scratch
@@ -87,5 +90,5 @@ scratch
 # Avoid vscode files
 .vscode
 
-# Avoid tidayall files
+# Avoid tidyall files
 .tidyall.d

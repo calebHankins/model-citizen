@@ -1,4 +1,5 @@
 [PerlTidy]
-select = {lib,t,script}/**/*.{pl,pm,t}
+select = {lib,t}/**/*.{pl,pm,t}
+select = {script}/**/*
 select = Build.PL
 argv = --profile=$ROOT/.perltidyrc

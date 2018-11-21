@@ -37,15 +37,15 @@ STDERR->autoflush(1);
 
 # User options that we'll set using GetOptions()
 my $modelFilepath  = '';
-my $outputFileSQL  = './scratch/model.sql';                      # Default file to write the SQL results
-my $outputFileJSON = './scratch/model.json';                     # Default file to write the json results
+my $outputFileSQL  = '';
+my $outputFileJSON = '';
 my $typesFilePath  = '';
-my $RDBMS          = 'Oracle Database 12c';                      # Default RDBMS SQL to generate
+my $RDBMS          = 'Oracle Database 12c';                      # Default target RDBMS SQL to generate
 my $testMode       = '';
 my $verbose        = '';
 
 my $rc = GetOptions(
-  'f|modelFilepath=s'            => \$modelFilepath,
+  'i|f|modelFilepath=s'          => \$modelFilepath,
   'RDBMS|rdbms=s'                => \$RDBMS,
   'typesFilePath=s'              => \$typesFilePath,
   'o|outputFile|outputFileSQL=s' => \$outputFileSQL,
@@ -79,21 +79,21 @@ my $inputFileCnt = @inputFiles;
 $ModelCitizen::logger->info("[$inputFileCnt] files have been identified for analysis.");
 
 # Load files to form our model
-$ModelCitizen::logger->info("Parsing data model files loaded from from [$modelFilepath]...");
+$ModelCitizen::logger->info("Parsing data model files loaded from [$modelFilepath]...");
 my $model = ModelCitizen::loadModel(\@inputFiles);
 
-# Export model as SQL (if asked)
-if ($outputFileSQL && $types && $RDBMS) {
-  $ModelCitizen::logger->info("Exporting data model as $RDBMS sql to [$outputFileSQL]...");
-  my $sql = ModelCitizen::getSQL($model, $types, $RDBMS);
-  ModelCitizen::createExportFile($sql, $outputFileSQL);
+# Generate SQL from the loaded model
+my $sql;
+if ($types && $RDBMS) {
+  $ModelCitizen::logger->info("Generating '$RDBMS' sql for data model...");
+  $sql = ModelCitizen::getSQL($model, $types, $RDBMS);
+}
+else {
+  $ModelCitizen::logger->info("Missing either RDBMS or types info, skipping sql generation.");
 }
 
-# Export model as json
-if ($outputFileJSON) {
-  $ModelCitizen::logger->info("Exporting data model as json to [$outputFileJSON]...");
-  ModelCitizen::createExportFile($ModelCitizen::json->encode($model), $outputFileJSON);
-}
+# Export files generated from the model
+exportFiles();
 
 # Log out warning if we couldn't find any files to load
 if (!@inputFiles > 0) {
@@ -167,6 +167,47 @@ sub logScriptConfig {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
+# Export files generated from the model
+sub exportFiles {
+
+  # Export model as SQL (if asked and not in test mode)
+  if ($outputFileSQL) {
+    if (!$testMode) {
+      if (defined $sql) {
+        $ModelCitizen::logger->info("Exporting data model as '$RDBMS' sql to [$outputFileSQL]...");
+        ModelCitizen::createExportFile($sql, $outputFileSQL);
+      }
+      else {
+        $ModelCitizen::logger->warn("No sql was generated for '$RDBMS' sql to [$outputFileSQL], check config.");
+      }
+    } ## end if (!$testMode)
+    else {
+      $ModelCitizen::logger->info("Running in testMode, skipping sql file creation.");
+    }
+  } ## end if ($outputFileSQL)
+  else {
+    $ModelCitizen::logger->info("No outputFileSQL path was supplied, skipping sql file creation.");
+  }
+
+  # Export model as json (if asked and not in test mode)
+  if ($outputFileJSON) {
+    if (!$testMode) {
+      $ModelCitizen::logger->info("Exporting data model as json array to [$outputFileJSON]...");
+      ModelCitizen::createExportFile($ModelCitizen::json->encode($model), $outputFileJSON);
+    }
+    else {
+      $ModelCitizen::logger->info("Running in testMode, skipping json file creation.");
+    }
+  } ## end if ($outputFileJSON)
+  else {
+    $ModelCitizen::logger->info("No outputFileJSON path was supplied, skipping json file creation.");
+  }
+
+  return;
+} ## end sub exportFiles
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
 # Podusage
 
 __END__
@@ -184,11 +225,11 @@ model-citizen
 model-citizen: Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes 
 
  Options:
-    f|modelFilepath             String. Directory path where data model lives.
+    i|f|modelFilepath           String. Directory path where data model lives.
     typesFilePath               String. File path of XML file containing type lookup information. This file can be located in your Oracle Data Modeler install directory at ${MODELER_HOME}/datamodeler/datamodeler/types/types.xml
     RDBMS|rdbms                 String. Target RDBMS system type. Defaults to 'Oracle Database 12c'. Must be defined in the 'types' file.
     o|outputFile|outputFileSQL  String. Output file path for SQL DDL file built off the model.
-    outputFileJSON              String. Output file path for json file built off the model.
+    outputFileJSON              String. Output file path for json file built off the model. This will be an array of json documents.
     t|testMode                  Flag. Skip call to create output file(s) but print all of the other information.
     v|verbose                   Flag. Print more verbose output.
     version                     Flag. Print version information.

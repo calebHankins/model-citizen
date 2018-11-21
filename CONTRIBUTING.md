@@ -16,7 +16,19 @@ All commits to the project must pass linting and style guidelines.
     - If the build fails due to a failed style check, try running `tidyall -a` and recommitting.
 - Code should pass Perl::Critic with no errors/warnings using the `.perlcriticrc` in the project's root.
     - Any exceptions should be documented, noted in the pull request, and an exception added to the `.perlcriticrc` file.
-- Please rebuild the manifest via the Build app if you added/removed any files: `.\Build manifest`
+- Please Build the project and make sure all meta files are up to date
+	- See https://metacpan.org/pod/Module::Build for more info on Module::Build 
+```powershell
+perl ./Build.PL   # Build new Build file
+./Build clean     # Clean up build files
+./Build           # Build code and docs
+./Build manifest  # Rebuild manifest
+./Build test      # Run test suite
+./Build distmeta  # Update metadata
+
+./Build dist      # If you would also like to create a tar.gz
+
+```
 
 #### Suggested tools
 #### vscode

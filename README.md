@@ -5,17 +5,31 @@ _I am the very model of modern meta generable_
 Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes 
 
 - [MODEL-CITIZEN](#model-citizen)
+    - [Description](#description)
     - [Note for Windows Users](#note-for-windows-users)
     - [Installation](#installation)
-        - [Manual Dependency install](#manual-dependency-install)
-            - [Example commands to install Log::Log4perl on various platforms](#example-commands-to-install-loglog4perl-on-various-platforms)
+        - [Install using cpanm](#install-using-cpanm)
+            - [Using git repository directly](#using-git-repository-directly)
+                - [Github](#github)
+                - [Generic Repository](#generic-repository)
+            - [Using local files](#using-local-files)
+            - [Installing cpanm (App::cpanminus)](#installing-cpanm-appcpanminus)
+        - [Install using cpan](#install-using-cpan)
+        - [Install using Module::Build](#install-using-modulebuild)
+        - [Install using Make](#install-using-make)
+        - [Manual Dependency Install](#manual-dependency-install)
+            - [Example Commands To Install Log Log4perl On Various Platforms](#example-commands-to-install-log-log4perl-on-various-platforms)
         - [Troubleshooting](#troubleshooting)
-    - [Run without installing](#run-without-installing)
+    - [Run Without Installing](#run-without-installing)
     - [Usage](#usage)
         - [Help](#help)
         - [Export Model as SQL and or JSON array](#export-model-as-sql-and-or-json-array)
         - [Load JSON output to MongoDB](#load-json-output-to-mongodb)
+    - [Sample Models](#sample-models)
     - [Contributing](#contributing)
+
+## Description
+This tool was developed to feed downstream continuous integration processes (like [join-hero](https://github.com/Acxiom/join-hero)) using objects modeled by the graphical tool [Oracle SQL Developer Data Modeler](https://www.oracle.com/database/technologies/appdev/datamodeler.html). It was created to support version 18.2 of Oracle SQL Developer Data Modeler and Oracle Database 12c export type, primarily focused on tables, indexes and foreign keys. Your milage may vary for other targets and Data Modeler versions.
 
 ## Note for Windows Users
 This application requires Perl to be installed and on your path. [Active Perl](https://en.wikipedia.org/wiki/ActivePerl) is one alternative for installing a Perl interpreter.
@@ -27,6 +41,53 @@ choco install activeperl
 ```
 
 ## Installation
+**Installing may require elevated privileges.** If you want to run without installing, see [Run Without Installing](#run-without-installing). The following commands that reference '.' should be executed from the same folder in which this README file can be found.
+
+### Install using cpanm
+cpanm is the easiest and most modern way to install. If you don't have cpanm on your path, check out [Installing cpanm](#installing-cpanm-appcpanminus)
+
+#### Using git repository directly
+
+##### Github
+Install directly from a github repository.
+```powershell
+cpanm git://github.com/Acxiom/model-citizen.git
+```
+
+By default it will install the Master branch version. If you want another version, you can specify with the `@` symbol after the URL.
+
+```powershell
+# Install the current development build
+cpanm git://github.com/Acxiom/model-citizen.git@develop
+```
+
+[Video showing cpanm github install example](https://www.youtube.com/watch?feature=player_embedded&v=6Vglyf7X2S8#t=5m).
+
+##### Generic Repository
+If this code repo is in BitBucket / Stash / Gitlab etc, you can use the checkout url that you would normally use for git.
+```powershell
+cpanm https://<YOUR_USER_HERE>@<REPO_HOST_HERE>/<PATH_TO_GIT_HERE>.git@<BRANCH_HERE / COMMIT_HASH_HERE>
+```
+#### Using local files
+If you've checkout out the repository or unpacked the release tarball, you can run the following from the folder containing this README:
+```powershell
+# Install from the directory the README file is in after unpacking the tar.gz
+cpanm install .
+```
+
+
+#### Installing cpanm (App::cpanminus)
+https://metacpan.org/pod/App::cpanminus#INSTALLATION
+
+
+
+### Install using cpan
+
+```powershell
+cpan install .
+```
+
+### Install using Module::Build
 
 ```powershell
 perl Build.PL
@@ -37,12 +98,34 @@ perl Build.PL
 ./Build install       # Add entry point(s) to your path. May require superuser privs
 ```
 
-### Manual Dependency install
+See https://metacpan.org/pod/Module::Build for more info on Module::Build
+
+### Install using Make
+
+```bash
+# *nix
+perl Makefile.PL
+make
+make test
+make install
+
+```
+
+```powershell
+# Activeperl
+perl Makefile.PL
+dmake.exe
+dmake.exe test
+dmake.exe install
+
+```
+
+### Manual Dependency Install
 If you don't want to or can't install dependencies via `Build installdeps`, you can install them manually via your favorite management system.
 
 [The dependency list can be reviewed here](MYMETA.json).
 
-#### Example commands to install Log::Log4perl on various platforms
+#### Example Commands To Install Log Log4perl On Various Platforms
 - `cpan install Log::Log4perl (cpan)`
 - `ppm install Log-Log4perl (ActivePerl)`
 - `sudo apt install liblog-log4perl-perl (Ubuntu/Debian)`
@@ -51,9 +134,9 @@ If you don't want to or can't install dependencies via `Build installdeps`, you 
 ### Troubleshooting
 Users have reporting issues installing certain modules on Windows platforms. If one or more libraries fail to load due to failing tests on Windows, consider installing with the force flag turned on:
 ```powershell
-cpan install Log::Log4perl -f
+cpan install -f Log::Log4perl
 ```
-## Run without installing
+## Run Without Installing
 
 You can run the model-citizen app without installing by invoking it in the `./script` directory. 
 
@@ -82,6 +165,11 @@ The json output is an array of documents describing the data model. These can be
 mongoimport.exe --db model-citizen --collection model --file "C:\git\model-citizen\scratch\model.json"
  --host localhost:27017 -v --stopOnError --jsonArray;
 ```
+
+## Sample Models
+Sample data models can be [found here](https://www.oracle.com/technetwork/developer-tools/datamodeler/sample-models-scripts-224531.html). 
+
+*Note: These models may be an older format (v2.x or v3.x) and will yield better results if upgraded using a more recent version of the Data Modeler utility.*
 
 ## Contributing
 If you are interested in contributing to the project, please check out our [Contributor's Guide](CONTRIBUTING.md).
