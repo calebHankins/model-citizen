@@ -444,6 +444,12 @@ sub loadModelFileTable {
     if (defined $column->first_child('dataTypeSize')) {
       $colInfo->{"dataTypeSize"} = $column->first_child("dataTypeSize")->inner_xml;
     }
+    if (defined $column->first_child('dataTypePrecision')) {
+      $colInfo->{"dataTypePrecision"} = $column->first_child("dataTypePrecision")->inner_xml;
+    }
+    if (defined $column->first_child('dataTypeScale')) {
+      $colInfo->{"dataTypeScale"} = $column->first_child("dataTypeScale")->inner_xml;
+    }
     if (defined $column->first_child('commentInRDBMS')) {
 
       # These comments might have encoded new lines, replace the encoded version with \n
@@ -829,7 +835,7 @@ sub getFieldSQL {
       $map =~ s/^\s+|\s+$//g;    # Trim whitespace
       if ($map eq 'size') {
 
-        # Populate size with the dedicated size attribute if it exists and is populated
+        # Populate with the dedicated attribute if it exists and is populated
         if (defined($column->{dataTypeSize})) {
           $column->{size} = $column->{dataTypeSize};
         }
@@ -842,6 +848,12 @@ sub getFieldSQL {
         }
       } ## end if ($map eq 'size')
       if ($map eq 'precision') {
+
+        # Populate with the dedicated attribute if it exists and is populated
+        if (defined($column->{dataTypePrecision})) {
+          $column->{precision} = $column->{dataTypePrecision};
+        }
+
         if ($ownDataTypeParameters[1]) {
           my $precision = $ownDataTypeParameters[1];
           $precision =~ s/^\s+|\s+$//g;                       # Trim whitespace
@@ -849,6 +861,11 @@ sub getFieldSQL {
         }
       } ## end if ($map eq 'precision')
       if ($map eq 'scale') {
+
+        # Populate with the dedicated attribute if it exists and is populated
+        if (defined($column->{dataTypeScale})) {
+          $column->{scale} = $column->{dataTypeScale};
+        }
         if ($ownDataTypeParameters[2]) {
           my $scale = $ownDataTypeParameters[2];
           $scale =~ s/^\s+|\s+$//g;                           # Trim whitespace
