@@ -940,9 +940,12 @@ sub getIndexFromID {
 
   for my $table (@$tables) {
     for my $index (@{$table->{indexes}}) {
-      if ($index->{id} eq $indexID) { return $index; }
-    }
-  }
+      if ($index->{id} eq $indexID) {
+        $index->{parentTableID} = $table->{id};
+        return $index;
+      }
+    } ## end for my $index (@{$table...})
+  } ## end for my $table (@$tables)
 
   my $error = "ERR_COULD_NOT_RESOLVE_INDEX_FOR_ID_${indexID}";
   $logger->warn("$subName $error");
@@ -1035,19 +1038,21 @@ sub getSQLForeignKey {
     my $referredKeyIndex = getIndexFromID($modelFiles, $referredKeyID);
 
     # Convert host table id to human name
-    my $hostTableName = getTableNameFromID($modelFiles, $hostTableID);
+    # my $hostTable = getModelFileByID($modelFiles, $hostTableID);
+    my $hostTable = getModelFileByID($modelFiles, $hostKeyIndex->{parentTableID});
 
     # Convert host key to human key field list
     my $hostKeyFieldList = getFieldListFromIndex($hostKeyIndex, $modelFile, $modelFiles);
 
     # Convert referred table id to human name
-    my $referredTableName = getTableNameFromID($modelFiles, $referredTableID);
+    # my $referredTable = getModelFileByID($modelFiles, $referredTableID);
+    my $referredTable = getModelFileByID($modelFiles, $referredKeyIndex->{parentTableID});
 
     # Convert referred key to human key field list
     my $referredKeyFieldList = getFieldListFromIndex($referredKeyIndex, $modelFile, $modelFiles);
 
     # If we could find all the objects we needed, construct the SQL
-    if (defined($hostKeyIndex->{error})) {
+    if (defined($hostKeyIndex->{error}) || defined($referredKeyIndex->{error})) {
       $logger->warn("$subName Foreign Key $modelFile->{name} has no columns.");
       $sql = "-- Error - Foreign Key $modelFile->{name} has no columns\n\n";
       if ($verbose) {
@@ -1060,14 +1065,14 @@ sub getSQLForeignKey {
       } ## end if ($verbose)
     } ## end if (defined($hostKeyIndex...))
     else {
-      $sql = qq{ALTER TABLE $hostTableName
+      $sql = qq{ALTER TABLE $hostTable->{schemaPrefixSQL}$hostTable->{name}
     ADD CONSTRAINT $modelFile->{name} FOREIGN KEY ( $hostKeyFieldList )
-      REFERENCES $referredTableName ( $referredKeyFieldList );\n\n};
+      REFERENCES $referredTable->{schemaPrefixSQL}$referredTable->{name} ( $referredKeyFieldList );\n\n};
     }
 
     # Update the model file with our findings # todo, review mutating the model
-    $modelFile->{hostTableName}        = $hostTableName;
-    $modelFile->{referredTableName}    = $referredTableName;
+    $modelFile->{hostTableName}        = $hostTable->{name};
+    $modelFile->{referredTableName}    = $referredTable->{name};
     $modelFile->{hostKeyID}            = $hostKeyID;
     $modelFile->{referredKeyID}        = $referredKeyID;
     $modelFile->{hostKeyFieldList}     = $hostKeyFieldList;
@@ -1099,18 +1104,35 @@ sub getColumnNameFromID {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
+# Get a model file from the modelFiles array ref using guid lookup
+sub getModelFileByID {
+  my ($modelFiles, $ID) = @_;
+  my $subName = (caller(0))[3];
+
+  for my $modelFile (@$modelFiles) {
+    if ($modelFile->{id} eq $ID) { return $modelFile; }
+  }
+
+  my $error = "ERR_COULD_NOT_FIND_MODEL_FILE_BY_ID_$ID";
+  $logger->warn("$subName $error");
+  return {error => $error, name => ' ', schemaPrefixSQL => ' ', id => $ID};
+} ## end sub getModelFileByID
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
 # Generate human readable table name using guid lookup
 sub getTableNameFromID {
   my ($tables, $tableID) = @_;
   my $subName = (caller(0))[3];
+  my $tableName;
 
-  for my $table (@$tables) {
-    if ($table->{id} eq $tableID) { return $table->{name}; }
+  my $table = getModelFileByID($tables, $tableID);
+
+  if (defined $table->{error}) {
+    $tableName = "ERR_COULD_NOT_RESOLVE_TABLE_NAME_FOR_ID_${tableID}";
+    $logger->warn("$subName $tableName");
   }
-
-  my $error = "ERR_COULD_NOT_RESOLVE_TABLE_NAME_FOR_ID_${tableID}";
-  $logger->warn("$subName $error");
-  return $error;
+  return $tableName;
 } ## end sub getTableNameFromID
 ##---------------------------------------------------------------------------
 
