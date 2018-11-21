@@ -34,7 +34,7 @@ no if $] >= 5.017011, warnings => 'experimental::smartmatch';    # Suppress smar
 
 ##--------------------------------------------------------------------------
 # Version info
-our $VERSION = '0.1.2';                                          # Todo, pull this from git tag
+our $VERSION = '0.1.3';                                          # Todo, pull this from git tag
 ##--------------------------------------------------------------------------
 
 ##--------------------------------------------------------------------------
@@ -342,18 +342,42 @@ sub loadModelFile {
   my $fileType = '';
   if    ($currentFilename ~~ /table/)          { $fileType = 'table'; }
   elsif ($currentFilename ~~ /foreignkey/)     { $fileType = 'foreignkey'; }
+  elsif ($currentFilename ~~ /schema/)         { $fileType = 'schema'; }
   elsif ($currentFilename ~~ /Objects\.local/) { $fileType = 'Objects.local'; }
   else                                         { $fileType = 'unknown'; }
   if ($verbose) { $logger->info("$subName detected as a $fileType fileType: [$currentFilename]"); }
 
-  if ($fileType eq 'table')         { $modelFile = loadModelFileTable($XMLObj); }
-  if ($fileType eq 'foreignkey')    { $modelFile = loadModelFileForeignKey($XMLObj); }
-  if ($fileType eq 'Objects.local') { $modelFile = loadModelFileObjectsLocal($XMLObj); }
+  if    ($fileType eq 'table')         { $modelFile = loadModelFileTable($XMLObj); }
+  elsif ($fileType eq 'foreignkey')    { $modelFile = loadModelFileForeignKey($XMLObj); }
+  elsif ($fileType eq 'schema')        { $modelFile = loadModelFileSchema($XMLObj); }
+  elsif ($fileType eq 'Objects.local') { $modelFile = loadModelFileObjectsLocal($XMLObj); }
 
   if ($verbose) { $logger->info("$subName Complete: [$currentFilename]"); }
 
   return $modelFile;
 } ## end sub loadModelFile
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Load schema info from an XML object and return a hash ref of handy info
+sub loadModelFileSchema {
+  my ($XMLObj) = @_;
+  my $subName = (caller(0))[3];
+
+  # schema info
+  my $schemaInfo   = {};
+  my $schemaXMLObj = $XMLObj->root;
+  $schemaInfo->{type}            = 'schema';
+  $schemaInfo->{name}            = getSanitizedObjectName($schemaXMLObj->att("name"));
+  $schemaInfo->{id}              = $schemaXMLObj->att("id");
+  $schemaInfo->{createdBy}       = $schemaXMLObj->first_child("createdBy")->inner_xml;
+  $schemaInfo->{createdTime}     = $schemaXMLObj->first_child("createdTime")->inner_xml;
+  $schemaInfo->{ownerDesignName} = $schemaXMLObj->first_child("ownerDesignName")->inner_xml;
+
+  if ($verbose) { $logger->info("$subName schemaInfo:\n" . Dumper($schemaInfo)); }
+
+  return $schemaInfo;
+} ## end sub loadModelFileSchema
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
@@ -365,11 +389,12 @@ sub loadModelFileTable {
   # Table info
   my $tableInfo   = {};
   my $tableXMLObj = $XMLObj->root;
-  $tableInfo->{type}        = 'table';
-  $tableInfo->{name}        = getSanitizedObjectName($tableXMLObj->att("name"));
-  $tableInfo->{id}          = $tableXMLObj->att("id");
-  $tableInfo->{createdBy}   = $tableXMLObj->first_child("createdBy")->inner_xml;
-  $tableInfo->{createdTime} = $tableXMLObj->first_child("createdTime")->inner_xml;
+  $tableInfo->{type}         = 'table';
+  $tableInfo->{name}         = getSanitizedObjectName($tableXMLObj->att("name"));
+  $tableInfo->{id}           = $tableXMLObj->att("id");
+  $tableInfo->{createdBy}    = $tableXMLObj->first_child("createdBy")->inner_xml;
+  $tableInfo->{createdTime}  = $tableXMLObj->first_child("createdTime")->inner_xml;
+  $tableInfo->{schemaObject} = $tableXMLObj->first_child("schemaObject")->inner_xml;
 
   # Column info
   my $columns = $tableXMLObj->first_child("columns");
@@ -683,11 +708,16 @@ sub enrichModelFiles {
 
 ##---------------------------------------------------------------------------
 sub getSQLCreateTable {
-  my ($modelFile, $types, $RDBMS) = @_;
+  my ($modelFile, $modelFiles, $types, $RDBMS) = @_;
   my $subName        = (caller(0))[3];
   my $createTableSQL = '';
 
-  $createTableSQL .= qq{\nCREATE TABLE $modelFile->{name} (\n};
+  # Schema
+  my $schema = getSchemaFromID($modelFiles, $modelFile->{schemaObject});
+  $modelFile->{schema} = $schema->{name};
+  $modelFile->{schemaPrefixSQL} = $schema->{name} ? "$schema->{name}." : '';
+
+  $createTableSQL .= qq{\nCREATE TABLE $modelFile->{schemaPrefixSQL}$modelFile->{name} (\n};
 
   # Field list
   my $fieldList          = [];
@@ -718,8 +748,9 @@ sub getSQLCreateTable {
   for my $commentInRDBMS (@{$commentInRDBMSList}) {
     my $commentText = $commentInRDBMS->{commentInRDBMS};
     $commentText =~ s/'/''/g;    # Escape single quotes inside the text
-    $createTableSQL .= qq{COMMENT ON COLUMN $modelFile->{name}.$commentInRDBMS->{name} IS '$commentText';\n\n};
-  }
+    $createTableSQL
+      .= qq{COMMENT ON COLUMN $modelFile->{schemaPrefixSQL}$modelFile->{name}.$commentInRDBMS->{name} IS '$commentText';\n\n};
+  } ## end for my $commentInRDBMS ...
 
   $modelFile->{sql} = $createTableSQL;    # todo, review saving this SQL to the model
 
@@ -743,7 +774,7 @@ sub getSQL {
     if ($modelFile->{type} eq 'table') {
 
       # Create table SQL
-      $tableSQL .= getSQLCreateTable($modelFile, $types, $RDBMS);
+      $tableSQL .= getSQLCreateTable($modelFile, $modelFiles, $types, $RDBMS);
 
       # Create index SQL
       for my $index (@{$modelFile->{indexes}}) {
@@ -871,7 +902,8 @@ sub getSQLIndex {
     if ($verbose) { $logger->info("$subName index:" . $index->{name} . " detected as $keyTypeSQL"); }
 
     my $fieldList = getFieldListFromIndex($index, $modelFile, $modelFiles);
-    $sql = qq{ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} $keyTypeSQL ( $fieldList );\n\n};
+    $sql
+      = qq{ALTER TABLE $modelFile->{schemaPrefixSQL}$modelFile->{name} ADD CONSTRAINT $index->{name} $keyTypeSQL ( $fieldList );\n\n};
     $index->{sql} = $sql;    # todo, revisit sql storage in model
   } ## end if (defined $index->{indexState...})
 
@@ -895,6 +927,22 @@ sub getIndexFromID {
   $logger->warn("$subName $error");
   return {error => $error};
 } ## end sub getIndexFromID
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Return schema from id
+sub getSchemaFromID {
+  my ($schemas, $schemaID) = @_;
+  my $subName = (caller(0))[3];
+
+  for my $schemaCandidate (@$schemas) {
+    if ($schemaCandidate->{id} eq $schemaID) { return $schemaCandidate; }
+  }
+
+  my $error = "ERR_COULD_NOT_RESOLVE_SCHEMA_FOR_ID_${schemaID}";
+  $logger->warn("$subName $error");
+  return {error => $error, name => ''};
+} ## end sub getSchemaFromID
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
