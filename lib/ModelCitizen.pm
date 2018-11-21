@@ -788,16 +788,20 @@ sub getSQL {
       for my $index (@{$modelFile->{indexes}}) {
         if (defined $index->{indexState}) {
           if ($index->{indexState} ne 'Foreign Key') {
-
             $tableSQL .= getSQLIndex($index, $modelFile, $modelFiles);
           }
-        } ## end if (defined $index->{indexState...})
+        }
       } ## end for my $index (@{$modelFile...})
     } ## end if ($modelFile->{type}...)
-    elsif ($modelFile->{type} eq "foreignkey") {
+
+  } ## end for my $modelFile (@$modelFiles)
+
+  # Need to have all the tables and indexes set first, then we can construct the FKs
+  for my $modelFile (@$modelFiles) {
+    if ($modelFile->{type} eq "foreignkey") {
       $fkSQL .= getSQLForeignKey($modelFile, $modelFiles);
     }
-  } ## end for my $modelFile (@$modelFiles)
+  }
 
   # Write fk after all table objects to avoid dependency issues
   $sql = qq{$tableSQL\n$fkSQL\n};
