@@ -389,12 +389,14 @@ sub loadModelFileTable {
   # Table info
   my $tableInfo   = {};
   my $tableXMLObj = $XMLObj->root;
-  $tableInfo->{type}         = 'table';
-  $tableInfo->{name}         = getSanitizedObjectName($tableXMLObj->att("name"));
-  $tableInfo->{id}           = $tableXMLObj->att("id");
-  $tableInfo->{createdBy}    = $tableXMLObj->first_child("createdBy")->inner_xml;
-  $tableInfo->{createdTime}  = $tableXMLObj->first_child("createdTime")->inner_xml;
-  $tableInfo->{schemaObject} = $tableXMLObj->first_child("schemaObject")->inner_xml;
+  $tableInfo->{type}        = 'table';
+  $tableInfo->{name}        = getSanitizedObjectName($tableXMLObj->att("name"));
+  $tableInfo->{id}          = $tableXMLObj->att("id");
+  $tableInfo->{createdBy}   = $tableXMLObj->first_child("createdBy")->inner_xml;
+  $tableInfo->{createdTime} = $tableXMLObj->first_child("createdTime")->inner_xml;
+  if (defined $tableXMLObj->first_child("schemaObject")) {
+    $tableInfo->{schemaObject} = $tableXMLObj->first_child("schemaObject")->inner_xml;
+  }
 
   # Column info
   my $columns = $tableXMLObj->first_child("columns");
@@ -953,6 +955,10 @@ sub getIndexFromID {
 sub getSchemaFromID {
   my ($schemas, $schemaID) = @_;
   my $subName = (caller(0))[3];
+
+  if (!defined $schemaID) {
+    return {name => ''};
+  }
 
   for my $schemaCandidate (@$schemas) {
     if ($schemaCandidate->{id} eq $schemaID) { return $schemaCandidate; }
