@@ -821,9 +821,11 @@ sub getFieldSQL {
   }
 
   # Use mapping and ownDataTypeParameters to generate the RDBMS specific info
-  if (defined($column->{ownDataTypeParameters}) && defined($typeInfo->{mapping})) {
-    my @ownDataTypeParameters
-      = split(/,/, $column->{ownDataTypeParameters}, 3);            # These are the values we need to sub in
+  if (defined($typeInfo->{mapping})) {
+    my @ownDataTypeParameters;
+    if (defined($column->{ownDataTypeParameters})) {
+      @ownDataTypeParameters = split(/,/, $column->{ownDataTypeParameters}, 3); # These are the values we need to sub in
+    }
 
     # Look for defined size/precision/scale information
     # It appears that ownDataTypeParameters is a 3 part array
@@ -873,7 +875,7 @@ sub getFieldSQL {
         }
       } ## end if ($map eq 'scale')
     } ## end for my $map (@mapping)
-  } ## end if (defined($column->{...}))
+  } ## end if (defined($typeInfo->...))
 
   # Add size/precision/scale information if we have any
   my $fieldDetails = [];
