@@ -1018,24 +1018,10 @@ sub getSQLForeignKey {
   if ($verbose) { $logger->info("$subName modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]"); }
 
   # Set out first guesses for IDs. Some of these will not be populated and we'll have to fall back
-  my $hostTableID     = $modelFile->{containerWithKeyObject};
-  my $hostKeyID       = $modelFile->{localFKIndex};
-  my $referredTableID = $modelFile->{referredTableID};
-  my $referredKeyID   = $modelFile->{referredKeyID};
+  my $hostKeyID     = $modelFile->{localFKIndex};
+  my $referredKeyID = $modelFile->{referredKeyID};
 
   # Sometimes these refereed fields aren't set, try to look them up in the enrichment object
-  if (!defined $hostTableID) {
-    if (defined $modelFile->{enrichment}->{containerID}) {
-      $hostTableID = $modelFile->{enrichment}->{containerID};
-      if ($verbose) { $logger->info("$subName hostTableID set using enrichment data: $hostTableID"); }
-    }
-  } ## end if (!defined $hostTableID)
-  if (!defined $referredTableID) {
-    if (defined $modelFile->{enrichment}->{refContainerID}) {
-      $referredTableID = $modelFile->{enrichment}->{refContainerID};
-      if ($verbose) { $logger->info("$subName referredTableID set using enrichment data: $referredTableID"); }
-    }
-  } ## end if (!defined $referredTableID)
   if (!defined $referredKeyID) {
     if (defined $modelFile->{keyObject}) {
       $referredKeyID = $modelFile->{keyObject};
@@ -1048,21 +1034,19 @@ sub getSQLForeignKey {
   } ## end if (!defined $referredKeyID)
 
   # Proceed if we have the minimum required info to continue
-  if (defined $hostTableID && defined $hostKeyID && defined $referredTableID && defined $referredKeyID) {
+  if (defined $hostKeyID && defined $referredKeyID) {
 
     # Need to convert these index IDs to index objects
     my $hostKeyIndex     = getIndexFromID($modelFiles, $hostKeyID);
     my $referredKeyIndex = getIndexFromID($modelFiles, $referredKeyID);
 
     # Convert host table id to human name
-    # my $hostTable = getModelFileByID($modelFiles, $hostTableID);
     my $hostTable = getModelFileByID($modelFiles, $hostKeyIndex->{parentTableID});
 
     # Convert host key to human key field list
     my $hostKeyFieldList = getFieldListFromIndex($hostKeyIndex, $modelFile, $modelFiles);
 
     # Convert referred table id to human name
-    # my $referredTable = getModelFileByID($modelFiles, $referredTableID);
     my $referredTable = getModelFileByID($modelFiles, $referredKeyIndex->{parentTableID});
 
     # Convert referred key to human key field list
@@ -1072,14 +1056,12 @@ sub getSQLForeignKey {
     if (defined($hostKeyIndex->{error}) || defined($referredKeyIndex->{error})) {
       $logger->warn("$subName Foreign Key $modelFile->{name} has no columns.");
       $sql = "-- Error - Foreign Key $modelFile->{name} has no columns\n\n";
-      if ($verbose) {
-        if (defined($hostKeyIndex->{error})) {
-          $logger->warn("$subName Foreign Key $modelFile->{name} host has no columns: $hostKeyIndex->{error}");
-        }
-        if (defined($referredKeyIndex->{error})) {
-          $logger->warn("$subName Foreign Key $modelFile->{name} target has no columns: $referredKeyIndex->{error}");
-        }
-      } ## end if ($verbose)
+      if (defined($hostKeyIndex->{error})) {
+        $logger->warn("$subName Foreign Key $modelFile->{name} host has no columns: $hostKeyIndex->{error}");
+      }
+      if (defined($referredKeyIndex->{error})) {
+        $logger->warn("$subName Foreign Key $modelFile->{name} target has no columns: $referredKeyIndex->{error}");
+      }
     } ## end if (defined($hostKeyIndex...))
     else {
       $sql = qq{ALTER TABLE $hostTable->{schemaPrefixSQL}$hostTable->{name}
@@ -1097,7 +1079,7 @@ sub getSQLForeignKey {
     $modelFile->{sql}                  = $sql;
 
     if ($verbose) { $logger->info("$subName \$sql:\n $sql"); }
-  } ## end if (defined $hostTableID...)
+  } ## end if (defined $hostKeyID...)
   return $sql;
 } ## end sub getSQLForeignKey
 ##---------------------------------------------------------------------------
@@ -1125,12 +1107,18 @@ sub getColumnNameFromID {
 sub getModelFileByID {
   my ($modelFiles, $ID) = @_;
   my $subName = (caller(0))[3];
+  my $error;
 
-  for my $modelFile (@$modelFiles) {
-    if ($modelFile->{id} eq $ID) { return $modelFile; }
+  if (defined $ID) {
+    for my $modelFile (@$modelFiles) {
+      if ($modelFile->{id} eq $ID) { return $modelFile; }
+    }
+    $error = "ERR_COULD_NOT_FIND_MODEL_FILE_BY_ID_$ID";
+  } ## end if (defined $ID)
+  else {
+    $error = "ERR_COULD_NOT_FIND_MODEL_FILE_BY_ID_UNDEFINED_ID";
   }
 
-  my $error = "ERR_COULD_NOT_FIND_MODEL_FILE_BY_ID_$ID";
   $logger->warn("$subName $error");
   return {error => $error, name => ' ', schemaPrefixSQL => ' ', id => $ID};
 } ## end sub getModelFileByID
