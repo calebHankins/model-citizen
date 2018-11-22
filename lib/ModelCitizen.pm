@@ -775,26 +775,12 @@ sub getSQL {
   my $tableSQL = '';
   my $fkSQL    = '';
 
+  # Generate SQL for table files
   for my $modelFile (@$modelFiles) {
-    if ($verbose) {
-      $logger->info("$subName modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]");
-    }
     if ($modelFile->{type} eq 'table') {
-
-      # Create table SQL
-      $tableSQL .= getSQLCreateTable($modelFile, $modelFiles, $types, $RDBMS);
-
-      # Create index SQL
-      for my $index (@{$modelFile->{indexes}}) {
-        if (defined $index->{indexState}) {
-          if ($index->{indexState} ne 'Foreign Key') {
-            $tableSQL .= getSQLIndex($index, $modelFile, $modelFiles);
-          }
-        }
-      } ## end for my $index (@{$modelFile...})
-    } ## end if ($modelFile->{type}...)
-
-  } ## end for my $modelFile (@$modelFiles)
+      $tableSQL .= getSQLTable($modelFile, $modelFiles, $types, $RDBMS);
+    }
+  }
 
   # Need to have all the tables and indexes set first, then we can construct the FKs
   for my $modelFile (@$modelFiles) {
@@ -808,6 +794,31 @@ sub getSQL {
 
   return $sql;
 } ## end sub getSQL
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Get SQL for a table
+sub getSQLTable {
+  my ($modelFile, $modelFiles, $types, $RDBMS) = @_;
+  my $subName  = (caller(0))[3];
+  my $tableSQL = '';
+
+  if ($verbose) { $logger->info("$subName modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]"); }
+
+  # Create table SQL
+  $tableSQL .= getSQLCreateTable($modelFile, $modelFiles, $types, $RDBMS);
+
+  # Create index SQL
+  for my $index (@{$modelFile->{indexes}}) {
+    if (defined $index->{indexState}) {
+      if ($index->{indexState} ne 'Foreign Key') {
+        $tableSQL .= getSQLIndex($index, $modelFile, $modelFiles);
+      }
+    }
+  } ## end for my $index (@{$modelFile...})
+
+  return $tableSQL;
+} ## end sub getSQLTable
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
@@ -1003,6 +1014,8 @@ sub getSQLForeignKey {
   my ($modelFile, $modelFiles) = @_;
   my $subName = (caller(0))[3];
   my $sql     = '';
+
+  if ($verbose) { $logger->info("$subName modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]"); }
 
   # Set out first guesses for IDs. Some of these will not be populated and we'll have to fall back
   my $hostTableID     = $modelFile->{containerWithKeyObject};
