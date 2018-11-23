@@ -715,58 +715,6 @@ sub enrichModelFiles {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
-sub getSQLCreateTable {
-  my ($modelFile, $modelFiles, $types, $RDBMS) = @_;
-  my $subName        = (caller(0))[3];
-  my $createTableSQL = '';
-
-  # Schema
-  my $schema = getSchemaFromID($modelFiles, $modelFile->{schemaObject});
-  $modelFile->{schema} = $schema->{name};
-  $modelFile->{schemaPrefixSQL} = $schema->{name} ? "$schema->{name}." : '';
-
-  $createTableSQL .= qq{\nCREATE TABLE $modelFile->{schemaPrefixSQL}$modelFile->{name} (\n};
-
-  # Field list
-  my $fieldList          = [];
-  my $commentInRDBMSList = [];
-  for my $column (@{$modelFile->{columns}}) {
-
-    # Lookup type info using logical type
-    my $typeInfo = getTypeInfo($types, $column->{logicalDatatype}, $RDBMS);
-    ## this will give us something like "NUMBER, precision, scale" in $typeInfo->{mapping}
-    ## need to use this info along with the column info to generate the rest of the SQL
-
-    my $fieldSQL = getFieldSQL($column, $typeInfo, $RDBMS);
-
-    # Save off any comments so we can add the DDL for them later
-    if (defined $column->{commentInRDBMS}) {
-      push(@{$commentInRDBMSList}, {name => $column->{name}, commentInRDBMS => $column->{commentInRDBMS}});
-    }
-    push(@{$fieldList}, qq{    $fieldSQL});
-  } ## end for my $column (@{$modelFile...})
-
-  # Add field list to SQL statement
-  $createTableSQL .= join ",\n", @$fieldList;
-
-  # Close field list
-  $createTableSQL .= qq{\n);\n\n};
-
-  # Add SQL for column comments
-  for my $commentInRDBMS (@{$commentInRDBMSList}) {
-    my $commentText = $commentInRDBMS->{commentInRDBMS};
-    $commentText =~ s/'/''/g;    # Escape single quotes inside the text
-    $createTableSQL
-      .= qq{COMMENT ON COLUMN $modelFile->{schemaPrefixSQL}$modelFile->{name}.$commentInRDBMS->{name} IS '$commentText';\n\n};
-  } ## end for my $commentInRDBMS ...
-
-  $modelFile->{sql} = $createTableSQL;    # todo, review saving this SQL to the model
-
-  return $createTableSQL;
-} ## end sub getSQLCreateTable
-##---------------------------------------------------------------------------
-
-##---------------------------------------------------------------------------
 # Generate sql from modelFile info
 sub getSQL {
   my ($modelFiles, $types, $RDBMS) = @_;
@@ -819,6 +767,58 @@ sub getSQLTable {
 
   return $tableSQL;
 } ## end sub getSQLTable
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+sub getSQLCreateTable {
+  my ($modelFile, $modelFiles, $types, $RDBMS) = @_;
+  my $subName        = (caller(0))[3];
+  my $createTableSQL = '';
+
+  # Schema
+  my $schema = getSchemaFromID($modelFiles, $modelFile->{schemaObject});
+  $modelFile->{schema} = $schema->{name};
+  $modelFile->{schemaPrefixSQL} = $schema->{name} ? "$schema->{name}." : '';
+
+  $createTableSQL .= qq{\nCREATE TABLE $modelFile->{schemaPrefixSQL}$modelFile->{name} (\n};
+
+  # Field list
+  my $fieldList          = [];
+  my $commentInRDBMSList = [];
+  for my $column (@{$modelFile->{columns}}) {
+
+    # Lookup type info using logical type
+    my $typeInfo = getTypeInfo($types, $column->{logicalDatatype}, $RDBMS);
+    ## this will give us something like "NUMBER, precision, scale" in $typeInfo->{mapping}
+    ## need to use this info along with the column info to generate the rest of the SQL
+
+    my $fieldSQL = getFieldSQL($column, $typeInfo, $RDBMS);
+
+    # Save off any comments so we can add the DDL for them later
+    if (defined $column->{commentInRDBMS}) {
+      push(@{$commentInRDBMSList}, {name => $column->{name}, commentInRDBMS => $column->{commentInRDBMS}});
+    }
+    push(@{$fieldList}, qq{    $fieldSQL});
+  } ## end for my $column (@{$modelFile...})
+
+  # Add field list to SQL statement
+  $createTableSQL .= join ",\n", @$fieldList;
+
+  # Close field list
+  $createTableSQL .= qq{\n);\n\n};
+
+  # Add SQL for column comments
+  for my $commentInRDBMS (@{$commentInRDBMSList}) {
+    my $commentText = $commentInRDBMS->{commentInRDBMS};
+    $commentText =~ s/'/''/g;    # Escape single quotes inside the text
+    $createTableSQL
+      .= qq{COMMENT ON COLUMN $modelFile->{schemaPrefixSQL}$modelFile->{name}.$commentInRDBMS->{name} IS '$commentText';\n\n};
+  } ## end for my $commentInRDBMS ...
+
+  $modelFile->{sql} = $createTableSQL;    # todo, review saving this SQL to the model
+
+  return $createTableSQL;
+} ## end sub getSQLCreateTable
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
