@@ -474,7 +474,6 @@ sub loadModelFileTable {
 
       my $indexInfo = {name => getSanitizedObjectName($index->att("name")), id => $index->att("id")};
 
-      # looks like FKs don't have indexColumnUsage
       if (defined $index->first_child("indexState")) {
         $indexInfo->{indexState} = $index->first_child("indexState")->inner_xml;
       }
@@ -768,12 +767,8 @@ sub getSQLTable {
 
   # Create index SQL
   for my $index (@{$modelFile->{indexes}}) {
-    if (defined $index->{indexState}) {
-      if ($index->{indexState} ne 'Foreign Key') {
-        $tableSQL .= getSQLIndex($index, $modelFile, $modelFiles);
-      }
-    }
-  } ## end for my $index (@{$modelFile...})
+    $tableSQL .= getSQLIndex($index, $modelFile, $modelFiles);
+  }
 
   return $tableSQL;
 } ## end sub getSQLTable
@@ -936,25 +931,87 @@ sub getSQLIndex {
   my $sql     = '';
 
   if ($verbose) { $logger->info("$subName index name:" . $index->{name}); }
+
+  # Try to suss out what type of key we got
+  my $keyTypeSQL = 'DEFAULT INDEX';
   if (defined $index->{indexState}) {
-    my $keyTypeSQL = 'UNKNOWN_INDEX_TYPE';
     if (defined $index->{pk}) {
       $keyTypeSQL = 'PRIMARY KEY';
     }
     elsif ($index->{indexState} eq 'Unique Plain Index' or $index->{indexState} eq 'Unique Constraint') {
       $keyTypeSQL = 'UNIQUE';
     }
+    elsif ($index->{indexState} eq 'Foreign Key') {
+      $keyTypeSQL = 'FOREIGN KEY';
+    }
+  } ## end if (defined $index->{indexState...})
 
-    if ($verbose) { $logger->info("$subName index:" . $index->{name} . " detected as $keyTypeSQL"); }
+  # Sometimes indexState is not set, need to check against the list of FKs and make sure we're not in there
+  if ($keyTypeSQL eq 'DEFAULT INDEX') {
+    my $isFK = isIndexFK($index, $modelFiles);
+    if ($isFK) { $keyTypeSQL = 'FOREIGN KEY'; }
+  }
 
-    my $fieldList = getFieldListFromIndex($index, $modelFile, $modelFiles);
+  if ($verbose) { $logger->info("$subName index:" . $index->{name} . " detected as $keyTypeSQL"); }
+
+  if ($keyTypeSQL eq 'FOREIGN KEY') { return $sql; }    # Leave early, FKs are handled separately
+
+  my $fieldList = getFieldListFromIndex($index, $modelFile, $modelFiles);
+  if ($keyTypeSQL ne 'DEFAULT INDEX') {
     $sql
       = qq{ALTER TABLE $modelFile->{schemaPrefixSQL}$modelFile->{name} ADD CONSTRAINT $index->{name} $keyTypeSQL ( $fieldList );\n\n};
-    $index->{sql} = $sql;    # todo, revisit sql storage in model
-  } ## end if (defined $index->{indexState...})
+  }
+  else {
+    $sql
+      = qq{CREATE INDEX $modelFile->{schemaPrefixSQL}$index->{name} ON $modelFile->{schemaPrefixSQL}$modelFile->{name} ( $fieldList );\n\n};
+  }
+  $index->{sql} = $sql;                                 # todo, revisit sql storage in model
 
   return $sql;
 } ## end sub getSQLIndex
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Is the supplied index a FK?
+sub isIndexFK {
+  my ($index, $modelFiles) = @_;
+  my $subName = (caller(0))[3];
+  my $isFK    = 0;
+
+  for my $modelFile (@$modelFiles) {
+    if ($modelFile->{type} eq 'foreignkey') {
+      my ($hostKeyID, $referredKeyID) = getKeyIndexIDsFromFK($modelFile, $modelFiles);
+      if ($index->{id} eq $hostKeyID)     { $isFK = 1; last; }
+      if ($index->{id} eq $referredKeyID) { $isFK = 1; last; }
+    }
+  } ## end for my $modelFile (@$modelFiles)
+
+  return $isFK;
+} ## end sub isIndexFK
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Return key index ids from a foreign key object
+sub getKeyIndexIDsFromFK {
+  my ($modelFile, $modelFiles) = @_;
+  my $subName = (caller(0))[3];
+
+  # Set out first guesses for IDs. Some of these will not be populated and we'll have to fall back
+  my $hostKeyID     = $modelFile->{localFKIndex};
+  my $referredKeyID = $modelFile->{referredKeyID};
+
+  # Sometimes these refereed fields aren't set, try to look them up in the enrichment object
+  if (!defined $referredKeyID) {
+    if (defined $modelFile->{keyObject}) {
+      $referredKeyID = $modelFile->{keyObject};
+    }
+    elsif (defined $modelFile->{enrichment}->{propertyTargetId}) {
+      $referredKeyID = $modelFile->{enrichment}->{propertyTargetId};
+    }
+  } ## end if (!defined $referredKeyID)
+
+  return ($hostKeyID, $referredKeyID);
+} ## end sub getKeyIndexIDsFromFK
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
@@ -1027,21 +1084,7 @@ sub getSQLForeignKey {
 
   if ($verbose) { $logger->info("$subName modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]"); }
 
-  # Set out first guesses for IDs. Some of these will not be populated and we'll have to fall back
-  my $hostKeyID     = $modelFile->{localFKIndex};
-  my $referredKeyID = $modelFile->{referredKeyID};
-
-  # Sometimes these refereed fields aren't set, try to look them up in the enrichment object
-  if (!defined $referredKeyID) {
-    if (defined $modelFile->{keyObject}) {
-      $referredKeyID = $modelFile->{keyObject};
-      if ($verbose) { $logger->info("$subName referredKeyID set using keyObject: $referredKeyID"); }
-    }
-    elsif (defined $modelFile->{enrichment}->{propertyTargetId}) {
-      $referredKeyID = $modelFile->{enrichment}->{propertyTargetId};
-      if ($verbose) { $logger->info("$subName referredKeyID set using enrichment data: $referredKeyID"); }
-    }
-  } ## end if (!defined $referredKeyID)
+  my ($hostKeyID, $referredKeyID) = getKeyIndexIDsFromFK($modelFile, $modelFiles);
 
   # Proceed if we have the minimum required info to continue
   if (defined $hostKeyID && defined $referredKeyID) {
