@@ -398,40 +398,42 @@ sub loadModelFileView {
   }
 
   # viewElements info
-  my $viewElements = $viewXMLObj->first_child("viewElements");
-  $viewInfo->{viewElements} = [];
-  for my $viewElement ($viewElements->children('viewElement')) {
-    if ($viewElement->att("class") ~~ /relational.ColumnView$/) {
+  if (defined $viewXMLObj->first_child("viewElements")) {
+    my $viewElements = $viewXMLObj->first_child("viewElements");
+    $viewInfo->{viewElements} = [];
+    for my $viewElement ($viewElements->children('viewElement')) {
+      if ($viewElement->att("class") ~~ /relational.ColumnView$/) {
 
-      my $viewElementInfo = {};
-      $viewElementInfo->{id}   = $viewElement->att("id");
-      $viewElementInfo->{name} = $viewElement->att("name");
+        my $viewElementInfo = {};
+        $viewElementInfo->{id}   = $viewElement->att("id");
+        $viewElementInfo->{name} = $viewElement->att("name");
 
-      if (defined $viewElement->first_child("createdBy")) {
-        $viewElementInfo->{createdBy} = $viewElement->first_child("createdBy")->inner_xml;
-      }
-      if (defined $viewElement->first_child("createdTime")) {
-        $viewElementInfo->{createdTime} = $viewElement->first_child("createdTime")->inner_xml;
-      }
-      if (defined $viewElement->first_child("changedBy")) {
-        $viewElementInfo->{changedBy} = $viewElement->first_child("changedBy")->inner_xml;
-      }
-      if (defined $viewElement->first_child("changedTime")) {
-        $viewElementInfo->{changedTime} = $viewElement->first_child("changedTime")->inner_xml;
-      }
-      if (defined $viewElement->first_child("alias")) {
-        $viewElementInfo->{alias} = $viewElement->first_child("alias")->inner_xml;
-      }
-      if (defined $viewElement->first_child("dataType")) {
-        $viewElementInfo->{dataType} = $viewElement->first_child("dataType")->inner_xml;
-      }
-      if (defined $viewElement->first_child("reference")) {
-        $viewElementInfo->{reference} = $viewElement->first_child("reference")->inner_xml;
-      }
+        if (defined $viewElement->first_child("createdBy")) {
+          $viewElementInfo->{createdBy} = $viewElement->first_child("createdBy")->inner_xml;
+        }
+        if (defined $viewElement->first_child("createdTime")) {
+          $viewElementInfo->{createdTime} = $viewElement->first_child("createdTime")->inner_xml;
+        }
+        if (defined $viewElement->first_child("changedBy")) {
+          $viewElementInfo->{changedBy} = $viewElement->first_child("changedBy")->inner_xml;
+        }
+        if (defined $viewElement->first_child("changedTime")) {
+          $viewElementInfo->{changedTime} = $viewElement->first_child("changedTime")->inner_xml;
+        }
+        if (defined $viewElement->first_child("alias")) {
+          $viewElementInfo->{alias} = $viewElement->first_child("alias")->inner_xml;
+        }
+        if (defined $viewElement->first_child("dataType")) {
+          $viewElementInfo->{dataType} = $viewElement->first_child("dataType")->inner_xml;
+        }
+        if (defined $viewElement->first_child("reference")) {
+          $viewElementInfo->{reference} = $viewElement->first_child("reference")->inner_xml;
+        }
 
-      push(@{$viewInfo->{viewElements}}, $viewElementInfo);
-    } ## end if ($viewElement->att(...))
-  } ## end for my $viewElement ($viewElements...)
+        push(@{$viewInfo->{viewElements}}, $viewElementInfo);
+      } ## end if ($viewElement->att(...))
+    } ## end for my $viewElement ($viewElements...)
+  } ## end if (defined $viewXMLObj...)
 
   if ($verbose) { $logger->info("$subName viewInfo:\n" . Dumper($viewInfo)); }
 
@@ -802,6 +804,7 @@ sub getSQL {
   my $sql          = '';
   my $tableSQL     = '';
   my $fkSQL        = '';
+  my $viewSQL      = '';
   my $headerSQL    = '';
   my $startTime    = localtime;
   my $startTimeSQL = $startTime->datetime;
@@ -817,7 +820,10 @@ sub getSQL {
     if ($modelFile->{type} eq 'table') {
       $tableSQL .= getSQLTable($modelFile, $modelFiles, $types, $RDBMS);
     }
-  }
+    elsif ($modelFile->{type} eq 'view') {
+      $viewSQL .= getSQLView($modelFile, $modelFiles);
+    }
+  } ## end for my $modelFile (@$modelFiles)
 
   # Need to have all the tables and indexes set first, then we can construct the FKs
   for my $modelFile (@$modelFiles) {
@@ -827,10 +833,45 @@ sub getSQL {
   }
 
   # Assemble final SQL. Write fk after all table objects to avoid dependency issues
-  $sql = qq{$headerSQL\n\n$tableSQL\n$fkSQL\n};
+  $sql = qq{$headerSQL\n\n$tableSQL\n$fkSQL\n$viewSQL\n};
 
   return $sql;
 } ## end sub getSQL
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Get SQL for a view
+sub getSQLView {
+  my ($modelFile, $modelFiles) = @_;
+  my $subName = (caller(0))[3];
+  my $viewSQL = '';
+
+  if ($verbose) { $logger->info("$subName modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]"); }
+
+  # If we have user defined SQL, use that to create the view sql
+  if (defined $modelFile->{userDefinedSQL}) {
+    $viewSQL = "$modelFile->{userDefinedSQL};";
+    $viewSQL =~ s/&lt;br\/>/\n/g;             # Convert html new lines to \n
+    $viewSQL =~ s/&amp;lt;br&amp;gt;/\n/g;    # Convert escaped html new lines to \n
+
+    # Schema
+    my $schema = getSchemaFromID($modelFiles, $modelFile->{schemaObject});
+    $modelFile->{schema} = $schema->{name};
+    $modelFile->{schemaPrefixSQL} = $schema->{name} ? "$schema->{name}." : '';
+
+    # If we got a schema, update the view name in the SQL to use it
+    if ($modelFile->{schemaPrefixSQL}) {
+      $viewSQL =~ s/$modelFile->{name}/$modelFile->{schemaPrefixSQL}$modelFile->{name}/g;
+    }
+
+    $modelFile->{sql} = $viewSQL;
+  } ## end if (defined $modelFile...)
+  else {
+    if ($verbose) { $logger->warn("$subName [$modelFile->{name}] had no userDefinedSQL, skipping SQL generation"); }
+  }
+
+  return $viewSQL;
+} ## end sub getSQLView
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
