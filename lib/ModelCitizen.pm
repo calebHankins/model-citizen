@@ -35,7 +35,7 @@ no if $] >= 5.017011, warnings => 'experimental::smartmatch';    # Suppress smar
 
 ##--------------------------------------------------------------------------
 # Version info
-our $VERSION = '0.1.4';                                          # Todo, pull this from git tag
+our $VERSION = '0.1.5';                                          # Todo, pull this from git tag
 ##--------------------------------------------------------------------------
 
 ##--------------------------------------------------------------------------
@@ -339,24 +339,104 @@ sub loadModelFile {
   eval { $XMLObj = $twig->parsefile($currentFilename); };
   $logger->error(objConversionErrorMsgGenerator($@)) if $@;
 
-  # Handle files based on type. Could also do this based on internal metadata in the file instead of the path
-  my $fileType = '';
-  if    ($currentFilename ~~ /table/)          { $fileType = 'table'; }
-  elsif ($currentFilename ~~ /foreignkey/)     { $fileType = 'foreignkey'; }
-  elsif ($currentFilename ~~ /schema/)         { $fileType = 'schema'; }
-  elsif ($currentFilename ~~ /Objects\.local/) { $fileType = 'Objects.local'; }
-  else                                         { $fileType = 'unknown'; }
+  # Handle files based on type
+  my $fileType   = 'unknown';
+  my $XMLObjRoot = $XMLObj->root;
+  if (defined $XMLObjRoot->att("class")) {
+    my $XMLObjClass = $XMLObjRoot->att("class");
+    if    ($XMLObjClass ~~ /relational.Table$/)              { $fileType = 'table'; }
+    elsif ($XMLObjClass ~~ /relational.FKIndexAssociation$/) { $fileType = 'foreignkey'; }
+    elsif ($XMLObjClass ~~ /relational.SchemaObject$/)       { $fileType = 'schema'; }
+    elsif ($XMLObjClass ~~ /relational.TableView$/)          { $fileType = 'view'; }
+  } ## end if (defined $XMLObjRoot...)
+  if ($currentFilename ~~ /Objects\.local$/) { $fileType = 'Objects.local'; }
+
   if ($verbose) { $logger->info("$subName detected as a $fileType fileType: [$currentFilename]"); }
 
   if    ($fileType eq 'table')         { $modelFile = loadModelFileTable($XMLObj); }
   elsif ($fileType eq 'foreignkey')    { $modelFile = loadModelFileForeignKey($XMLObj); }
   elsif ($fileType eq 'schema')        { $modelFile = loadModelFileSchema($XMLObj); }
   elsif ($fileType eq 'Objects.local') { $modelFile = loadModelFileObjectsLocal($XMLObj); }
+  elsif ($fileType eq 'view')          { $modelFile = loadModelFileView($XMLObj); }
 
   if ($verbose) { $logger->info("$subName Complete: [$currentFilename]"); }
 
   return $modelFile;
 } ## end sub loadModelFile
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Load view info from an XML object and return a hash ref of handy info
+sub loadModelFileView {
+  my ($XMLObj) = @_;
+  my $subName = (caller(0))[3];
+
+  # schema info
+  my $viewInfo   = {};
+  my $viewXMLObj = $XMLObj->root;
+  $viewInfo->{type}            = 'view';
+  $viewInfo->{name}            = getSanitizedObjectName($viewXMLObj->att("name"));
+  $viewInfo->{id}              = $viewXMLObj->att("id");
+  $viewInfo->{createdBy}       = $viewXMLObj->first_child("createdBy")->inner_xml;
+  $viewInfo->{createdTime}     = $viewXMLObj->first_child("createdTime")->inner_xml;
+  $viewInfo->{ownerDesignName} = $viewXMLObj->first_child("ownerDesignName")->inner_xml;
+
+  if (defined $viewXMLObj->first_child("changedBy")) {
+    $viewInfo->{changedBy} = $viewXMLObj->first_child("changedBy")->inner_xml;
+  }
+  if (defined $viewXMLObj->first_child("changedTime")) {
+    $viewInfo->{changedTime} = $viewXMLObj->first_child("changedTime")->inner_xml;
+  }
+  if (defined $viewXMLObj->first_child("userDefined")) {
+    $viewInfo->{userDefined} = $viewXMLObj->first_child("userDefined")->inner_xml;
+  }
+  if (defined $viewXMLObj->first_child("userDefinedSQL")) {
+    $viewInfo->{userDefinedSQL} = $viewXMLObj->first_child("userDefinedSQL")->inner_xml;
+  }
+  if (defined $viewXMLObj->first_child("schemaObject")) {
+    $viewInfo->{schemaObject} = $viewXMLObj->first_child("schemaObject")->inner_xml;
+  }
+
+  # viewElements info
+  my $viewElements = $viewXMLObj->first_child("viewElements");
+  $viewInfo->{viewElements} = [];
+  for my $viewElement ($viewElements->children('viewElement')) {
+    if ($viewElement->att("class") ~~ /relational.ColumnView$/) {
+
+      my $viewElementInfo = {};
+      $viewElementInfo->{id}   = $viewElement->att("id");
+      $viewElementInfo->{name} = $viewElement->att("name");
+
+      if (defined $viewElement->first_child("createdBy")) {
+        $viewElementInfo->{createdBy} = $viewElement->first_child("createdBy")->inner_xml;
+      }
+      if (defined $viewElement->first_child("createdTime")) {
+        $viewElementInfo->{createdTime} = $viewElement->first_child("createdTime")->inner_xml;
+      }
+      if (defined $viewElement->first_child("changedBy")) {
+        $viewElementInfo->{changedBy} = $viewElement->first_child("changedBy")->inner_xml;
+      }
+      if (defined $viewElement->first_child("changedTime")) {
+        $viewElementInfo->{changedTime} = $viewElement->first_child("changedTime")->inner_xml;
+      }
+      if (defined $viewElement->first_child("alias")) {
+        $viewElementInfo->{alias} = $viewElement->first_child("alias")->inner_xml;
+      }
+      if (defined $viewElement->first_child("dataType")) {
+        $viewElementInfo->{dataType} = $viewElement->first_child("dataType")->inner_xml;
+      }
+      if (defined $viewElement->first_child("reference")) {
+        $viewElementInfo->{reference} = $viewElement->first_child("reference")->inner_xml;
+      }
+
+      push(@{$viewInfo->{viewElements}}, $viewElementInfo);
+    } ## end if ($viewElement->att(...))
+  } ## end for my $viewElement ($viewElements...)
+
+  if ($verbose) { $logger->info("$subName viewInfo:\n" . Dumper($viewInfo)); }
+
+  return $viewInfo;
+} ## end sub loadModelFileView
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
