@@ -55,10 +55,10 @@ my $rc = GetOptions(
   'v|verbose'  => \$verbose,
 
   # Version info
-  'version' => sub { print("model-citizen Version: $ModelCitizen::VERSION\n"); exit; },
+  'version' => \&logVersionInfo,
 
   # pod2usage variables
-  'help' => sub { pod2usage(1); },
+  'help' => sub { pod2usage(0); },
   'man'  => sub { pod2usage(-exitstatus => 0, -verbose => 2); }
 );
 
@@ -164,6 +164,15 @@ sub logScriptConfig {
 
   return;
 } ## end sub logScriptConfig
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Print [Version Information] to log
+sub logVersionInfo {
+  my $subName = (caller(0))[3];
+  $ModelCitizen::logger->info("$subName model-citizen Version: $ModelCitizen::VERSION\n");
+  exit;
+}
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
