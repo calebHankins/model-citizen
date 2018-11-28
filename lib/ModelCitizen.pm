@@ -477,6 +477,11 @@ sub loadModelFileTable {
   $tableInfo->{id}          = $tableXMLObj->att("id");
   $tableInfo->{createdBy}   = $tableXMLObj->first_child("createdBy")->inner_xml;
   $tableInfo->{createdTime} = $tableXMLObj->first_child("createdTime")->inner_xml;
+
+  # Schema info
+  if (defined $tableXMLObj->att("schemaObject")) {
+    $tableInfo->{schemaObject} = $tableXMLObj->att("schemaObject");
+  }
   if (defined $tableXMLObj->first_child("schemaObject")) {
     $tableInfo->{schemaObject} = $tableXMLObj->first_child("schemaObject")->inner_xml;
   }
