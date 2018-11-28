@@ -35,7 +35,7 @@ no if $] >= 5.017011, warnings => 'experimental::smartmatch';    # Suppress smar
 
 ##--------------------------------------------------------------------------
 # Version info
-our $VERSION = '0.1.3';                                          # Todo, pull this from git tag
+our $VERSION = '0.1.5';                                          # Todo, pull this from git tag
 ##--------------------------------------------------------------------------
 
 ##--------------------------------------------------------------------------
@@ -339,24 +339,106 @@ sub loadModelFile {
   eval { $XMLObj = $twig->parsefile($currentFilename); };
   $logger->error(objConversionErrorMsgGenerator($@)) if $@;
 
-  # Handle files based on type. Could also do this based on internal metadata in the file instead of the path
-  my $fileType = '';
-  if    ($currentFilename ~~ /table/)          { $fileType = 'table'; }
-  elsif ($currentFilename ~~ /foreignkey/)     { $fileType = 'foreignkey'; }
-  elsif ($currentFilename ~~ /schema/)         { $fileType = 'schema'; }
-  elsif ($currentFilename ~~ /Objects\.local/) { $fileType = 'Objects.local'; }
-  else                                         { $fileType = 'unknown'; }
+  # Handle files based on type
+  my $fileType   = 'unknown';
+  my $XMLObjRoot = $XMLObj->root;
+  if (defined $XMLObjRoot->att("class")) {
+    my $XMLObjClass = $XMLObjRoot->att("class");
+    if    ($XMLObjClass ~~ /relational.Table$/)              { $fileType = 'table'; }
+    elsif ($XMLObjClass ~~ /relational.FKIndexAssociation$/) { $fileType = 'foreignkey'; }
+    elsif ($XMLObjClass ~~ /relational.SchemaObject$/)       { $fileType = 'schema'; }
+    elsif ($XMLObjClass ~~ /relational.TableView$/)          { $fileType = 'view'; }
+  } ## end if (defined $XMLObjRoot...)
+  if ($currentFilename ~~ /Objects\.local$/) { $fileType = 'Objects.local'; }
+
   if ($verbose) { $logger->info("$subName detected as a $fileType fileType: [$currentFilename]"); }
 
   if    ($fileType eq 'table')         { $modelFile = loadModelFileTable($XMLObj); }
   elsif ($fileType eq 'foreignkey')    { $modelFile = loadModelFileForeignKey($XMLObj); }
   elsif ($fileType eq 'schema')        { $modelFile = loadModelFileSchema($XMLObj); }
   elsif ($fileType eq 'Objects.local') { $modelFile = loadModelFileObjectsLocal($XMLObj); }
+  elsif ($fileType eq 'view')          { $modelFile = loadModelFileView($XMLObj); }
 
   if ($verbose) { $logger->info("$subName Complete: [$currentFilename]"); }
 
   return $modelFile;
 } ## end sub loadModelFile
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Load view info from an XML object and return a hash ref of handy info
+sub loadModelFileView {
+  my ($XMLObj) = @_;
+  my $subName = (caller(0))[3];
+
+  # schema info
+  my $viewInfo   = {};
+  my $viewXMLObj = $XMLObj->root;
+  $viewInfo->{type}            = 'view';
+  $viewInfo->{name}            = getSanitizedObjectName($viewXMLObj->att("name"));
+  $viewInfo->{id}              = $viewXMLObj->att("id");
+  $viewInfo->{createdBy}       = $viewXMLObj->first_child("createdBy")->inner_xml;
+  $viewInfo->{createdTime}     = $viewXMLObj->first_child("createdTime")->inner_xml;
+  $viewInfo->{ownerDesignName} = $viewXMLObj->first_child("ownerDesignName")->inner_xml;
+
+  if (defined $viewXMLObj->first_child("changedBy")) {
+    $viewInfo->{changedBy} = $viewXMLObj->first_child("changedBy")->inner_xml;
+  }
+  if (defined $viewXMLObj->first_child("changedTime")) {
+    $viewInfo->{changedTime} = $viewXMLObj->first_child("changedTime")->inner_xml;
+  }
+  if (defined $viewXMLObj->first_child("userDefined")) {
+    $viewInfo->{userDefined} = $viewXMLObj->first_child("userDefined")->inner_xml;
+  }
+  if (defined $viewXMLObj->first_child("userDefinedSQL")) {
+    $viewInfo->{userDefinedSQL} = $viewXMLObj->first_child("userDefinedSQL")->inner_xml;
+  }
+  if (defined $viewXMLObj->first_child("schemaObject")) {
+    $viewInfo->{schemaObject} = $viewXMLObj->first_child("schemaObject")->inner_xml;
+  }
+
+  # viewElements info
+  if (defined $viewXMLObj->first_child("viewElements")) {
+    my $viewElements = $viewXMLObj->first_child("viewElements");
+    $viewInfo->{viewElements} = [];
+    for my $viewElement ($viewElements->children('viewElement')) {
+      if ($viewElement->att("class") ~~ /relational.ColumnView$/) {
+
+        my $viewElementInfo = {};
+        $viewElementInfo->{id}   = $viewElement->att("id");
+        $viewElementInfo->{name} = $viewElement->att("name");
+
+        if (defined $viewElement->first_child("createdBy")) {
+          $viewElementInfo->{createdBy} = $viewElement->first_child("createdBy")->inner_xml;
+        }
+        if (defined $viewElement->first_child("createdTime")) {
+          $viewElementInfo->{createdTime} = $viewElement->first_child("createdTime")->inner_xml;
+        }
+        if (defined $viewElement->first_child("changedBy")) {
+          $viewElementInfo->{changedBy} = $viewElement->first_child("changedBy")->inner_xml;
+        }
+        if (defined $viewElement->first_child("changedTime")) {
+          $viewElementInfo->{changedTime} = $viewElement->first_child("changedTime")->inner_xml;
+        }
+        if (defined $viewElement->first_child("alias")) {
+          $viewElementInfo->{alias} = $viewElement->first_child("alias")->inner_xml;
+        }
+        if (defined $viewElement->first_child("dataType")) {
+          $viewElementInfo->{dataType} = $viewElement->first_child("dataType")->inner_xml;
+        }
+        if (defined $viewElement->first_child("reference")) {
+          $viewElementInfo->{reference} = $viewElement->first_child("reference")->inner_xml;
+        }
+
+        push(@{$viewInfo->{viewElements}}, $viewElementInfo);
+      } ## end if ($viewElement->att(...))
+    } ## end for my $viewElement ($viewElements...)
+  } ## end if (defined $viewXMLObj...)
+
+  if ($verbose) { $logger->info("$subName viewInfo:\n" . Dumper($viewInfo)); }
+
+  return $viewInfo;
+} ## end sub loadModelFileView
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
@@ -474,7 +556,6 @@ sub loadModelFileTable {
 
       my $indexInfo = {name => getSanitizedObjectName($index->att("name")), id => $index->att("id")};
 
-      # looks like FKs don't have indexColumnUsage
       if (defined $index->first_child("indexState")) {
         $indexInfo->{indexState} = $index->first_child("indexState")->inner_xml;
       }
@@ -723,6 +804,7 @@ sub getSQL {
   my $sql          = '';
   my $tableSQL     = '';
   my $fkSQL        = '';
+  my $viewSQL      = '';
   my $headerSQL    = '';
   my $startTime    = localtime;
   my $startTimeSQL = $startTime->datetime;
@@ -738,7 +820,10 @@ sub getSQL {
     if ($modelFile->{type} eq 'table') {
       $tableSQL .= getSQLTable($modelFile, $modelFiles, $types, $RDBMS);
     }
-  }
+    elsif ($modelFile->{type} eq 'view') {
+      $viewSQL .= getSQLView($modelFile, $modelFiles);
+    }
+  } ## end for my $modelFile (@$modelFiles)
 
   # Need to have all the tables and indexes set first, then we can construct the FKs
   for my $modelFile (@$modelFiles) {
@@ -748,10 +833,45 @@ sub getSQL {
   }
 
   # Assemble final SQL. Write fk after all table objects to avoid dependency issues
-  $sql = qq{$headerSQL\n\n$tableSQL\n$fkSQL\n};
+  $sql = qq{$headerSQL\n\n$tableSQL\n$fkSQL\n$viewSQL\n};
 
   return $sql;
 } ## end sub getSQL
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Get SQL for a view
+sub getSQLView {
+  my ($modelFile, $modelFiles) = @_;
+  my $subName = (caller(0))[3];
+  my $viewSQL = '';
+
+  if ($verbose) { $logger->info("$subName modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]"); }
+
+  # If we have user defined SQL, use that to create the view sql
+  if (defined $modelFile->{userDefinedSQL}) {
+    $viewSQL = "$modelFile->{userDefinedSQL};";
+    $viewSQL =~ s/&lt;br\/>/\n/g;             # Convert html new lines to \n
+    $viewSQL =~ s/&amp;lt;br&amp;gt;/\n/g;    # Convert escaped html new lines to \n
+
+    # Schema
+    my $schema = getSchemaFromID($modelFiles, $modelFile->{schemaObject});
+    $modelFile->{schema} = $schema->{name};
+    $modelFile->{schemaPrefixSQL} = $schema->{name} ? "$schema->{name}." : '';
+
+    # If we got a schema, update the view name in the SQL to use it
+    if ($modelFile->{schemaPrefixSQL}) {
+      $viewSQL =~ s/$modelFile->{name}/$modelFile->{schemaPrefixSQL}$modelFile->{name}/g;
+    }
+
+    $modelFile->{sql} = $viewSQL;
+  } ## end if (defined $modelFile...)
+  else {
+    if ($verbose) { $logger->warn("$subName [$modelFile->{name}] had no userDefinedSQL, skipping SQL generation"); }
+  }
+
+  return $viewSQL;
+} ## end sub getSQLView
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
@@ -768,12 +888,8 @@ sub getSQLTable {
 
   # Create index SQL
   for my $index (@{$modelFile->{indexes}}) {
-    if (defined $index->{indexState}) {
-      if ($index->{indexState} ne 'Foreign Key') {
-        $tableSQL .= getSQLIndex($index, $modelFile, $modelFiles);
-      }
-    }
-  } ## end for my $index (@{$modelFile...})
+    $tableSQL .= getSQLIndex($index, $modelFile, $modelFiles);
+  }
 
   return $tableSQL;
 } ## end sub getSQLTable
@@ -936,25 +1052,87 @@ sub getSQLIndex {
   my $sql     = '';
 
   if ($verbose) { $logger->info("$subName index name:" . $index->{name}); }
+
+  # Try to suss out what type of key we got
+  my $keyTypeSQL = 'DEFAULT INDEX';
   if (defined $index->{indexState}) {
-    my $keyTypeSQL = 'UNKNOWN_INDEX_TYPE';
     if (defined $index->{pk}) {
       $keyTypeSQL = 'PRIMARY KEY';
     }
     elsif ($index->{indexState} eq 'Unique Plain Index' or $index->{indexState} eq 'Unique Constraint') {
       $keyTypeSQL = 'UNIQUE';
     }
+    elsif ($index->{indexState} eq 'Foreign Key') {
+      $keyTypeSQL = 'FOREIGN KEY';
+    }
+  } ## end if (defined $index->{indexState...})
 
-    if ($verbose) { $logger->info("$subName index:" . $index->{name} . " detected as $keyTypeSQL"); }
+  # Sometimes indexState is not set, need to check against the list of FKs and make sure we're not in there
+  if ($keyTypeSQL eq 'DEFAULT INDEX') {
+    my $isFK = isIndexFK($index, $modelFiles);
+    if ($isFK) { $keyTypeSQL = 'FOREIGN KEY'; }
+  }
 
-    my $fieldList = getFieldListFromIndex($index, $modelFile, $modelFiles);
+  if ($verbose) { $logger->info("$subName index:" . $index->{name} . " detected as $keyTypeSQL"); }
+
+  if ($keyTypeSQL eq 'FOREIGN KEY') { return $sql; }    # Leave early, FKs are handled separately
+
+  my $fieldList = getFieldListFromIndex($index, $modelFile, $modelFiles);
+  if ($keyTypeSQL ne 'DEFAULT INDEX') {
     $sql
       = qq{ALTER TABLE $modelFile->{schemaPrefixSQL}$modelFile->{name} ADD CONSTRAINT $index->{name} $keyTypeSQL ( $fieldList );\n\n};
-    $index->{sql} = $sql;    # todo, revisit sql storage in model
-  } ## end if (defined $index->{indexState...})
+  }
+  else {
+    $sql
+      = qq{CREATE INDEX $modelFile->{schemaPrefixSQL}$index->{name} ON $modelFile->{schemaPrefixSQL}$modelFile->{name} ( $fieldList );\n\n};
+  }
+  $index->{sql} = $sql;                                 # todo, revisit sql storage in model
 
   return $sql;
 } ## end sub getSQLIndex
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Is the supplied index a FK?
+sub isIndexFK {
+  my ($index, $modelFiles) = @_;
+  my $subName = (caller(0))[3];
+  my $isFK    = 0;
+
+  for my $modelFile (@$modelFiles) {
+    if ($modelFile->{type} eq 'foreignkey') {
+      my ($hostKeyID, $referredKeyID) = getKeyIndexIDsFromFK($modelFile, $modelFiles);
+      if ($index->{id} eq $hostKeyID)     { $isFK = 1; last; }
+      if ($index->{id} eq $referredKeyID) { $isFK = 1; last; }
+    }
+  } ## end for my $modelFile (@$modelFiles)
+
+  return $isFK;
+} ## end sub isIndexFK
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Return key index ids from a foreign key object
+sub getKeyIndexIDsFromFK {
+  my ($modelFile, $modelFiles) = @_;
+  my $subName = (caller(0))[3];
+
+  # Set out first guesses for IDs. Some of these will not be populated and we'll have to fall back
+  my $hostKeyID     = $modelFile->{localFKIndex};
+  my $referredKeyID = $modelFile->{referredKeyID};
+
+  # Sometimes these refereed fields aren't set, try to look them up in the enrichment object
+  if (!defined $referredKeyID) {
+    if (defined $modelFile->{keyObject}) {
+      $referredKeyID = $modelFile->{keyObject};
+    }
+    elsif (defined $modelFile->{enrichment}->{propertyTargetId}) {
+      $referredKeyID = $modelFile->{enrichment}->{propertyTargetId};
+    }
+  } ## end if (!defined $referredKeyID)
+
+  return ($hostKeyID, $referredKeyID);
+} ## end sub getKeyIndexIDsFromFK
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
@@ -1027,21 +1205,7 @@ sub getSQLForeignKey {
 
   if ($verbose) { $logger->info("$subName modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]"); }
 
-  # Set out first guesses for IDs. Some of these will not be populated and we'll have to fall back
-  my $hostKeyID     = $modelFile->{localFKIndex};
-  my $referredKeyID = $modelFile->{referredKeyID};
-
-  # Sometimes these refereed fields aren't set, try to look them up in the enrichment object
-  if (!defined $referredKeyID) {
-    if (defined $modelFile->{keyObject}) {
-      $referredKeyID = $modelFile->{keyObject};
-      if ($verbose) { $logger->info("$subName referredKeyID set using keyObject: $referredKeyID"); }
-    }
-    elsif (defined $modelFile->{enrichment}->{propertyTargetId}) {
-      $referredKeyID = $modelFile->{enrichment}->{propertyTargetId};
-      if ($verbose) { $logger->info("$subName referredKeyID set using enrichment data: $referredKeyID"); }
-    }
-  } ## end if (!defined $referredKeyID)
+  my ($hostKeyID, $referredKeyID) = getKeyIndexIDsFromFK($modelFile, $modelFiles);
 
   # Proceed if we have the minimum required info to continue
   if (defined $hostKeyID && defined $referredKeyID) {
