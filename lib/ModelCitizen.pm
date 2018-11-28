@@ -30,11 +30,12 @@ use File::Path qw(make_path);    # Create directory trees
 use File::Basename;              # Parse file paths into directory, filename and suffix
 use Text::ParseWords;            # Parse text into an array of tokens or array of arrays
 use Exporter qw(import);         # Implements default import method for modules
+use Time::Piece;                 # Object Oriented time objects
 no if $] >= 5.017011, warnings => 'experimental::smartmatch';    # Suppress smartmatch warnings
 
 ##--------------------------------------------------------------------------
 # Version info
-our $VERSION = '0.1.2';                                          # Todo, pull this from git tag
+our $VERSION = '0.1.3';                                          # Todo, pull this from git tag
 ##--------------------------------------------------------------------------
 
 ##--------------------------------------------------------------------------
@@ -296,21 +297,31 @@ sub signOff {
 ##---------------------------------------------------------------------------
 # Loop over list of model files and load model info
 sub loadModel {
-  my ($fileList) = @_;
-  my $subName = (caller(0))[3];
+  my ($fileList)  = @_;
+  my $subName     = (caller(0))[3];
+  my $modelFiles  = [];
+  my $objectsInfo = [];
 
   # Process the list of model files, one file at a time
-  my $tablesInfo = [];
   for my $currentFilename (@$fileList) {
     my $modelFile = loadModelFile($currentFilename);
-    if ($modelFile) { push(@$tablesInfo, $modelFile); }
+    if (defined $modelFile->{type}) {
+      if   ($modelFile->{type} eq 'Objects.local') { push(@$objectsInfo, $modelFile); }
+      else                                         { push(@$modelFiles,  $modelFile); }
+    }
+  } ## end for my $currentFilename...
+
+  # If we loaded Objects.local info, enrich our other model files with it
+  if (@{$objectsInfo} > 0) {
+    $logger->info("$subName Found additional object info, enriching model...");
+    enrichModelFiles($modelFiles, $objectsInfo);
   }
 
   # Sort model by name
-  $logger->info("Sorting model files by name...");
-  @$tablesInfo = sort { uc(stripQuotes($a->{name})) cmp uc(stripQuotes($b->{name})) } @$tablesInfo;
+  $logger->info("$subName Sorting model files by name...");
+  @$modelFiles = sort { uc(stripQuotes($a->{name})) cmp uc(stripQuotes($b->{name})) } @$modelFiles;
 
-  return $tablesInfo;
+  return $modelFiles;
 } ## end sub loadModel
 ##---------------------------------------------------------------------------
 
@@ -330,18 +341,44 @@ sub loadModelFile {
 
   # Handle files based on type. Could also do this based on internal metadata in the file instead of the path
   my $fileType = '';
-  if    ($currentFilename ~~ /table/)      { $fileType = 'table'; }
-  elsif ($currentFilename ~~ /foreignkey/) { $fileType = 'foreignkey'; }
-  else                                     { $fileType = 'unknown'; }
+  if    ($currentFilename ~~ /table/)          { $fileType = 'table'; }
+  elsif ($currentFilename ~~ /foreignkey/)     { $fileType = 'foreignkey'; }
+  elsif ($currentFilename ~~ /schema/)         { $fileType = 'schema'; }
+  elsif ($currentFilename ~~ /Objects\.local/) { $fileType = 'Objects.local'; }
+  else                                         { $fileType = 'unknown'; }
   if ($verbose) { $logger->info("$subName detected as a $fileType fileType: [$currentFilename]"); }
 
-  if ($fileType eq 'table')      { $modelFile = loadModelFileTable($XMLObj); }
-  if ($fileType eq 'foreignkey') { $modelFile = loadModelFileForeignKey($XMLObj); }
+  if    ($fileType eq 'table')         { $modelFile = loadModelFileTable($XMLObj); }
+  elsif ($fileType eq 'foreignkey')    { $modelFile = loadModelFileForeignKey($XMLObj); }
+  elsif ($fileType eq 'schema')        { $modelFile = loadModelFileSchema($XMLObj); }
+  elsif ($fileType eq 'Objects.local') { $modelFile = loadModelFileObjectsLocal($XMLObj); }
 
   if ($verbose) { $logger->info("$subName Complete: [$currentFilename]"); }
 
   return $modelFile;
 } ## end sub loadModelFile
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Load schema info from an XML object and return a hash ref of handy info
+sub loadModelFileSchema {
+  my ($XMLObj) = @_;
+  my $subName = (caller(0))[3];
+
+  # schema info
+  my $schemaInfo   = {};
+  my $schemaXMLObj = $XMLObj->root;
+  $schemaInfo->{type}            = 'schema';
+  $schemaInfo->{name}            = getSanitizedObjectName($schemaXMLObj->att("name"));
+  $schemaInfo->{id}              = $schemaXMLObj->att("id");
+  $schemaInfo->{createdBy}       = $schemaXMLObj->first_child("createdBy")->inner_xml;
+  $schemaInfo->{createdTime}     = $schemaXMLObj->first_child("createdTime")->inner_xml;
+  $schemaInfo->{ownerDesignName} = $schemaXMLObj->first_child("ownerDesignName")->inner_xml;
+
+  if ($verbose) { $logger->info("$subName schemaInfo:\n" . Dumper($schemaInfo)); }
+
+  return $schemaInfo;
+} ## end sub loadModelFileSchema
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
@@ -358,6 +395,9 @@ sub loadModelFileTable {
   $tableInfo->{id}          = $tableXMLObj->att("id");
   $tableInfo->{createdBy}   = $tableXMLObj->first_child("createdBy")->inner_xml;
   $tableInfo->{createdTime} = $tableXMLObj->first_child("createdTime")->inner_xml;
+  if (defined $tableXMLObj->first_child("schemaObject")) {
+    $tableInfo->{schemaObject} = $tableXMLObj->first_child("schemaObject")->inner_xml;
+  }
 
   # Column info
   my $columns = $tableXMLObj->first_child("columns");
@@ -406,6 +446,12 @@ sub loadModelFileTable {
     }
     if (defined $column->first_child('dataTypeSize')) {
       $colInfo->{"dataTypeSize"} = $column->first_child("dataTypeSize")->inner_xml;
+    }
+    if (defined $column->first_child('dataTypePrecision')) {
+      $colInfo->{"dataTypePrecision"} = $column->first_child("dataTypePrecision")->inner_xml;
+    }
+    if (defined $column->first_child('dataTypeScale')) {
+      $colInfo->{"dataTypeScale"} = $column->first_child("dataTypeScale")->inner_xml;
     }
     if (defined $column->first_child('commentInRDBMS')) {
 
@@ -488,6 +534,52 @@ sub loadModelFileForeignKey {
 
   return $fkInfo;
 } ## end sub loadModelFileForeignKey
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Load Foreign Key info from an XML object and return a hash ref of handy info
+sub loadModelFileObjectsLocal {
+  my ($XMLObj) = @_;
+  my $subName = (caller(0))[3];
+
+  my $objectsInfoXMLObj = $XMLObj->root;
+  my $objects           = [];
+
+  # Object info
+  for my $object ($objectsInfoXMLObj->children('object')) {
+    my $objectInfo = {};
+
+    if (defined $object->att('objectType')) {
+      if ($object->att('objectType') eq 'FKIndexAssociation') {    # Store FKIndexAssociation metadata
+        $objectInfo->{objectType}        = $object->att('objectType');
+        $objectInfo->{objectID}          = $object->att('objectID');
+        $objectInfo->{name}              = $object->att('name');
+        $objectInfo->{seqName}           = $object->att('seqName');
+        $objectInfo->{propertyClassName} = $object->att('propertyClassName');
+        $objectInfo->{propertyParentId}  = $object->att('propertyParentId');
+        $objectInfo->{propertySourceId}  = $object->att('propertySourceId');
+        $objectInfo->{containerID}       = $object->att('containerID');
+        $objectInfo->{refContainerID}    = $object->att('refContainerID');
+        $objectInfo->{propertyTargetId}  = $object->att('propertyTargetId');
+
+        push(@{$objects}, $objectInfo);
+      } ## end if ($object->att('objectType'...))
+    } ## end if (defined $object->att...)
+  } ## end for my $object ($objectsInfoXMLObj...)
+
+  my $objectsInfo;
+  if (@{$objects} > 0) {    # If we found info, construct a populated object to return
+    $objectsInfo->{type}    = 'Objects.local';
+    $objectsInfo->{name}    = 'Objects.local';
+    $objectsInfo->{objects} = $objects;
+
+    if ($verbose) {
+      $logger->info("$subName objectsInfo:\n" . Dumper($objectsInfo));
+    }
+  } ## end if (@{$objects} > 0)
+
+  return $objectsInfo;
+} ## end sub loadModelFileObjectsLocal
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
@@ -596,12 +688,109 @@ sub getTypeInfo {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
+# Enrich Model Files using supplemental metadata
+sub enrichModelFiles {
+  my ($modelFiles, $objectsInfo) = @_;
+  my $subName = (caller(0))[3];
+
+  # If we have loaded Objects.local types, use them to enrich the other model files
+  for my $objectInfo (@{$objectsInfo}) {
+    for my $object (@{$objectInfo->{objects}}) {
+      if ($object->{objectType} eq "FKIndexAssociation") {    # Foreign Key enrichment
+        for my $enrichTarget (@{$modelFiles}) {
+          if (defined $enrichTarget->{type} && defined $enrichTarget->{id} && defined $object->{objectID}) {
+            if ($enrichTarget->{type} eq 'foreignkey' && $enrichTarget->{id} eq $object->{objectID}) {
+              if ($verbose) {
+                $logger->info("$subName enriching $enrichTarget->{name} using $object->{objectType} $object->{name} .");
+              }
+              $enrichTarget->{enrichment} = $object;          # Save our enriched fields into this matched object
+            } ## end if ($enrichTarget->{type...})
+          } ## end if (defined $enrichTarget...)
+        } ## end for my $enrichTarget (@...)
+      } ## end if ($object->{objectType...})
+    } ## end for my $object (@{$objectInfo...})
+  } ## end for my $objectInfo (@{$objectsInfo...})
+
+  return;
+} ## end sub enrichModelFiles
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Generate sql from modelFile info
+sub getSQL {
+  my ($modelFiles, $types, $RDBMS) = @_;
+  my $subName      = (caller(0))[3];
+  my $sql          = '';
+  my $tableSQL     = '';
+  my $fkSQL        = '';
+  my $headerSQL    = '';
+  my $startTime    = localtime;
+  my $startTimeSQL = $startTime->datetime;
+
+  # Header for SQL output
+  $headerSQL .= qq{-- Generated by ModelCitizen $VERSION\n};
+  $headerSQL .= qq{--   at:        $startTimeSQL\n};
+  $headerSQL .= qq{--   site:      $RDBMS\n};
+  $headerSQL .= qq{--   type:      $RDBMS\n};
+
+  # Generate SQL for table files
+  for my $modelFile (@$modelFiles) {
+    if ($modelFile->{type} eq 'table') {
+      $tableSQL .= getSQLTable($modelFile, $modelFiles, $types, $RDBMS);
+    }
+  }
+
+  # Need to have all the tables and indexes set first, then we can construct the FKs
+  for my $modelFile (@$modelFiles) {
+    if ($modelFile->{type} eq "foreignkey") {
+      $fkSQL .= getSQLForeignKey($modelFile, $modelFiles);
+    }
+  }
+
+  # Assemble final SQL. Write fk after all table objects to avoid dependency issues
+  $sql = qq{$headerSQL\n\n$tableSQL\n$fkSQL\n};
+
+  return $sql;
+} ## end sub getSQL
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Get SQL for a table
+sub getSQLTable {
+  my ($modelFile, $modelFiles, $types, $RDBMS) = @_;
+  my $subName  = (caller(0))[3];
+  my $tableSQL = '';
+
+  if ($verbose) { $logger->info("$subName modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]"); }
+
+  # Create table SQL
+  $tableSQL .= getSQLCreateTable($modelFile, $modelFiles, $types, $RDBMS);
+
+  # Create index SQL
+  for my $index (@{$modelFile->{indexes}}) {
+    if (defined $index->{indexState}) {
+      if ($index->{indexState} ne 'Foreign Key') {
+        $tableSQL .= getSQLIndex($index, $modelFile, $modelFiles);
+      }
+    }
+  } ## end for my $index (@{$modelFile...})
+
+  return $tableSQL;
+} ## end sub getSQLTable
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
 sub getSQLCreateTable {
-  my ($modelFile, $types, $RDBMS) = @_;
+  my ($modelFile, $modelFiles, $types, $RDBMS) = @_;
   my $subName        = (caller(0))[3];
   my $createTableSQL = '';
 
-  $createTableSQL .= qq{\nCREATE TABLE $modelFile->{name} (\n};
+  # Schema
+  my $schema = getSchemaFromID($modelFiles, $modelFile->{schemaObject});
+  $modelFile->{schema} = $schema->{name};
+  $modelFile->{schemaPrefixSQL} = $schema->{name} ? "$schema->{name}." : '';
+
+  $createTableSQL .= qq{\nCREATE TABLE $modelFile->{schemaPrefixSQL}$modelFile->{name} (\n};
 
   # Field list
   my $fieldList          = [];
@@ -632,59 +821,14 @@ sub getSQLCreateTable {
   for my $commentInRDBMS (@{$commentInRDBMSList}) {
     my $commentText = $commentInRDBMS->{commentInRDBMS};
     $commentText =~ s/'/''/g;    # Escape single quotes inside the text
-    $createTableSQL .= qq{COMMENT ON COLUMN $modelFile->{name}.$commentInRDBMS->{name} IS '$commentText';\n\n};
-  }
+    $createTableSQL
+      .= qq{COMMENT ON COLUMN $modelFile->{schemaPrefixSQL}$modelFile->{name}.$commentInRDBMS->{name} IS '$commentText';\n\n};
+  } ## end for my $commentInRDBMS ...
 
   $modelFile->{sql} = $createTableSQL;    # todo, review saving this SQL to the model
 
   return $createTableSQL;
 } ## end sub getSQLCreateTable
-##---------------------------------------------------------------------------
-
-##---------------------------------------------------------------------------
-# Generate sql from modelFile info
-sub getSQL {
-  my ($modelFiles, $types, $RDBMS) = @_;
-  my $subName  = (caller(0))[3];
-  my $sql      = '';
-  my $tableSQL = '';
-  my $fkSQL    = '';
-
-  for my $modelFile (@$modelFiles) {
-    if ($verbose) {
-      $logger->info("$subName modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]");
-    }
-    if ($modelFile->{type} eq 'table') {
-
-      # Create table SQL
-      $tableSQL .= getSQLCreateTable($modelFile, $types, $RDBMS);
-
-      # Create index SQL
-      for my $index (@{$modelFile->{indexes}}) {
-        if (defined $index->{indexState}) {
-          if ($index->{indexState} ne 'Foreign Key') {
-
-            $tableSQL .= getSQLIndex($index, $modelFile, $modelFiles);
-          }
-        } ## end if (defined $index->{indexState...})
-      } ## end for my $index (@{$modelFile...})
-    } ## end if ($modelFile->{type}...)
-    elsif ($modelFile->{type} eq "foreignkey") {
-      if (   defined $modelFile->{containerWithKeyObject}
-          && defined $modelFile->{localFKIndex}
-          && defined $modelFile->{referredTableID}
-          && defined $modelFile->{referredKeyID})
-      {    # If we're a foreignkey and we have all the required data to process
-        $fkSQL .= getSQLForeignKey($modelFile, $modelFiles);
-      } ## end if (defined $modelFile...)
-    } ## end elsif ($modelFile->{type}...)
-  } ## end for my $modelFile (@$modelFiles)
-
-  # Write fk after all table objects to avoid dependency issues
-  $sql = qq{$tableSQL\n$fkSQL\n};
-
-  return $sql;
-} ## end sub getSQL
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
@@ -704,9 +848,11 @@ sub getFieldSQL {
   }
 
   # Use mapping and ownDataTypeParameters to generate the RDBMS specific info
-  if (defined($column->{ownDataTypeParameters}) && defined($typeInfo->{mapping})) {
-    my @ownDataTypeParameters
-      = split(/,/, $column->{ownDataTypeParameters}, 3);            # These are the values we need to sub in
+  if (defined($typeInfo->{mapping})) {
+    my @ownDataTypeParameters;
+    if (defined($column->{ownDataTypeParameters})) {
+      @ownDataTypeParameters = split(/,/, $column->{ownDataTypeParameters}, 3); # These are the values we need to sub in
+    }
 
     # Look for defined size/precision/scale information
     # It appears that ownDataTypeParameters is a 3 part array
@@ -718,7 +864,7 @@ sub getFieldSQL {
       $map =~ s/^\s+|\s+$//g;    # Trim whitespace
       if ($map eq 'size') {
 
-        # Populate size with the dedicated size attribute if it exists and is populated
+        # Populate with the dedicated attribute if it exists and is populated
         if (defined($column->{dataTypeSize})) {
           $column->{size} = $column->{dataTypeSize};
         }
@@ -731,6 +877,12 @@ sub getFieldSQL {
         }
       } ## end if ($map eq 'size')
       if ($map eq 'precision') {
+
+        # Populate with the dedicated attribute if it exists and is populated
+        if (defined($column->{dataTypePrecision})) {
+          $column->{precision} = $column->{dataTypePrecision};
+        }
+
         if ($ownDataTypeParameters[1]) {
           my $precision = $ownDataTypeParameters[1];
           $precision =~ s/^\s+|\s+$//g;                       # Trim whitespace
@@ -738,6 +890,11 @@ sub getFieldSQL {
         }
       } ## end if ($map eq 'precision')
       if ($map eq 'scale') {
+
+        # Populate with the dedicated attribute if it exists and is populated
+        if (defined($column->{dataTypeScale})) {
+          $column->{scale} = $column->{dataTypeScale};
+        }
         if ($ownDataTypeParameters[2]) {
           my $scale = $ownDataTypeParameters[2];
           $scale =~ s/^\s+|\s+$//g;                           # Trim whitespace
@@ -745,7 +902,7 @@ sub getFieldSQL {
         }
       } ## end if ($map eq 'scale')
     } ## end for my $map (@mapping)
-  } ## end if (defined($column->{...}))
+  } ## end if (defined($typeInfo->...))
 
   # Add size/precision/scale information if we have any
   my $fieldDetails = [];
@@ -791,7 +948,8 @@ sub getSQLIndex {
     if ($verbose) { $logger->info("$subName index:" . $index->{name} . " detected as $keyTypeSQL"); }
 
     my $fieldList = getFieldListFromIndex($index, $modelFile, $modelFiles);
-    $sql = qq{ALTER TABLE $modelFile->{name} ADD CONSTRAINT $index->{name} $keyTypeSQL ( $fieldList );\n\n};
+    $sql
+      = qq{ALTER TABLE $modelFile->{schemaPrefixSQL}$modelFile->{name} ADD CONSTRAINT $index->{name} $keyTypeSQL ( $fieldList );\n\n};
     $index->{sql} = $sql;    # todo, revisit sql storage in model
   } ## end if (defined $index->{indexState...})
 
@@ -807,14 +965,37 @@ sub getIndexFromID {
 
   for my $table (@$tables) {
     for my $index (@{$table->{indexes}}) {
-      if ($index->{id} eq $indexID) { return $index; }
-    }
-  }
+      if ($index->{id} eq $indexID) {
+        $index->{parentTableID} = $table->{id};
+        return $index;
+      }
+    } ## end for my $index (@{$table...})
+  } ## end for my $table (@$tables)
 
   my $error = "ERR_COULD_NOT_RESOLVE_INDEX_FOR_ID_${indexID}";
   $logger->warn("$subName $error");
   return {error => $error};
 } ## end sub getIndexFromID
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
+# Return schema from id
+sub getSchemaFromID {
+  my ($schemas, $schemaID) = @_;
+  my $subName = (caller(0))[3];
+
+  if (!defined $schemaID) {
+    return {name => ''};
+  }
+
+  for my $schemaCandidate (@$schemas) {
+    if ($schemaCandidate->{id} eq $schemaID) { return $schemaCandidate; }
+  }
+
+  my $error = "ERR_COULD_NOT_RESOLVE_SCHEMA_FOR_ID_${schemaID}";
+  $logger->warn("$subName $error");
+  return {error => $error, name => ''};
+} ## end sub getSchemaFromID
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
@@ -842,56 +1023,73 @@ sub getColumnNamesFromIndex {
 sub getSQLForeignKey {
   my ($modelFile, $modelFiles) = @_;
   my $subName = (caller(0))[3];
-  my $sql     = '';               # Default
+  my $sql     = '';
 
-  my $hostTableID     = $modelFile->{containerWithKeyObject};
-  my $hostKeyID       = $modelFile->{localFKIndex};
-  my $referredTableID = $modelFile->{referredTableID};
-  my $referredKeyID   = $modelFile->{referredKeyID};
+  if ($verbose) { $logger->info("$subName modelFile name: [$modelFile->{name}] type: [$modelFile->{type}]"); }
 
-  # Need to convert these index IDs to index objects
-  my $hostKeyIndex     = getIndexFromID($modelFiles, $hostKeyID);
-  my $referredKeyIndex = getIndexFromID($modelFiles, $referredKeyID);
+  # Set out first guesses for IDs. Some of these will not be populated and we'll have to fall back
+  my $hostKeyID     = $modelFile->{localFKIndex};
+  my $referredKeyID = $modelFile->{referredKeyID};
 
-  # Convert host table id to human name
-  my $hostTableName = getTableNameFromID($modelFiles, $hostTableID);
+  # Sometimes these refereed fields aren't set, try to look them up in the enrichment object
+  if (!defined $referredKeyID) {
+    if (defined $modelFile->{keyObject}) {
+      $referredKeyID = $modelFile->{keyObject};
+      if ($verbose) { $logger->info("$subName referredKeyID set using keyObject: $referredKeyID"); }
+    }
+    elsif (defined $modelFile->{enrichment}->{propertyTargetId}) {
+      $referredKeyID = $modelFile->{enrichment}->{propertyTargetId};
+      if ($verbose) { $logger->info("$subName referredKeyID set using enrichment data: $referredKeyID"); }
+    }
+  } ## end if (!defined $referredKeyID)
 
-  # Convert host key to human key field list
-  my $hostKeyFieldList = getFieldListFromIndex($hostKeyIndex, $modelFile, $modelFiles);
+  # Proceed if we have the minimum required info to continue
+  if (defined $hostKeyID && defined $referredKeyID) {
 
-  # Convert referred table id to human name
-  my $referredTableName = getTableNameFromID($modelFiles, $referredTableID);
+    # Need to convert these index IDs to index objects
+    my $hostKeyIndex     = getIndexFromID($modelFiles, $hostKeyID);
+    my $referredKeyIndex = getIndexFromID($modelFiles, $referredKeyID);
 
-  # Convert referred key to human key field list
-  my $referredKeyFieldList = getFieldListFromIndex($referredKeyIndex, $modelFile, $modelFiles);
+    # Convert host table id to human name
+    my $hostTable = getModelFileByID($modelFiles, $hostKeyIndex->{parentTableID});
 
-  # If we could find all the objects we needed, construct the SQL
-  if (defined($hostKeyIndex->{error})) {
-    $logger->warn("$subName Foreign Key $modelFile->{name} has no columns.");
-    $sql = "-- Error - Foreign Key $modelFile->{name} has no columns\n\n";
-    if ($verbose) {
+    # Convert host key to human key field list
+    my $hostKeyFieldList = getFieldListFromIndex($hostKeyIndex, $modelFile, $modelFiles);
+
+    # Convert referred table id to human name
+    my $referredTable = getModelFileByID($modelFiles, $referredKeyIndex->{parentTableID});
+
+    # Convert referred key to human key field list
+    my $referredKeyFieldList = getFieldListFromIndex($referredKeyIndex, $modelFile, $modelFiles);
+
+    # If we could find all the objects we needed, construct the SQL
+    if (defined($hostKeyIndex->{error}) || defined($referredKeyIndex->{error})) {
+      $logger->warn("$subName Foreign Key $modelFile->{name} has no columns.");
+      $sql = "-- Error - Foreign Key $modelFile->{name} has no columns\n\n";
       if (defined($hostKeyIndex->{error})) {
         $logger->warn("$subName Foreign Key $modelFile->{name} host has no columns: $hostKeyIndex->{error}");
       }
       if (defined($referredKeyIndex->{error})) {
-        $logger->warn("$subName Foreign Key $modelFile->{name} host has no columns: $referredKeyIndex->{error}");
+        $logger->warn("$subName Foreign Key $modelFile->{name} target has no columns: $referredKeyIndex->{error}");
       }
-    } ## end if ($verbose)
-  } ## end if (defined($hostKeyIndex...))
-  else {
-    $sql = qq{ALTER TABLE $hostTableName
+    } ## end if (defined($hostKeyIndex...))
+    else {
+      $sql = qq{ALTER TABLE $hostTable->{schemaPrefixSQL}$hostTable->{name}
     ADD CONSTRAINT $modelFile->{name} FOREIGN KEY ( $hostKeyFieldList )
-      REFERENCES $referredTableName ( $referredKeyFieldList );\n\n};
-  }
+      REFERENCES $referredTable->{schemaPrefixSQL}$referredTable->{name} ( $referredKeyFieldList );\n\n};
+    }
 
-  # Update the model file with our findings # todo, review mutating the model
-  $modelFile->{hostTableName}        = $hostTableName;
-  $modelFile->{referredTableName}    = $referredTableName;
-  $modelFile->{hostKeyFieldList}     = $hostKeyFieldList;
-  $modelFile->{referredKeyFieldList} = $referredKeyFieldList;
-  $modelFile->{sql}                  = $sql;
+    # Update the model file with our findings # todo, review mutating the model
+    $modelFile->{hostTableName}        = $hostTable->{name};
+    $modelFile->{referredTableName}    = $referredTable->{name};
+    $modelFile->{hostKeyID}            = $hostKeyID;
+    $modelFile->{referredKeyID}        = $referredKeyID;
+    $modelFile->{hostKeyFieldList}     = $hostKeyFieldList;
+    $modelFile->{referredKeyFieldList} = $referredKeyFieldList;
+    $modelFile->{sql}                  = $sql;
 
-  if ($verbose) { $logger->info("$subName \$sql:\n $sql"); }
+    if ($verbose) { $logger->info("$subName \$sql:\n $sql"); }
+  } ## end if (defined $hostKeyID...)
   return $sql;
 } ## end sub getSQLForeignKey
 ##---------------------------------------------------------------------------
@@ -915,18 +1113,41 @@ sub getColumnNameFromID {
 ##---------------------------------------------------------------------------
 
 ##---------------------------------------------------------------------------
+# Get a model file from the modelFiles array ref using guid lookup
+sub getModelFileByID {
+  my ($modelFiles, $ID) = @_;
+  my $subName = (caller(0))[3];
+  my $error;
+
+  if (defined $ID) {
+    for my $modelFile (@$modelFiles) {
+      if ($modelFile->{id} eq $ID) { return $modelFile; }
+    }
+    $error = "ERR_COULD_NOT_FIND_MODEL_FILE_BY_ID_$ID";
+  } ## end if (defined $ID)
+  else {
+    $error = "ERR_COULD_NOT_FIND_MODEL_FILE_BY_ID_UNDEFINED_ID";
+  }
+
+  $logger->warn("$subName $error");
+  return {error => $error, name => ' ', schemaPrefixSQL => ' ', id => $ID};
+} ## end sub getModelFileByID
+##---------------------------------------------------------------------------
+
+##---------------------------------------------------------------------------
 # Generate human readable table name using guid lookup
 sub getTableNameFromID {
   my ($tables, $tableID) = @_;
   my $subName = (caller(0))[3];
+  my $tableName;
 
-  for my $table (@$tables) {
-    if ($table->{id} eq $tableID) { return $table->{name}; }
+  my $table = getModelFileByID($tables, $tableID);
+
+  if (defined $table->{error}) {
+    $tableName = "ERR_COULD_NOT_RESOLVE_TABLE_NAME_FOR_ID_${tableID}";
+    $logger->warn("$subName $tableName");
   }
-
-  my $error = "ERR_COULD_NOT_RESOLVE_TABLE_NAME_FOR_ID_${tableID}";
-  $logger->warn("$subName $error");
-  return $error;
+  return $tableName;
 } ## end sub getTableNameFromID
 ##---------------------------------------------------------------------------
 

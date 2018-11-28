@@ -73,7 +73,7 @@ my $types = ModelCitizen::loadTypes($typesFilePath);
 
 # Construct a list of files to munge and log file details
 $ModelCitizen::logger->info("Opening data model from [$modelFilepath]...");
-my @inputFiles = ModelCitizen::buildPackageFileList($modelFilepath, '.xml');
+my @inputFiles = ModelCitizen::buildPackageFileList($modelFilepath, '.xml .local');
 if ($verbose) { ModelCitizen::logFileInformation(\@inputFiles, 'Input', $modelFilepath); }
 my $inputFileCnt = @inputFiles;
 $ModelCitizen::logger->info("[$inputFileCnt] files have been identified for analysis.");
