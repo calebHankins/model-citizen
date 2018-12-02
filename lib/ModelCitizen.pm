@@ -861,7 +861,7 @@ sub getSQLView {
 
     # Schema
     my $schema = getSchemaFromID($modelFiles, $modelFile->{schemaObject});
-    $modelFile->{schema} = $schema->{name};
+    $modelFile->{schema} = $schema->{name};                                      # Store schema name in model
     $modelFile->{schemaPrefixSQL} = $schema->{name} ? "$schema->{name}." : '';
 
     # If we got a schema, update the view name in the SQL to use it
@@ -908,7 +908,7 @@ sub getSQLCreateTable {
 
   # Schema
   my $schema = getSchemaFromID($modelFiles, $modelFile->{schemaObject});
-  $modelFile->{schema} = $schema->{name};
+  $modelFile->{schema} = $schema->{name};                                      # Store schema name in model
   $modelFile->{schemaPrefixSQL} = $schema->{name} ? "$schema->{name}." : '';
 
   $createTableSQL .= qq{\nCREATE TABLE $modelFile->{schemaPrefixSQL}$modelFile->{name} (\n};
