@@ -18,6 +18,18 @@ All commits to the project must pass linting and style guidelines.
     - Any exceptions should be documented, noted in the pull request, and an exception added to the `.perlcriticrc` file.
 - Please Build the project and make sure all meta files are up to date
 	- See https://metacpan.org/pod/Module::Build for more info on Module::Build 
+- To run style and linting checks, set the TEST_AUTHOR environment variable to a true value
+
+```powershell
+# Windows Powershell
+$Env:TEST_AUTHOR = 1
+```
+
+```bash
+# *nix
+export TEST_AUTHOR=1
+```
+
 ```powershell
 perl ./Build.PL   # Build new Build file
 ./Build clean     # Clean up build files
