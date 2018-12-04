@@ -12,6 +12,7 @@
 All commits to the project must pass linting and style guidelines. 
 
 ### Perl
+- Install the modules listed in the `recommended_requires` section of [Build.PL](./Build.PL)
 - Code should be formatted using the `.perltidyrc` in the project's root and the Perl::Tidy tool.
     - If the build fails due to a failed style check, try running `tidyall -a` and recommitting.
 - Code should pass Perl::Critic with no errors/warnings using the `.perlcriticrc` in the project's root.
