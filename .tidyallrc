@@ -2,4 +2,4 @@
 select = {lib,t}/**/*.{pl,pm,t}
 select = {script}/**/*
 select = Build.PL
-argv = --profile=$ROOT/.perltidyrc
+argv = --profile="$ROOT/.perltidyrc"

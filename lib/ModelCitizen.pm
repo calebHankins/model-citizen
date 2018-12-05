@@ -35,7 +35,7 @@ no if $] >= 5.017011, warnings => 'experimental::smartmatch';    # Suppress smar
 
 ##--------------------------------------------------------------------------
 # Version info
-our $VERSION = '0.1.7';                                          # Todo, pull this from git tag
+our $VERSION = '0.1.9';
 ##--------------------------------------------------------------------------
 
 ##--------------------------------------------------------------------------
@@ -859,9 +859,13 @@ sub getSQLView {
     $viewSQL =~ s/&lt;br\/>/\n/g;             # Convert html new lines to \n
     $viewSQL =~ s/&amp;lt;br&amp;gt;/\n/g;    # Convert escaped html new lines to \n
 
-    # Schema
+    # Lookup schema object
     my $schema = getSchemaFromID($modelFiles, $modelFile->{schemaObject});
+
+    # Store schema name in model
     $modelFile->{schema} = $schema->{name};
+
+    # Store schema prefix SQL in model
     $modelFile->{schemaPrefixSQL} = $schema->{name} ? "$schema->{name}." : '';
 
     # If we got a schema, update the view name in the SQL to use it
@@ -906,11 +910,16 @@ sub getSQLCreateTable {
   my $subName        = (caller(0))[3];
   my $createTableSQL = '';
 
-  # Schema
+  # Lookup schema object
   my $schema = getSchemaFromID($modelFiles, $modelFile->{schemaObject});
+
+  # Store schema name in model
   $modelFile->{schema} = $schema->{name};
+
+  # Store schema prefix SQL in model
   $modelFile->{schemaPrefixSQL} = $schema->{name} ? "$schema->{name}." : '';
 
+  # Create table header
   $createTableSQL .= qq{\nCREATE TABLE $modelFile->{schemaPrefixSQL}$modelFile->{name} (\n};
 
   # Field list
