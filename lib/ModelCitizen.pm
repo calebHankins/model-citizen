@@ -24,8 +24,6 @@ use strict;
 use JSON;                        # JSON (JavaScript Object Notation) encoder/decoder
 use XML::Twig;                   # A perl module for processing huge XML documents in tree mode
 use Data::Dumper;                # Stringified perl data structures, suitable for both printing and eval
-use HTML::Entities;              # Encode or decode strings with HTML entities
-use URI::Escape;                 # Percent-encode and percent-decode unsafe characters
 use File::Path qw(make_path);    # Create directory trees
 use File::Basename;              # Parse file paths into directory, filename and suffix
 use Text::ParseWords;            # Parse text into an array of tokens or array of arrays
@@ -35,7 +33,7 @@ no if $] >= 5.017011, warnings => 'experimental::smartmatch';    # Suppress smar
 
 ##--------------------------------------------------------------------------
 # Version info
-our $VERSION = '0.1.9';
+our $VERSION = '0.1.10';
 ##--------------------------------------------------------------------------
 
 ##--------------------------------------------------------------------------
