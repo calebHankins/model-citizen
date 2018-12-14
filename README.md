@@ -2,31 +2,34 @@
 
 _I am the very model of modern meta generable_
 
-Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes 
+Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes
+
+[![Master Build](https://img.shields.io/travis/calebHankins/model-citizen/master.svg?label=Master)](https://travis-ci.org/calebHankins/model-citizen?branch=master)
+[![Develop Build](https://img.shields.io/travis/calebHankins/model-citizen/develop.svg?label=Develop)](https://travis-ci.org/calebHankins/model-citizen?branch=develop)
 
 - [MODEL-CITIZEN](#model-citizen)
-    - [Description](#description)
-    - [Note for Windows Users](#note-for-windows-users)
-    - [Installation](#installation)
-        - [Install using cpanm](#install-using-cpanm)
-            - [Using git repository directly](#using-git-repository-directly)
-                - [Github](#github)
-                - [Generic Repository](#generic-repository)
-            - [Using local files](#using-local-files)
-            - [Installing cpanm (App::cpanminus)](#installing-cpanm-appcpanminus)
-        - [Install using cpan](#install-using-cpan)
-        - [Install using Module::Build](#install-using-modulebuild)
-        - [Install using Make](#install-using-make)
-        - [Manual Dependency Install](#manual-dependency-install)
-            - [Example Commands To Install Log Log4perl On Various Platforms](#example-commands-to-install-log-log4perl-on-various-platforms)
-        - [Troubleshooting](#troubleshooting)
-    - [Run Without Installing](#run-without-installing)
-    - [Usage](#usage)
-        - [Help](#help)
-        - [Export Model as SQL and or JSON array](#export-model-as-sql-and-or-json-array)
-        - [Load JSON output to MongoDB](#load-json-output-to-mongodb)
-    - [Sample Models](#sample-models)
-    - [Contributing](#contributing)
+  - [Description](#description)
+  - [Note for Windows Users](#note-for-windows-users)
+  - [Installation](#installation)
+    - [Install using cpanm](#install-using-cpanm)
+      - [Using git repository directly](#using-git-repository-directly)
+        - [Github](#github)
+        - [Generic Repository](#generic-repository)
+      - [Using local files](#using-local-files)
+      - [Installing cpanm (App::cpanminus)](#installing-cpanm-appcpanminus)
+    - [Install using cpan](#install-using-cpan)
+    - [Install using Module::Build](#install-using-modulebuild)
+    - [Install using Make](#install-using-make)
+    - [Manual Dependency Install](#manual-dependency-install)
+      - [Example Commands To Install Log Log4perl On Various Platforms](#example-commands-to-install-log-log4perl-on-various-platforms)
+    - [Troubleshooting](#troubleshooting)
+  - [Run Without Installing](#run-without-installing)
+  - [Usage](#usage)
+    - [Help](#help)
+    - [Export Model as SQL and or JSON array](#export-model-as-sql-and-or-json-array)
+    - [Load JSON output to MongoDB](#load-json-output-to-mongodb)
+  - [Sample Models](#sample-models)
+  - [Contributing](#contributing)
 
 ## Description
 This tool was developed to feed downstream continuous integration processes (like [join-hero](https://github.com/Acxiom/join-hero)) using objects modeled by the graphical tool [Oracle SQL Developer Data Modeler](https://www.oracle.com/database/technologies/appdev/datamodeler.html). It was created to support version 18.2 of Oracle SQL Developer Data Modeler and Oracle Database 12c export type, primarily focused on tables, indexes and foreign keys. Your milage may vary for other targets and Data Modeler versions.
