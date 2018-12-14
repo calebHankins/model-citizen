@@ -92,3 +92,6 @@ scratch
 
 # Avoid tidyall files
 .tidyall.d
+
+# Skip Travis Continuous Integration configuration
+^\.travis\.yml$ 
