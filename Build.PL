@@ -28,8 +28,14 @@ my $build = Module::Build->new(
                'Pod::Usage'       => '0',
                'Cwd'              => '0',
   },
-  recommended_requires =>
-    {'English' => '0', 'Test::Perl::Critic' => '0', 'Test::Code::TidyAll' => '0', 'Perl::Tidy' => '0',},
+  recommended_requires => {
+                           'English'                         => '0',
+                           'Test::Perl::Critic'              => '0',
+                           'Test::Code::TidyAll'             => '0',
+                           'Perl::Tidy'                      => '0',
+                           'Devel::Cover'                    => '0',
+                           'Devel::Cover::Report::Coveralls' => '0',
+  },
   configure_requires => {'Module::Build' => '0'},
   create_makefile_pl => 'traditional',
 );
