@@ -3,26 +3,26 @@ require 5.010001;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'INSTALLDIRS' => 'site',
-  'EXE_FILES' => [
-                   'script/model-citizen'
-                 ],
   'VERSION_FROM' => 'lib/ModelCitizen.pm',
+  'PL_FILES' => {},
   'PREREQ_PM' => {
+                   'Cwd' => '0',
+                   'File::Basename' => '0',
+                   'IO::Handle' => '0',
+                   'File::Glob' => '0',
+                   'Text::ParseWords' => '0',
+                   'Log::Log4perl' => '0',
+                   'File::Path' => '0',
                    'JSON' => '0',
                    'Getopt::Long' => '0',
-                   'XML::Twig' => '0',
-                   'IO::Handle' => '0',
-                   'File::Path' => '0',
-                   'File::Basename' => '0',
-                   'Text::ParseWords' => '0',
-                   'Cwd' => '0',
-                   'Log::Log4perl' => '0',
                    'Data::Dumper' => '0',
                    'Pod::Usage' => '0',
-                   'File::Glob' => '0'
+                   'XML::Twig' => '0'
                  },
+  'INSTALLDIRS' => 'site',
   'NAME' => 'ModelCitizen',
-  'PL_FILES' => {}
+  'EXE_FILES' => [
+                   'script/model-citizen'
+                 ]
 )
 ;

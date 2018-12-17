@@ -94,4 +94,8 @@ scratch
 .tidyall.d
 
 # Skip Travis Continuous Integration configuration
-^\.travis\.yml$ 
+^\.travis\.yml$
+
+# Skip coverage files
+MYMETA.json.lock
+cover_db/
