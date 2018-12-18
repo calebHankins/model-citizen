@@ -6,7 +6,6 @@ Export Oracle Data Modeler files as json and or SQL DDL for easier consumption b
 
 [![Master Build](https://img.shields.io/travis/calebHankins/model-citizen/master.svg?label=Master&nbsp;Build)](https://travis-ci.org/calebHankins/model-citizen?branch=master)
 [![Master Coverage](https://img.shields.io/coveralls/github/calebHankins/model-citizen/master.svg?label=Master&nbsp;Coverage)](https://coveralls.io/github/calebHankins/model-citizen/?branch=master)
-
 [![Develop Build](https://img.shields.io/travis/calebHankins/model-citizen/develop.svg?label=Develop&nbsp;Build)](https://travis-ci.org/calebHankins/model-citizen?branch=develop)
 [![Develop Coverage](https://img.shields.io/coveralls/github/calebHankins/model-citizen/develop.svg?label=Develop&nbsp;Coverage)](https://coveralls.io/github/calebHankins/model-citizen/?branch=develop)
 
