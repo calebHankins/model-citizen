@@ -1,0 +1,118 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableView class="oracle.dbtools.crest.model.design.relational.TableView" directorySegmentName="seg_0" id="72457BCB-9CE5-99C0-52A0-CDB50324BC57" name="STORES_W_LOCATION_NAMES">
+<createdBy>chanki</createdBy>
+<createdTime>2018-12-19 18:26:56 UTC</createdTime>
+<ownerDesignName>JJJ</ownerDesignName>
+<ordsAlias>view_1</ordsAlias>
+<userDefined>true</userDefined>
+<userDefinedSQL>select t1.*, t2.location_name from jjj.stores t1&lt;br/&gt;join jjj.store_locations t2&lt;br/&gt;on t1.location_id = t2.location_id</userDefinedSQL>
+<parsed>true</parsed>
+<usedContainers>
+<container alias="t2" containerID="DB1113D3-668A-6A60-95A6-C12E0DCB1720"/>
+<container alias="t1" containerID="8FEE201F-26AF-7AD0-6178-284577B5FA55"/>
+</usedContainers>
+<viewElements>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="STORE_ID" id="99C7CF25-4533-A5C3-C4F0-933C80FED91E">
+<createdBy>chanki</createdBy>
+<createdTime>2018-12-19 18:29:08 UTC</createdTime>
+<ownerDesignName>JJJ</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>VARCHAR2 (4000)</dataType>
+<reference>false</reference>
+<referencedColumn>32618D00-0A74-BA3C-BE21-126C0318D70A</referencedColumn>
+<table>8FEE201F-26AF-7AD0-6178-284577B5FA55</table>
+<tableAlias>t1</tableAlias>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="STORE_NAME" id="DFD7158E-C4E9-8A78-C14A-23E805E1B138">
+<createdBy>chanki</createdBy>
+<createdTime>2018-12-19 18:29:08 UTC</createdTime>
+<ownerDesignName>JJJ</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>VARCHAR2 (4000)</dataType>
+<reference>false</reference>
+<referencedColumn>09ADEC53-B37F-8161-9A38-2DF480240F1F</referencedColumn>
+<table>8FEE201F-26AF-7AD0-6178-284577B5FA55</table>
+<tableAlias>t1</tableAlias>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="MANAGER_ID" id="AF3379A3-3E6F-0D93-4CCD-B103DE3C8055">
+<createdBy>chanki</createdBy>
+<createdTime>2018-12-19 18:29:08 UTC</createdTime>
+<ownerDesignName>JJJ</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>VARCHAR2 (4000)</dataType>
+<reference>false</reference>
+<referencedColumn>93E9D83B-2DD5-161E-63ED-B7CD30EBEBA5</referencedColumn>
+<table>8FEE201F-26AF-7AD0-6178-284577B5FA55</table>
+<tableAlias>t1</tableAlias>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="LOCATION_ID" id="17F2D45B-DBCB-ED98-F869-8521349A0D70">
+<createdBy>chanki</createdBy>
+<createdTime>2018-12-19 18:29:08 UTC</createdTime>
+<ownerDesignName>JJJ</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>VARCHAR2 (4000)</dataType>
+<reference>false</reference>
+<referencedColumn>BD4C71CE-5811-AF9E-2F81-2C3EADA95440</referencedColumn>
+<table>8FEE201F-26AF-7AD0-6178-284577B5FA55</table>
+<tableAlias>t1</tableAlias>
+</viewElement>
+<viewElement class="oracle.dbtools.crest.model.design.relational.ColumnView" name="LOCATION_NAME" id="05CDF051-2F20-73F0-EA32-FA17EC81B0AF">
+<createdBy>chanki</createdBy>
+<createdTime>2018-12-19 18:29:08 UTC</createdTime>
+<ownerDesignName>JJJ</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<dataType>VARCHAR2 (4000)</dataType>
+<reference>false</reference>
+<referencedColumn>1EAC4AA3-A958-D101-464D-AD7E8BD887BF</referencedColumn>
+<table>DB1113D3-668A-6A60-95A6-C12E0DCB1720</table>
+<tableAlias>t2</tableAlias>
+</viewElement>
+</viewElements>
+<usedObjects>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="8FEE201F-26AF-7AD0-6178-284577B5FA55">
+<container>true</container>
+<schema>JJJ</schema>
+<tableName>STORES</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="DB1113D3-668A-6A60-95A6-C12E0DCB1720">
+<container>true</container>
+<schema>JJJ</schema>
+<tableName>STORE_LOCATIONS</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="1EAC4AA3-A958-D101-464D-AD7E8BD887BF">
+<columnName>LOCATION_NAME</columnName>
+<schema>JJJ</schema>
+<tableName>STORE_LOCATIONS</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="BD4C71CE-5811-AF9E-2F81-2C3EADA95440">
+<columnName>LOCATION_ID</columnName>
+<schema>JJJ</schema>
+<tableName>STORES</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="791D637F-D51D-817C-E97E-A3BD68A95BEA">
+<columnName>LOCATION_ID</columnName>
+<schema>JJJ</schema>
+<tableName>STORE_LOCATIONS</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="32618D00-0A74-BA3C-BE21-126C0318D70A">
+<columnName>STORE_ID</columnName>
+<schema>JJJ</schema>
+<tableName>STORES</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="09ADEC53-B37F-8161-9A38-2DF480240F1F">
+<columnName>STORE_NAME</columnName>
+<schema>JJJ</schema>
+<tableName>STORES</tableName>
+</UsedObject>
+<UsedObject class="oracle.dbtools.crest.swingui.editor.viewbuilder.SQLNameHelper" id="93E9D83B-2DD5-161E-63ED-B7CD30EBEBA5">
+<columnName>MANAGER_ID</columnName>
+<schema>JJJ</schema>
+<tableName>STORES</tableName>
+</UsedObject>
+</usedObjects>
+</TableView>

@@ -33,7 +33,7 @@ no if $] >= 5.017011, warnings => 'experimental::smartmatch';    # Suppress smar
 
 ##--------------------------------------------------------------------------
 # Version info
-our $VERSION = '0.1.12';
+our $VERSION = '0.1.13';
 ##--------------------------------------------------------------------------
 
 ##--------------------------------------------------------------------------
@@ -1334,6 +1334,9 @@ sub getTableNameFromID {
   if (defined $table->{error}) {
     $tableName = "ERR_COULD_NOT_RESOLVE_TABLE_NAME_FOR_ID_${tableID}";
     $logger->warn("$subName $tableName");
+  }
+  else {
+    $tableName = $table->{name};
   }
   return $tableName;
 } ## end sub getTableNameFromID

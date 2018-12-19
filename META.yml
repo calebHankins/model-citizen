@@ -15,7 +15,7 @@ name: ModelCitizen
 provides:
   ModelCitizen:
     file: lib/ModelCitizen.pm
-    version: v0.1.12
+    version: v0.1.13
   ModelCitizen::Logger:
     file: lib/ModelCitizen/Logger.pm
 requires:
@@ -34,5 +34,5 @@ requires:
   perl: v5.10.1
 resources:
   license: http://apache.org/licenses/LICENSE-2.0
-version: v0.1.12
+version: v0.1.13
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
