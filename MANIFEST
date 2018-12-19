@@ -13,12 +13,15 @@ META.json
 META.yml
 README.md
 samples/JJJ/foreignkey/S_SL_FK.xml
+samples/JJJ/Objects.local
 samples/JJJ/schema/JJJ.xml
 samples/JJJ/table/STORE_LOCATIONS.xml
 samples/JJJ/table/STORES.xml
+samples/JJJ/view/STORES_W_LOCATION_NAMES.xml
 script/model-citizen
 t/00-load.t
-t/01-parsing.t
+t/01-logger.t
 t/02-helpers.t
+t/10-parsing.t
 t/lint.t
 t/style.t
