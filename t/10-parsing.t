@@ -89,6 +89,6 @@ ok($STORES_W_LOCATION_NAMESLoaded->{userDefinedSQL} eq
   q{select t1.*, t2.location_name from jjj.stores t1&lt;br/>join jjj.store_locations t2&lt;br/>on t1.location_id = t2.location_id}
 );
 ok($STORES_W_LOCATION_NAMESLoaded->{sql} eq
-   qq{select t1.*, t2.location_name from jjj.stores t1\njoin jjj.store_locations t2\non t1.location_id = t2.location_id;}
+  qq{select t1.*, t2.location_name from jjj.stores t1\njoin jjj.store_locations t2\non t1.location_id = t2.location_id;}
 );
 
