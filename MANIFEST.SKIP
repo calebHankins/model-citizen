@@ -83,6 +83,7 @@
 \bmodel-citizen-[\d\.\_]+
 \bModelCitizen-[\d\.\_]+
 \bModelCitizen-.*.gz$
+\bModelCitizen-v.*
 
 # Avoid scratch dirs
 scratch
@@ -94,4 +95,8 @@ scratch
 .tidyall.d
 
 # Skip Travis Continuous Integration configuration
-^\.travis\.yml$ 
+^\.travis\.yml$
+
+# Skip coverage files
+MYMETA.json.lock
+cover_db/
