@@ -17,10 +17,7 @@ my $build = Module::Build->new(
                'perl'             => '5.10.1',
                'JSON'             => '0',
                'XML::Twig'        => '0',
-               'LWP::UserAgent'   => '0',
                'Data::Dumper'     => '0',
-               'HTML::Entities'   => '0',
-               'URI::Escape'      => '0',
                'File::Path'       => '0',
                'File::Basename'   => '0',
                'File::Glob'       => '0',
@@ -31,8 +28,14 @@ my $build = Module::Build->new(
                'Pod::Usage'       => '0',
                'Cwd'              => '0',
   },
-  recommended_requires =>
-    {'English' => '0', 'Test::Perl::Critic' => '0', 'Test::Code::TidyAll' => '0', 'Perl::Tidy' => '0',},
+  recommended_requires => {
+                           'English'                         => '0',
+                           'Test::Perl::Critic'              => '0',
+                           'Test::Code::TidyAll'             => '0',
+                           'Perl::Tidy'                      => '0',
+                           'Devel::Cover'                    => '0',
+                           'Devel::Cover::Report::Coveralls' => '0',
+  },
   configure_requires => {'Module::Build' => '0'},
   create_makefile_pl => 'traditional',
 );

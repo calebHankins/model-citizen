@@ -15,7 +15,7 @@ name: ModelCitizen
 provides:
   ModelCitizen:
     file: lib/ModelCitizen.pm
-    version: v0.1.9
+    version: v0.1.13
   ModelCitizen::Logger:
     file: lib/ModelCitizen/Logger.pm
 requires:
@@ -25,17 +25,14 @@ requires:
   File::Glob: '0'
   File::Path: '0'
   Getopt::Long: '0'
-  HTML::Entities: '0'
   IO::Handle: '0'
   JSON: '0'
-  LWP::UserAgent: '0'
   Log::Log4perl: '0'
   Pod::Usage: '0'
   Text::ParseWords: '0'
-  URI::Escape: '0'
   XML::Twig: '0'
   perl: v5.10.1
 resources:
   license: http://apache.org/licenses/LICENSE-2.0
-version: v0.1.9
+version: v0.1.13
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
