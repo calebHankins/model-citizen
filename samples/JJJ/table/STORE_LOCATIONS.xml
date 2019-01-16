@@ -1,0 +1,65 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="DB1113D3-668A-6A60-95A6-C12E0DCB1720" schemaObject="B28EB275-E427-1CB2-7F30-0676E8AF18B1" name="STORE_LOCATIONS">
+<sourceDDLFile>JJJ.ddl</sourceDDLFile>
+<createdBy>chanki</createdBy>
+<createdTime>2018-12-18 19:23:02 UTC</createdTime>
+<ownerDesignName>JJJ</ownerDesignName>
+<importedID>7FF185A2-1426-2E35-8144-D634EEFC7058</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="LOCATION_ID" id="791D637F-D51D-817C-E97E-A3BD68A95BEA">
+<sourceDDLFile>JJJ.ddl</sourceDDLFile>
+<createdBy>chanki</createdBy>
+<createdTime>2018-12-18 19:23:03 UTC</createdTime>
+<ownerDesignName>JJJ</ownerDesignName>
+<importedID>E0D76A6B-AF73-1DDB-8FB2-CEB3DC5BF66C</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>6EB59AAF-B95F-DB7B-39F3-5A93E256072A</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="STREET_ADDRESS" id="100D1F18-08A6-8000-601F-5095EB04C425">
+<sourceDDLFile>JJJ.ddl</sourceDDLFile>
+<createdBy>chanki</createdBy>
+<createdTime>2018-12-18 19:23:03 UTC</createdTime>
+<ownerDesignName>JJJ</ownerDesignName>
+<importedID>48FDBD61-800A-6511-41D3-B8B45F3E4BF2</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>6EB59AAF-B95F-DB7B-39F3-5A93E256072A</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LOCATION_NAME" id="1EAC4AA3-A958-D101-464D-AD7E8BD887BF">
+<sourceDDLFile>JJJ.ddl</sourceDDLFile>
+<createdBy>chanki</createdBy>
+<createdTime>2018-12-18 19:23:03 UTC</createdTime>
+<ownerDesignName>JJJ</ownerDesignName>
+<importedID>0438C9FD-A9E7-A7BE-934F-3120A33C308F</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>6EB59AAF-B95F-DB7B-39F3-5A93E256072A</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="D37D734C-0AD4-76BE-3CD4-960574860D5F" name="STORES_LOCATIONS_PK">
+<sourceDDLFile>JJJ.ddl</sourceDDLFile>
+<createdBy>chanki</createdBy>
+<createdTime>2018-12-18 19:23:03 UTC</createdTime>
+<ownerDesignName>JJJ</ownerDesignName>
+<importedID>B07A19F7-251D-2CE5-1727-DE478085E658</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="791D637F-D51D-817C-E97E-A3BD68A95BEA"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>
