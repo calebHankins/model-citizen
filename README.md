@@ -9,7 +9,7 @@ _I am the very model of modern meta generable_
 [![Develop Build](https://img.shields.io/travis/Acxiom/model-citizen/develop.svg?label=Develop&nbsp;Build)](https://travis-ci.org/Acxiom/model-citizen?branch=develop)
 [![Develop Coverage](https://img.shields.io/coveralls/github/Acxiom/model-citizen/develop.svg?label=Develop&nbsp;Coverage)](https://coveralls.io/github/Acxiom/model-citizen/?branch=develop)
 
-<img src="logo\logo.png" width="200">
+<img src="logo/logo.png" width="200">
 
 ----
 Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes
@@ -111,7 +111,7 @@ cpanm https://<YOUR_USER_HERE>@<REPO_HOST_HERE>/<PATH_TO_GIT_HERE>.git@<BRANCH_H
 If you've checkout out the repository or unpacked the release tarball, you can run the following from the folder containing this README:
 ```powershell
 # Install from the directory the README file is in after unpacking the tar.gz
-cpanm install .
+cpanm .
 ```
 
 
@@ -119,11 +119,10 @@ cpanm install .
 https://metacpan.org/pod/App::cpanminus#INSTALLATION
 
 
-
 #### Install using cpan
 
 ```powershell
-cpan install .
+cpan .
 ```
 
 #### Install using Module::Build
