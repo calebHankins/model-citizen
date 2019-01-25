@@ -11,7 +11,7 @@ _I am the very model of modern meta generable_
 
 <img src="logo/logo.png" width="200">
 
-----
+
 Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes
 
 ----
