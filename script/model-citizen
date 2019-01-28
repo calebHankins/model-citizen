@@ -231,7 +231,7 @@ model-citizen
 
 =head1 SYNOPSIS
 
-model-citizen: Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes 
+model-citizen: Export Oracle Data Modeler files as json and or SQL DDL for easier consumption by other processes
 
  Options:
     i|f|modelFilepath           String. Directory path where data model lives.
