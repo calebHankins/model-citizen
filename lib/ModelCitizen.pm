@@ -1018,9 +1018,10 @@ sub getFieldSQL {
         # This version of size is more specific than dataTypeSize sometimes, so use it if we have it
         if ($ownDataTypeParameters[0]) {
           my $size = $ownDataTypeParameters[0];
-          $size =~ s/^\s+|\s+$//g;                            # Trim whitespace
+          $size =~ s/^\s+|\s+$//g;    # Trim whitespace
+
           if (defined($size)) { $column->{size} = $size; }    # Only overwrite if we got something here
-        }
+        } ## end if ($ownDataTypeParameters...)
       } ## end if ($map eq 'size')
       if ($map eq 'precision') {
 
