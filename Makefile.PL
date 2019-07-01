@@ -6,23 +6,23 @@ WriteMakefile
   'EXE_FILES' => [
                    'script/model-citizen'
                  ],
-  'VERSION_FROM' => 'lib/ModelCitizen.pm',
-  'INSTALLDIRS' => 'site',
-  'PL_FILES' => {},
-  'NAME' => 'ModelCitizen',
   'PREREQ_PM' => {
-                   'Log::Log4perl' => '0',
                    'Cwd' => '0',
-                   'Pod::Usage' => '0',
-                   'File::Basename' => '0',
                    'Getopt::Long' => '0',
-                   'File::Path' => '0',
-                   'File::Glob' => '0',
                    'Text::ParseWords' => '0',
+                   'File::Path' => '0',
                    'IO::Handle' => '0',
-                   'JSON' => '0',
+                   'Log::Log4perl' => '0',
+                   'File::Basename' => '0',
+                   'XML::Twig' => '0',
                    'Data::Dumper' => '0',
-                   'XML::Twig' => '0'
-                 }
+                   'JSON' => '0',
+                   'File::Glob' => '0',
+                   'Pod::Usage' => '0'
+                 },
+  'NAME' => 'ModelCitizen',
+  'INSTALLDIRS' => 'site',
+  'VERSION_FROM' => 'lib/ModelCitizen.pm',
+  'PL_FILES' => {}
 )
 ;

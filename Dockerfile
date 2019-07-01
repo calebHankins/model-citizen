@@ -5,3 +5,4 @@ COPY . /usr/src/model-citizen
 WORKDIR /usr/src/model-citizen
 RUN cpanm --verbose .
 ENTRYPOINT [ "model-citizen" ]
+LABEL name=model-citizen maintainer="Caleb Hankins <caleb.hankins@acxiom.com>"
